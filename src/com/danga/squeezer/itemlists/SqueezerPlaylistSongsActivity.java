@@ -16,35 +16,25 @@
 
 package com.danga.squeezer.itemlists;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.RemoteException;
-import android.text.InputType;
 import android.util.Log;
 import android.view.ContextMenu;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.View.OnKeyListener;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import com.danga.squeezer.R;
-import com.danga.squeezer.Util;
 import com.danga.squeezer.framework.SqueezerItemView;
+import com.danga.squeezer.itemlists.dialogs.SqueezerPlaylistDeleteDialog;
+import com.danga.squeezer.itemlists.dialogs.SqueezerPlaylistItemMoveDialog;
+import com.danga.squeezer.itemlists.dialogs.SqueezerPlaylistRenameDialog;
 import com.danga.squeezer.model.SqueezerPlaylist;
 import com.danga.squeezer.model.SqueezerSong;
 
 public class SqueezerPlaylistSongsActivity extends SqueezerAbstractSongListActivity {
-	protected static final int DIALOG_MOVE = 0;
-	protected static final int DIALOG_RENAME = 1;
-	protected static final int DIALOG_DELETE = 2;
-
 	private static final int PLAYLIST_CONTEXTMENU_PLAY_ITEM = 0;
 	private static final int PLAYLIST_CONTEXTMENU_ADD_ITEM = 1;
 	private static final int PLAYLIST_CONTEXTMENU_INSERT_ITEM = 2;
@@ -59,9 +49,12 @@ public class SqueezerPlaylistSongsActivity extends SqueezerAbstractSongListActiv
 	    context.startActivity(intent);
 	}
 
-	private SqueezerPlaylist playlist;
-	private String oldname;
-	private int fromIndex;
+    private SqueezerPlaylist playlist;
+    public SqueezerPlaylist getPlaylist() { return playlist; }
+	
+    private String oldname;
+    public String getOldname() { return oldname; }
+    public void setOldname(String oldname) { this.oldname = oldname; }
 
 	@Override
 	public SqueezerItemView<SqueezerSong> createItemView() {
@@ -104,8 +97,7 @@ public class SqueezerPlaylistSongsActivity extends SqueezerAbstractSongListActiv
 					orderItems();
 					return true;
 				case PLAYLIST_CONTEXTMENU_MOVE:
-					fromIndex = index;
-					showDialog(DIALOG_MOVE);
+				    SqueezerPlaylistItemMoveDialog.addTo(SqueezerPlaylistSongsActivity.this, playlist, index);
 					return true;
 				}
 				return false;
@@ -153,137 +145,14 @@ public class SqueezerPlaylistSongsActivity extends SqueezerAbstractSongListActiv
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menu_item_playlists_delete:
-			showDialog(DIALOG_DELETE);
+		    SqueezerPlaylistDeleteDialog.addTo(this);
 			return true;
 		case R.id.menu_item_playlists_rename:
-			showDialog(DIALOG_RENAME);
+		    SqueezerPlaylistRenameDialog.addTo(this);
 			return true;
 		}
 		return super.onMenuItemSelected(featureId, item);
 	}
-
-    @Override
-    protected Dialog onCreateDialog(int id) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-        switch (id) {
-        case DIALOG_DELETE:
-			builder.setTitle(getString(R.string.delete_title, playlist.getName()));
-        	builder.setMessage(R.string.delete__message);
-	        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
-               		try {
-						getService().playlistsDelete(playlist);
-						finish();
-					} catch (RemoteException e) {
-		                Log.e(getTag(), "Error deleting playlist");
-					}
-				}
-			});
-			break;
-		case DIALOG_RENAME:
-			{
-				builder.setTitle(getString(R.string.rename_title, playlist.getName()));
-				View form = getLayoutInflater().inflate(R.layout.edittext_dialog, null);
-				builder.setView(form);
-		        final EditText editText = (EditText) form.findViewById(R.id.edittext);
-				editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
-		        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-						rename(editText.getText().toString());
-					}
-				});
-			}
-			break;
-		case DIALOG_MOVE:
-			{
-				View form = getLayoutInflater().inflate(R.layout.edittext_dialog, null);
-				builder.setView(form);
-		        final EditText editText = (EditText) form.findViewById(R.id.edittext);
-				builder.setTitle(getString(R.string.move_to_dialog_title, fromIndex));
-				editText.setInputType(InputType.TYPE_CLASS_NUMBER);
-				editText.setHint(R.string.move_to_index_hint);
-		        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-		               	int targetIndex = Util.parseDecimalInt(editText.getText().toString(), -1);
-		               	if (targetIndex > 0 && targetIndex <= getItemAdapter().getCount()) {
-		               		try {
-								getService().playlistsMove(playlist, fromIndex-1, targetIndex-1);
-								orderItems();
-							} catch (RemoteException e) {
-				                Log.e(getTag(), "Error moving song from '"+ fromIndex + "' to '" +targetIndex + "': " + e);
-							}
-		               	}
-					}
-				});
-			}
-			break;
-        }
-
-        builder.setNegativeButton(android.R.string.cancel, null);
-
-        return builder.create();
-    }
-
-    @Override
-    protected void onPrepareDialog(int id, final Dialog dialog) {
-        switch (id) {
-        case DIALOG_DELETE:
-        	break;
-		case DIALOG_RENAME:
-			{
-		        final EditText editText = (EditText) dialog.findViewById(R.id.edittext);
-		        editText.setText(playlist.getName());
-		        editText.setOnKeyListener(new OnKeyListener() {
-		            public boolean onKey(View v, int keyCode, KeyEvent event) {
-		                if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
-							rename(editText.getText().toString());
-							dialog.dismiss();
-							return true;
-		                }
-		                return false;
-		            }
-		        });
-			}
-			break;
-		case DIALOG_MOVE:
-			{
-				dialog.setTitle(getString(R.string.move_to_dialog_title, fromIndex));
-		        final EditText editText = (EditText) dialog.findViewById(R.id.edittext);
-		        editText.setText("");
-		        editText.setOnKeyListener(new OnKeyListener() {
-		            public boolean onKey(View v, int keyCode, KeyEvent event) {
-		                if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
-			               	int targetIndex = Util.parseDecimalInt(editText.getText().toString(), -1);
-			               	if (targetIndex > 0 && targetIndex <= getItemAdapter().getCount()) {
-			               		try {
-									getService().playlistsMove(playlist, fromIndex-1, targetIndex-1);
-									orderItems();
-									dialog.dismiss();
-								} catch (RemoteException e) {
-					                Log.e(getTag(), "Error moving song from '"+ fromIndex + "' to '" +targetIndex + "': " + e);
-								}
-			               	}
-							return true;
-		                }
-		                return false;
-		            }
-		        });
-			}
-			break;
-        }
-    	super.onPrepareDialog(id, dialog);
-    }
-
-    private void rename(String newname) {
-   		try {
-   	    	oldname = playlist.getName();
-			getService().playlistsRename(playlist, newname);
-   	    	playlist.setName(newname);
-		} catch (RemoteException e) {
-            Log.e(getTag(), "Error renaming playlist to '"+ newname + "': " + e);
-		}
-    }
 
     private void showServiceMessage(final String msg) {
 		getUIThreadHandler().post(new Runnable() {

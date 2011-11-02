@@ -18,41 +18,43 @@ package com.danga.squeezer.itemlists;
 
 import java.util.List;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.util.Log;
-import android.view.KeyEvent;
-import android.view.View;
-import android.view.View.OnKeyListener;
-import android.widget.EditText;
 import android.widget.Spinner;
 
-import com.danga.squeezer.R;
 import com.danga.squeezer.framework.SqueezerFilterableListActivity;
 import com.danga.squeezer.framework.SqueezerItem;
 import com.danga.squeezer.framework.SqueezerItemView;
 import com.danga.squeezer.itemlists.GenreSpinner.GenreSpinnerCallback;
+import com.danga.squeezer.itemlists.dialogs.SqueezerArtistFilterDialog;
 import com.danga.squeezer.model.SqueezerAlbum;
 import com.danga.squeezer.model.SqueezerArtist;
 import com.danga.squeezer.model.SqueezerGenre;
 
 public class SqueezerArtistListActivity extends SqueezerFilterableListActivity<SqueezerArtist> implements GenreSpinnerCallback{
-	private String searchString = null;
+
+    private String searchString = null;
+    public String getSearchString() { return searchString; }
+    public void setSearchString(String searchString) { this.searchString = searchString; }
+
 	private SqueezerAlbum album;
-	private SqueezerGenre genre;
+    public SqueezerAlbum getAlbum() { return album; }
+    public void setAlbum(SqueezerAlbum album) { this.album = album; }
+
+	SqueezerGenre genre;
+    public SqueezerGenre getGenre() { return genre; }
+    public void setGenre(SqueezerGenre genre) { this.genre = genre; }
 
 	private GenreSpinner genreSpinner;
-
-	public SqueezerGenre getGenre() {
-		return genre;
+	public void setGenreSpinner(Spinner spinner) {
+	    genreSpinner = new GenreSpinner(this, this, spinner);
 	}
 
-	@Override
+	
+    @Override
 	public SqueezerItemView<SqueezerArtist> createItemView() {
 		return new SqueezerArtistView(this);
 	}
@@ -85,56 +87,11 @@ public class SqueezerArtistListActivity extends SqueezerFilterableListActivity<S
 
 	@Override
 	protected void orderPage(int start) throws RemoteException {
-		getService().artists(start, searchString, album, genre);
+		getService().artists(start, getSearchString(), album, genre);
 	}
 
-    @Override
-    protected Dialog onCreateDialog(int id) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-		switch (id) {
-		case DIALOG_FILTER:
-
-			View filterForm = getLayoutInflater().inflate(R.layout.filter_dialog, null);
-			builder.setTitle(R.string.menu_item_filter);
-			builder.setView(filterForm);
-
-	        final EditText editText = (EditText) filterForm.findViewById(R.id.search_string);
-	        editText.setHint(getString(R.string.filter_text_hint, getItemAdapter().getQuantityString(2)));
-			filterForm.findViewById(R.id.year_view).setVisibility(View.GONE);
-			final Spinner genreSpinnerView = (Spinner) filterForm.findViewById(R.id.genre_spinner);
-	        genreSpinner = new GenreSpinner(this, this, genreSpinnerView);
-
-	        if (album != null) {
-	        	((EditText)filterForm.findViewById(R.id.album)).setText(album.getName());
-	        	(filterForm.findViewById(R.id.album_view)).setVisibility(View.VISIBLE);
-	        }
-
-	        editText.setOnKeyListener(new OnKeyListener() {
-	            public boolean onKey(View v, int keyCode, KeyEvent event) {
-	                if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
-	                	searchString = editText.getText().toString();
-						genre = (SqueezerGenre) genreSpinnerView.getSelectedItem();
-						orderItems();
-						dismissDialog(DIALOG_FILTER);
-	                  return true;
-	                }
-	                return false;
-	            }
-	        });
-
-	        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
-                	searchString = editText.getText().toString();
-					genre = (SqueezerGenre) genreSpinnerView.getSelectedItem();
-					orderItems();
-				}
-			});
-	        builder.setNegativeButton(android.R.string.cancel, null);
-
-			return builder.create();
-        }
-        return null;
+    public void showFilterDialog() {
+        SqueezerArtistFilterDialog.addTo(this);
     }
 
 	public static void show(Context context, SqueezerItem... items) {

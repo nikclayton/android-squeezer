@@ -16,7 +16,6 @@
 
 package com.danga.squeezer.framework;
 
-import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -24,7 +23,9 @@ import android.content.ServiceConnection;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.view.KeyEvent;
 
 import com.danga.squeezer.service.ISqueezeService;
 import com.danga.squeezer.service.SqueezeService;
@@ -34,7 +35,7 @@ import com.danga.squeezer.service.SqueezeService;
  * @author Kurt Aaholst
  *
  */
-public abstract class SqueezerBaseActivity extends Activity {
+public abstract class SqueezerBaseActivity extends FragmentActivity {
 	private ISqueezeService service = null;
 	private final Handler uiThreadHandler = new Handler() {};
 
@@ -42,10 +43,6 @@ public abstract class SqueezerBaseActivity extends Activity {
 
     protected String getTag() {
     	return getClass().getSimpleName();
-	}
-
-	public void setService(ISqueezeService service) {
-		this.service = service;
 	}
 
 	/**
@@ -90,6 +87,54 @@ public abstract class SqueezerBaseActivity extends Activity {
 	public Handler getUIThreadHandler() {
 		return uiThreadHandler;
 	}
+
+	
+    /*
+     * Intercept hardware volume control keys to control Squeezeserver
+     * volume.
+     *
+     * Change the volume when the key is depressed.  Suppress the keyUp
+     * event, otherwise you get a notification beep as well as the volume
+     * changing.
+     */
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+        case KeyEvent.KEYCODE_VOLUME_UP:
+            changeVolumeBy(+5);
+            return true;
+        case KeyEvent.KEYCODE_VOLUME_DOWN:
+            changeVolumeBy(-5);
+            return true;
+        }
+
+        return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+        case KeyEvent.KEYCODE_VOLUME_UP:
+        case KeyEvent.KEYCODE_VOLUME_DOWN:
+            return true;
+        }
+
+        return super.onKeyUp(keyCode, event);
+    }
+
+    private boolean changeVolumeBy(int delta) {
+        if (getService() == null) {
+            return false;
+        }
+        Log.v(getTag(), "Adjust volume by: " + delta);
+        try {
+            getService().adjustVolumeBy(delta);
+            return true;
+        } catch (RemoteException e) {
+            Log.e(getTag(), "Error from service.adjustVolumeBy: " + e);
+        }
+        return false;
+    }
 
 
 	// This section is just an easier way to call squeeze service

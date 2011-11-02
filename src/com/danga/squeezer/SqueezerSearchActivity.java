@@ -26,7 +26,6 @@ import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.KeyEvent;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -216,27 +215,7 @@ public class SqueezerSearchActivity extends SqueezerItemListActivity {
 	}
 
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.itemlistmenu, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-	@Override
-    public boolean onMenuItemSelected(int featureId, MenuItem item) {
-        switch (item.getItemId()) {
-        case R.id.menu_item_home:
-        	SqueezerHomeActivity.show(this);
-			return true;
-        case R.id.menu_item_main:
-        	SqueezerActivity.show(this);
-			return true;
-        }
-        return super.onMenuItemSelected(featureId, item);
-	}
-
-
-	private final IServiceArtistListCallback artistsCallback = new IServiceArtistListCallback.Stub() {
+    private final IServiceArtistListCallback artistsCallback = new IServiceArtistListCallback.Stub() {
 		public void onArtistsReceived(int count, int start, List<SqueezerArtist> items) throws RemoteException {
 			onItemsReceived(count, start, items);
 		}

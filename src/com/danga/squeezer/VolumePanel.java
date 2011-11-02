@@ -73,7 +73,7 @@ public class VolumePanel extends Handler {
     	mLevel.setMax(100);
     	mLevel.setProgress(newVolume);
 
-    	mMessage.setText(mContext.getText(R.string.app_name) + " volume");
+    	mMessage.setText(mContext.getString(R.string.volume, mContext.getString(R.string.app_name)));
     	mAdditionalMessage.setText(additionalMessage);
 
 		mLargeStreamIcon.setImageResource(newVolume == 0

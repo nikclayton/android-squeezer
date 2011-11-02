@@ -27,6 +27,25 @@
     <LinearLayout android:orientation="vertical"
                   android:layout_width="fill_parent"
                   android:layout_height="fill_parent"
+                  android:id="@+id/track_view"
+                  android:visibility="gone">
+      <TextView android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/track_label"/>
+      <EditText android:id="@+id/track"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:enabled="false"
+                android:focusable="false"
+                android:inputType="none"
+      />
+      <View android:layout_height="2dip" android:layout_width="fill_parent"
+            android:background="#FF909090" />
+    </LinearLayout>
+
+    <LinearLayout android:orientation="vertical"
+                  android:layout_width="fill_parent"
+                  android:layout_height="fill_parent"
                   android:id="@+id/artist_view"
                   android:visibility="gone">
       <TextView android:layout_width="fill_parent"

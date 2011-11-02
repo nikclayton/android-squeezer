@@ -18,6 +18,7 @@
 
 <resources>
     <string name="app_name">Squeezer</string>
+    <string name="volume">%s volume</string>
     <string name="menu_item_players">Players</string>
     <string name="menu_item_search_label">Search</string>
     <string name="menu_item_settings_label">Settings</string>
@@ -67,6 +68,7 @@
     <string name="choose_sort_order">Choose ordering of %s</string>
     <string name="genre_prompt">Choose genre</string>
     <string name="year_prompt">Choose year</string>
+    <string name="track_label">Track</string>
     <string name="artist_label">Artist</string>
     <string name="album_label">Album</string>
     <string name="genre_label">Genre</string>

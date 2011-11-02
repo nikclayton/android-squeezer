@@ -124,8 +124,7 @@ public class SqueezerPluginItemListActivity extends SqueezerBaseListActivity<Squ
     }
 
     private final IServicePluginItemListCallback pluginItemListCallback = new IServicePluginItemListCallback.Stub() {
-		@SuppressWarnings("unchecked")
-		public void onPluginItemsReceived(int count, int start, final Map parameters, List<SqueezerPluginItem> items) throws RemoteException {
+		public void onPluginItemsReceived(int count, int start, @SuppressWarnings("rawtypes") final Map parameters, List<SqueezerPluginItem> items) throws RemoteException {
 			if (parameters.containsKey("title")) {
 				getUIThreadHandler().post(new Runnable() {
 					public void run() {

@@ -95,9 +95,9 @@ public abstract class SqueezerBaseItemView<T extends SqueezerItem> implements Sq
 		return Util.getListItemView(getActivity(), convertView, item.getName());
 	}
 
-    public View getSpinnerAdapterView(View convertView, T item) {
-        return Util.getSpinnerItemView(getActivity(), convertView, item.getName());
-    }
+	public View getAdapterView(View convertView, String label) {
+		return Util.getListItemView(getActivity(), convertView, label);
+	}
 
 
 	/**

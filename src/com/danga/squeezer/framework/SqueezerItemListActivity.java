@@ -21,12 +21,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import android.os.Bundle;
 import android.os.RemoteException;
 import android.util.Log;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 
 import com.danga.squeezer.R;
+import com.danga.squeezer.menu.SqueezerMenuFragment;
 import com.danga.squeezer.service.SqueezeService;
 
 /**
@@ -38,6 +40,12 @@ import com.danga.squeezer.service.SqueezeService;
  */
 public abstract class SqueezerItemListActivity extends SqueezerBaseActivity implements OnScrollListener {
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        SqueezerMenuFragment.addTo(this);
+    };
+    
     /**
      * This is called when the service is connected.
      * <p>

@@ -120,7 +120,7 @@ public class SettingsActivity extends PreferenceActivity implements
 		return false;
 	}
 
-	static void show(Context context) {
+	public static void show(Context context) {
         final Intent intent = new Intent(context, SettingsActivity.class);
         context.startActivity(intent);
     }

@@ -18,6 +18,7 @@
 
 <resources>
     <string name="app_name">Squeezer</string>
+    <string name="volume">%s lydstyrke</string>
     <string name="menu_item_players">Afspillere</string>
     <string name="menu_item_search_label">Søg</string>
     <string name="menu_item_settings_label">Indstillinger</string>
@@ -68,6 +69,7 @@
     <string name="choose_sort_order">Vælg rækkefølge af %s</string>
     <string name="genre_prompt">Vælg genre</string>
     <string name="year_prompt">Vælg år</string>
+    <string name="track_label">Sang</string>
     <string name="artist_label">Kunster</string>
     <string name="album_label">Album</string>
     <string name="genre_label">Genre</string>

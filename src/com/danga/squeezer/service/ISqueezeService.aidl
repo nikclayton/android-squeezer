@@ -112,7 +112,7 @@ interface ISqueezeService {
 		 * @param year
 		 * @param genre
 		 */
-        boolean albums(int start, String sortOrder, String searchString, in SqueezerArtist artist, in SqueezerYear year, in SqueezerGenre genre);
+        boolean albums(int start, String sortOrder, String searchString, in SqueezerArtist artist, in SqueezerYear year, in SqueezerGenre genre, in SqueezerSong song);
 	    void registerAlbumListCallback(IServiceAlbumListCallback callback);
         void unregisterAlbumListCallback(IServiceAlbumListCallback callback);
         

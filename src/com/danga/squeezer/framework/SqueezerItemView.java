@@ -58,15 +58,14 @@ public interface SqueezerItemView<T extends SqueezerItem> {
 	 */
 	View getAdapterView(View convertView, T item);
 
-    /**
-     * <p>
-     * Called by {@link Adapter#getDropDownView(int, View, ViewGroup)}
-     *
-     * @param convertView
-     * @param item
-     * @return
-     */
-    View getSpinnerAdapterView(View convertView, T item);
+	/**
+	 * <p>Called by {@link Adapter#getView(int, View, ViewGroup)}
+	 *
+	 * @param convertView
+	 * @param item
+	 * @return
+	 */
+	View getAdapterView(View convertView, String label);
 
 	/**
 	 * @return The generic argument of the implementation

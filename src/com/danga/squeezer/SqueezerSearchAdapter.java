@@ -63,7 +63,6 @@ public class SqueezerSearchAdapter extends BaseExpandableListAdapter {
 				public View getAdapterView(View convertView, SqueezerAlbum item) {
 					return Util.getListItemView(getActivity(), convertView, item.getName());
 				}
-
 			}),
 			new SqueezerItemAdapter<SqueezerArtist>(new SqueezerArtistView(activity)),
 			new SqueezerItemAdapter<SqueezerGenre>(new SqueezerGenreView(activity)),

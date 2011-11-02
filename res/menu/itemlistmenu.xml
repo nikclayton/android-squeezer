@@ -25,4 +25,9 @@
     android:id="@+id/menu_item_home"
    	android:title="@string/menu_item_home"	android:icon="@drawable/icon_home"
   />
+  <item
+    android:icon="@android:drawable/ic_menu_preferences"
+    android:id="@+id/menu_item_settings"
+    android:title="@string/menu_item_settings_label"
+    android:alphabeticShortcut="p" />
 </menu>

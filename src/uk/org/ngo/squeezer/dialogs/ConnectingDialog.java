@@ -1,6 +1,7 @@
 package uk.org.ngo.squeezer.dialogs;
 
 import uk.org.ngo.squeezer.R;
+import uk.org.ngo.squeezer.SqueezerActivity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.os.Bundle;
@@ -20,6 +21,13 @@ public class ConnectingDialog extends DialogFragment {
         connectingDialog.setMessage(getString(R.string.connecting_to_text, connectingTo));
         return connectingDialog;
     }
+    
+    @Override
+    public void onDismiss(android.content.DialogInterface dialog) {
+        FragmentActivity activity = getActivity();
+        if (activity != null)
+            ((SqueezerActivity)activity).clearConnectingDialog();
+    };
 
     public static ConnectingDialog addTo(FragmentActivity activity, String connectingTo) {
         ConnectingDialog dialog = new ConnectingDialog();

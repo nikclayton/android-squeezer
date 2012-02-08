@@ -101,6 +101,7 @@ public class SqueezerActivity extends SqueezerBaseActivity {
 
     // Where we're connecting to.
     private ConnectingDialog connectingDialog = null;
+    public void clearConnectingDialog() { connectingDialog = null; }
 
     // Updating the seekbar
     private boolean updateSeekBar = true;

@@ -670,8 +670,16 @@ public class SqueezerActivity extends SqueezerBaseActivity {
                 if (isAutoConnect()) {
                     WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
                     if (!wifiManager.isWifiEnabled()) {
-                        new EnableWifiDialog().show(getSupportFragmentManager(), "EnableWifiDialog");
-                        return; // We will come back here when Wi-Fi is ready
+                        try {
+                            new EnableWifiDialog().show(getSupportFragmentManager(), "EnableWifiDialog");
+                        } catch (IllegalStateException e) {
+                            // We couldn't create the enable WiFi dialog. If this
+                            // happens because of the android life cycle, then we are
+                            // fine, and will get back here shortly, otherwise the user
+                            // will have to press the connect button again.
+                            Log.i(getTag(), "EnableWifiDialog.show() was not allowed: " + e);
+                        }
+                        return; // We will come back here when WiFi is ready
                     }
                 }
 

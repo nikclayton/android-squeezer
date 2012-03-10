@@ -79,6 +79,9 @@
     <string name="genre_label">Genre</string>
     <string name="year_label">År</string>
     <string name="filter_label">Søgetekst</string>
+    <string name="unknown_track">Ukendt sang</string>
+    <string name="unknown_album">Ukendt album</string>
+    <string name="unknown_artist">Ukendt kunster</string>
 
     <!-- Dialog buttons -->
     <string name="dialog_license">Licens</string>

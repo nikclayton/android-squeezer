@@ -63,6 +63,7 @@ public class SqueezerPlayerState implements Parcelable {
     private boolean poweredOn;
 
     private SqueezerSong currentSong;
+    private String currentPlaylist;
     private int currentPlaylistIndex;
     private int currentTimeSecond;
     private int currentSongDuration;
@@ -94,6 +95,11 @@ public class SqueezerPlayerState implements Parcelable {
     	currentSong = song;
     	return this;
     }
+
+    public String getCurrentPlaylist() {
+        return currentPlaylist;
+    }
+
 
     public int getCurrentPlaylistIndex() {
         return currentPlaylistIndex;
@@ -127,6 +133,7 @@ public class SqueezerPlayerState implements Parcelable {
         if (playerStateChanged.musicHasChanged) currentSong = newSong;
 
         setPoweredOn(Util.parseDecimalIntOrZero(tokenMap.get("power")) == 1);
+        currentPlaylist = tokenMap.get("playlist_name");
 
         int lastTime = getCurrentTimeSecond();
         currentTimeSecond = Util.parseDecimalIntOrZero(tokenMap.get("time"));

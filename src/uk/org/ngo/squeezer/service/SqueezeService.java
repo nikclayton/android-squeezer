@@ -785,6 +785,11 @@ public class SqueezeService extends Service {
             return playerState.getCurrentSong();
         }
 
+        public String getCurrentPlaylist() {
+            return playerState.getCurrentPlaylist();
+        }
+
+
         public String getAlbumArtUrl(String artworkTrackId) throws RemoteException {
             Integer port = connectionState.getHttpPort();
             if (port == null || port == 0) return "";

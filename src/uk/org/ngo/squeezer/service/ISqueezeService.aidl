@@ -93,6 +93,7 @@ interface ISqueezeService {
         
         SqueezerPlayerState getPlayerState();
         SqueezerSong currentSong();
+        String getCurrentPlaylist();
         String getAlbumArtUrl(String artworkTrackId);
         String getIconUrl(String icon);
 

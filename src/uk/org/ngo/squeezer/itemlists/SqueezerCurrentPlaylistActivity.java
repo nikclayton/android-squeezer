@@ -96,6 +96,8 @@ public class SqueezerCurrentPlaylistActivity extends SqueezerBaseListActivity<Sq
                 super.onCreateContextMenu(menu, v, menuInfo);
 
                 menu.setGroupVisible(R.id.group_playlist, true);
+                menu.findItem(R.id.add_to_playlist).setVisible(false);
+                menu.findItem(R.id.play_next).setVisible(false);
 
                 if (menuInfo.position == 0)
                     menu.findItem(R.id.playlist_move_up).setVisible(false);
@@ -162,12 +164,24 @@ public class SqueezerCurrentPlaylistActivity extends SqueezerBaseListActivity<Sq
 				}
 			return true;
 		case R.id.menu_item_playlist_save:
-	        new SqueezerPlaylistSaveDialog().show(getSupportFragmentManager(), "SaveDialog");
+		    SqueezerPlaylistSaveDialog.addTo(this, getCurrentPlaylist());
 	        return true;
 		}
 		return super.onMenuItemSelected(featureId, item);
 	}
-
+	
+    private String getCurrentPlaylist() {
+        if (getService() == null) {
+            return null;
+        }
+        try {
+            return getService().getCurrentPlaylist();
+        } catch (RemoteException e) {
+            Log.e(getTag(), "Service exception in getCurrentPlaylist(): " + e);
+        }
+        return null;
+    }
+    
 	@Override
     protected void registerCallback() throws RemoteException {
         getService().registerSongListCallback(songListCallback);

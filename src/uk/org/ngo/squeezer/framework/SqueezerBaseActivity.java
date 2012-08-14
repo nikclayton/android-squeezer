@@ -16,6 +16,8 @@
 
 package uk.org.ngo.squeezer.framework;
 
+import org.acra.ErrorReporter;
+
 import uk.org.ngo.squeezer.service.ISqueezeService;
 import uk.org.ngo.squeezer.service.SqueezeService;
 import uk.org.ngo.squeezer.util.UIUtils;
@@ -24,6 +26,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -177,6 +180,30 @@ public abstract class SqueezerBaseActivity extends FragmentActivity {
         }
         service.playlistControl(cmd.name(), item.getPlaylistTag(), item.getId());
         return true;
+    }
+
+    /**
+     * Attempts to download the song given by songId.
+     * 
+     * @param songId ID of the song to download
+     */
+    public void downloadSong(String songId) {
+        /*
+         * Quick-and-dirty version. Use ACTION_VIEW to have something try and
+         * download the song (probably the browser).
+         * 
+         * TODO: If running on Gingerbread or greater use the Download Manager
+         * APIs to have more control over the download.
+         */
+        try {
+            String url = getService().getSongDownloadUrl(songId);
+
+            Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            startActivity(i);
+        } catch (RemoteException e) {
+            ErrorReporter.getInstance().handleException(e);
+            e.printStackTrace();
+        }
     }
 
     private enum PlaylistControlCmd {

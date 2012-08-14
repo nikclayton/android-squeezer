@@ -107,8 +107,7 @@ public class SqueezerSongView extends SqueezerAlbumArtView<SqueezerSong> {
                 return true;
 
             case R.id.download:
-                ((SqueezerAbstractSongListActivity) getActivity()).downloadSong(selectedItem
-                        .getId());
+                getActivity().downloadSong(selectedItem.getId());
                 return true;
 		}
 

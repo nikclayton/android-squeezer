@@ -18,12 +18,8 @@ package uk.org.ngo.squeezer.itemlists;
 
 import java.util.List;
 
-import org.acra.ErrorReporter;
-
 import uk.org.ngo.squeezer.framework.SqueezerBaseListActivity;
 import uk.org.ngo.squeezer.model.SqueezerSong;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.RemoteException;
 
 public abstract class SqueezerAbstractSongListActivity extends SqueezerBaseListActivity<SqueezerSong> {
@@ -44,27 +40,4 @@ public abstract class SqueezerAbstractSongListActivity extends SqueezerBaseListA
 		}
     };
 
-    /**
-     * Attempts to download the song given by songId.
-     * 
-     * @param songId ID of the song to download
-     */
-    public void downloadSong(String songId) {
-        /*
-         * Quick-and-dirty version. Use ACTION_VIEW to have something try and
-         * download the song (probably the browser).
-         * 
-         * TODO: If running on Gingerbread or greater use the Download Manager
-         * APIs to have more control over the download.
-         */
-        try {
-            String url = getService().getSongDownloadUrl(songId);
-
-            Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-            startActivity(i);
-        } catch (RemoteException e) {
-            ErrorReporter.getInstance().handleException(e);
-            e.printStackTrace();
-        }
-    }
 }

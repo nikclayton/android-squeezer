@@ -18,15 +18,12 @@ package uk.org.ngo.squeezer.itemlists;
 
 import java.util.List;
 
-import org.acra.ErrorReporter;
-
 import uk.org.ngo.squeezer.framework.SqueezerBaseListActivity;
 import uk.org.ngo.squeezer.framework.SqueezerItemAdapter;
 import uk.org.ngo.squeezer.framework.SqueezerItemView;
 import uk.org.ngo.squeezer.model.SqueezerMusicFolderItem;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.RemoteException;
 
@@ -131,22 +128,4 @@ public class SqueezerMusicFolderListActivity extends SqueezerBaseListActivity<Sq
         }
     };
 
-    /**
-     * Attempts to download the song given by songId.
-     * <p>
-     * XXX: Duplicated from SqueezerAbstractSongListActivity.
-     * 
-     * @param songId ID of the song to download
-     */
-    public void downloadSong(String songId) {
-        try {
-            String url = getService().getSongDownloadUrl(songId);
-
-            Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-            startActivity(i);
-        } catch (RemoteException e) {
-            ErrorReporter.getInstance().handleException(e);
-            e.printStackTrace();
-        }
-    }
 }

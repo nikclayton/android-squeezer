@@ -31,14 +31,22 @@
     <string name="settings_server_scan_stop">Afbryd scanning</string>
     <string name="settings_server_scan_msg">Eller tryk \'Start scanning\' for at scanne netværket for servere.</string>
     <string name="settings_server_scanning_disabled_msg">Scanning er deaktiveret, fordi Wi-Fi ikke er forbundet.</string>
+    <string name="settings_server_scan_progress">Scanner efter servere&#8230;</string>
     <string name="settings_autoconnect_title">Forbind automatisk</string>
     <string name="settings_autoconnect_summary">Tilbyd at aktivere Wi-Fi, og prøv at forbinde ved aktiv Wi-Fi forbindelse.</string>
+
+    <string name="settings_scrobble_title">Scrobble til Last.fm</string>
+    <string name="settings_scrobble_on">Sang information sendes til Last.fm</string>
+    <string name="settings_scrobble_off">Sang information sendes ikke til Last.fm</string>
+    <string name="settings_scrobble_noapp">Der er ikke installeret noget program, der kan scrobble</string>
+
     <string name="menu_item_disconnect">Afbryd</string>
     <string name="menu_item_connect">Forbind</string>
     <string name="menu_item_poweron">Tænd</string>
     <string name="menu_item_poweroff">Sluk</string>
     <string name="menu_item_main">Nu spiller</string>
     <string name="menu_item_home">Hovedmenu</string>
+    <string name="menu_item_download">Hent</string>
     <string name="menu_item_fetch_all">Hent resten</string>
     <string name="menu_item_filter">Filter</string>
     <string name="menu_item_sort">Sortér</string>
@@ -79,12 +87,18 @@
     <string name="genre_label">Genre</string>
     <string name="year_label">År</string>
     <string name="filter_label">Søgetekst</string>
+
     <string name="unknown_track">Ukendt sang</string>
     <string name="unknown_album">Ukendt album</string>
     <string name="unknown_artist">Ukendt kunster</string>
 
+    <string name="tips_title">Tips</string>
+    <string name="tip_volume">Brug enhedens hardware lydstyrkeknapper for at ændre spille lydstyrken.\n\nPrøv det nu.</string>
+
     <!-- Dialog buttons -->
     <string name="dialog_license">Licens</string>
+
+    <string name="copyright_text">Copyright &#169; 2009 Google Inc.  Alle rettigheder forbeholdes\nCopyright &#169; 2011 Kurt Aaholst. Alle rettigheder forbeholdes.</string>
 
 	<string name="CONTEXTMENU_BROWSE_SONGS">Vis sange</string>
 	<string name="CONTEXTMENU_BROWSE_ALBUMS">Vis album</string>
@@ -95,6 +109,7 @@
 	<string name="CONTEXTMENU_PLAY_ITEM">Afspil</string>
 	<string name="CONTEXTMENU_ADD_ITEM">Tilføj til afspilningsliste</string>
 	<string name="CONTEXTMENU_INSERT_ITEM">Afspil efter den sang der spilles nu</string>
+    <string name="CONTEXTMENU_DOWNLOAD_ITEM">Hent</string>
 
     <string name="PLAYLIST_CONTEXTMENU_REMOVE_ITEM">Fjern fra afspilningsliste</string>
     <string name="PLAYLIST_CONTEXTMENU_MOVE_UP">Flyt op</string>
@@ -107,12 +122,38 @@
   
     <string name="PLAYLIST_EXISTS_MESSAGE">Afspilningsliste %s findes allerede</string>
 	
+    <!-- Album sort orders -->
 	<string name="albums_sort_order_album">Album</string>
     <string name="albums_sort_order_artflow">Kunstner, År, Album</string>
     <string name="albums_sort_order_new">Nye numre</string>
 
+    <!-- Song sort orders -->
 	<string name="songs_sort_order_title">Titel</string>
 	<string name="songs_sort_order_tracknum">Spor</string>
+
+    <!--  Crash notifications -->
+    <string name="crash_toast_text">Beklager, der opstod en fejl.</string>
+    <string name="crash_notif_ticker_text">Beklager, squeezer gik ned. Send venligst en rapport.</string>
+    <string name="crash_notif_title">Squeezer gik ned.</string>
+    <string name="crash_notif_text">Vælg for at hjælpe med at rette fejlen.</string>
+    <string name="crash_dialog_text">En uventet fejl opstod, og Squeezer gik ned. En fejlrapport er udarbejdet, tryk venligst på OK for at sende den. Ingen personidentificerende oplysninger er medtaget i denne rapport.</string>	
+    <string name="crash_dialog_comment_prompt">Hvis du har yderligere kommentarer, som du mener er nyttigte, kan du indtaste dem her.</string>
+    <string name="crash_dialog_ok_toast">Tak fordi du hjælper os med at forbedre Squeezer.</string>
+
+    <!--  ACRA preference strings -->
+    <string name="pref_cat_error_reports">Fejlrapporter og statistik</string>
+    <string name="pref_disable_acra">Rapportér fejl</string>
+    <string name="pref_acra_enabled">Fejl fanges, og du har mulighed for at sende en rapport til udviklerne.</string>
+    <string name="pref_acra_disabled">Fejl bliver fanget, men du vil ikke blive bedt om at sende en rapport. Ingen rapport sendes.</string>
+
+    <string name="pref_acra_alwaysaccept">Send rapporter automatisk</string>
+    <string name="pref_acra_alwaysaccept_enabled">Fejl vil automatisk blive rapporteret.</string>
+    <string name="pref_acra_alwaysaccept_disabled">Fejl vil ikke automatisk blive rapporteret.</string>
+
+    <!--  Analytics preference strings -->
+    <string name="pref_analytics_enable">Send brugsstatistikker</string>
+    <string name="pref_analytics_enable_enabled">Anonyme brugsstatistikker indsamles ved hjælp af Google Analytics.</string>
+    <string name="pref_analytics_enable_disabled">Ingen brugsstatistikker indsamles.</string>
 
     <plurals name="artist">
         <item quantity="one">kunstner</item>

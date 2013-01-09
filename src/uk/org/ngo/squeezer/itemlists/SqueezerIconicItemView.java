@@ -29,10 +29,10 @@ import uk.org.ngo.squeezer.framework.SqueezerItemListActivity;
  */
 public abstract class SqueezerIconicItemView<T extends SqueezerItem> extends SqueezerBaseItemView<T> {
     /** The icon to display when there's no artwork for this item */
-    protected static final int ICON_NO_ARTWORK = R.drawable.icon_album_noart_143;
+    protected static final int ICON_NO_ARTWORK = R.drawable.icon_album_noart;
 
     /** The icon to display when artwork exists, but has not been loaded yet */
-    protected static final int ICON_PENDING_ARTWORK = R.drawable.icon_album_noart_143;
+    protected static final int ICON_PENDING_ARTWORK = R.drawable.icon_album_noart;
 
     public SqueezerIconicItemView(SqueezerItemListActivity activity) {
         super(activity);

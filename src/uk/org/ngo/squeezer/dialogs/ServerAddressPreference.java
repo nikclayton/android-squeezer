@@ -151,12 +151,11 @@ public class ServerAddressPreference extends DialogPreference {
         mProgressDialog.setSecondaryProgress(0);
         mProgressDialog.setMessage(mContext.getString(R.string.settings_server_scan_progress));
 
+        mProgressDialog.show();
         if (UIUtils.hasHoneycomb()) {
             mProgressDialog.setProgressNumberFormat(null);
             mProgressDialog.setProgressPercentFormat(null);
         }
-
-        mProgressDialog.show();
     }
 
     /**

@@ -18,6 +18,7 @@ package uk.org.ngo.squeezer.framework;
 
 import org.acra.ErrorReporter;
 
+import uk.org.ngo.squeezer.model.SqueezerSong;
 import uk.org.ngo.squeezer.service.ISqueezeService;
 import uk.org.ngo.squeezer.service.SqueezeService;
 import uk.org.ngo.squeezer.util.UIUtils;
@@ -183,11 +184,25 @@ public abstract class SqueezerBaseActivity extends FragmentActivity {
     }
 
     /**
+     * Attempts to download the supplied song.
+     * <p>This method will silently refuse to download if song is null or is remote.
+     * 
+     * @param song song to download
+     */
+    public void downloadSong(SqueezerSong song) {
+        if (song != null && !song.isRemote())
+            downloadSong(song.getId());
+    }
+
+    /**
      * Attempts to download the song given by songId.
+     * <p>This method will silently refuse to download if songId is null.
      * 
      * @param songId ID of the song to download
      */
     public void downloadSong(String songId) {
+        if (songId == null) return;
+
         /*
          * Quick-and-dirty version. Use ACTION_VIEW to have something try and
          * download the song (probably the browser).

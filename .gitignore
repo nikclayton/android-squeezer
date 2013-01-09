@@ -3,6 +3,7 @@
 *.apk
 bin
 gen
+.classpath
 local.properties
 build.properties
 src/com/danga/squeezer/IServiceCallback.java

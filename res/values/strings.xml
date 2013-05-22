@@ -409,4 +409,12 @@ of your accepting any such warranty or additional liability.&lt;/p&gt;</string>
         <item quantity="other">applications</item>
     </plurals>
 
+    <string name="settings_album_selectaction">Album Selection action</string>
+    <string name="settings_album_selectaction_summary">What to do when selecting an album</string>
+    <string name="settings_song_selectaction">Song select action</string>
+    <string name="settings_song_selectaction_summary">What to do when a single song is selected</string>
+    <string name="playable_item_action_play">Play immediately</string>
+    <string name="playable_item_action_add">Append to playlist</string>
+    <string name="playable_item_action_insert">Play after current song</string>
+    <string name="playable_item_action_browse">Browse songs</string>
 </resources>

@@ -53,6 +53,11 @@ public final class Preferences {
     // Fade-in period? (0 = disable fade-in)
     public static final String KEY_FADE_IN_SECS = "squeezer.fadeInSecs";
 
+    // What do to when an album is selected in the list view
+    public static final String KEY_ON_SELECT_ALBUM_ACTION = "squeezer.action.onselect.album";
+    // What do to when a song is selected in the list view
+    public static final String KEY_ON_SELECT_SONG_ACTION = "squeezer.action.onselect.song";
+    
 	private Preferences() {
 	}
 }

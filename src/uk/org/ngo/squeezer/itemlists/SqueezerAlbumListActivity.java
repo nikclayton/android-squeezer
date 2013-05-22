@@ -18,11 +18,13 @@ package uk.org.ngo.squeezer.itemlists;
 
 import java.util.List;
 
+import uk.org.ngo.squeezer.Preferences;
 import uk.org.ngo.squeezer.framework.SqueezerBaseListActivity;
 import uk.org.ngo.squeezer.framework.SqueezerItem;
 import uk.org.ngo.squeezer.framework.SqueezerItemView;
 import uk.org.ngo.squeezer.itemlists.GenreSpinner.GenreSpinnerCallback;
 import uk.org.ngo.squeezer.itemlists.YearSpinner.YearSpinnerCallback;
+import uk.org.ngo.squeezer.itemlists.actions.PlayableItemAction;
 import uk.org.ngo.squeezer.itemlists.dialogs.SqueezerAlbumFilterDialog;
 import uk.org.ngo.squeezer.itemlists.dialogs.SqueezerAlbumOrderDialog;
 import uk.org.ngo.squeezer.itemlists.dialogs.SqueezerAlbumOrderDialog.AlbumsSortOrder;
@@ -113,6 +115,12 @@ public class SqueezerAlbumListActivity extends SqueezerBaseListActivity<Squeezer
         }
     }
 
+    @Override
+    protected PlayableItemAction getOnSelectAction() {
+    	String actionType = preferences.getString(Preferences.KEY_ON_SELECT_ALBUM_ACTION, PlayableItemAction.Type.PLAY.name());
+    	return PlayableItemAction.createAction(this, actionType);
+    }
+    
 	@Override
 	protected void registerCallback() throws RemoteException {
 		getService().registerAlbumListCallback(albumListCallback);

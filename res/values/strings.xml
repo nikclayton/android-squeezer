@@ -285,21 +285,21 @@ defend, and hold each Contributor harmless for any liability
 incurred by, or claims asserted against, such Contributor by reason
 of your accepting any such warranty or additional liability.&lt;/p&gt;</string>
 
-	<string name="CONTEXTMENU_BROWSE_SONGS">Browse songs</string>
-	<string name="CONTEXTMENU_BROWSE_ALBUMS">Browse albums</string>
-	<string name="CONTEXTMENU_BROWSE_ARTISTS">Browse artists</string>
-    <string name="CONTEXTMENU_BROWSE_ALBUM_SONGS">Browse songs on album</string>
-    <string name="CONTEXTMENU_BROWSE_ARTIST_ALBUMS">Browse albums with song by artist</string>
-    <string name="CONTEXTMENU_BROWSE_ARTIST_SONGS">Browse songs by artist</string>
-	<string name="CONTEXTMENU_PLAY_ITEM">Play</string>
-	<string name="CONTEXTMENU_ADD_ITEM">Add to Playlist</string>
-	<string name="CONTEXTMENU_INSERT_ITEM">Play after the currently playing song</string>
-    <string name="CONTEXTMENU_DOWNLOAD_ITEM">Download</string>
+	<string name="BROWSE_SONGS">Browse songs</string>
+	<string name="BROWSE_ALBUMS">Browse albums</string>
+	<string name="BROWSE_ARTISTS">Browse artists</string>
+    <string name="BROWSE_ALBUM_SONGS">Browse songs on album</string>
+    <string name="BROWSE_ARTIST_ALBUMS">Browse albums with song by artist</string>
+    <string name="BROWSE_ARTIST_SONGS">Browse songs by artist</string>
+	<string name="PLAY_NOW">Play</string>
+	<string name="ADD_TO_END">Add to Playlist</string>
+	<string name="PLAY_NEXT">Play after the currently playing song</string>
+    <string name="DOWNLOAD_ITEM">Download</string>
 
-    <string name="PLAYLIST_CONTEXTMENU_REMOVE_ITEM">Remove from playlist</string>
-    <string name="PLAYLIST_CONTEXTMENU_MOVE_UP">Move up</string>
-    <string name="PLAYLIST_CONTEXTMENU_MOVE_DOWN">Move down</string>
-    <string name="PLAYLIST_CONTEXTMENU_MOVE">Move &#8230;</string>
+    <string name="PLAYLIST_REMOVE_ITEM">Remove from playlist</string>
+    <string name="PLAYLIST_MOVE_UP">Move up</string>
+    <string name="PLAYLIST_MOVE_DOWN">Move down</string>
+    <string name="PLAYLIST_MOVE">Move &#8230;</string>
 
 	<string name="ITEM_PLAYING">Now playing %s</string>
 	<string name="ITEM_ADDED">Added %s to the current playlist</string>
@@ -413,8 +413,4 @@ of your accepting any such warranty or additional liability.&lt;/p&gt;</string>
     <string name="settings_album_selectaction_summary">What to do when selecting an album</string>
     <string name="settings_song_selectaction">Song select action</string>
     <string name="settings_song_selectaction_summary">What to do when a single song is selected</string>
-    <string name="playable_item_action_play">Play immediately</string>
-    <string name="playable_item_action_add">Append to playlist</string>
-    <string name="playable_item_action_insert">Play after current song</string>
-    <string name="playable_item_action_browse">Browse songs</string>
 </resources>

@@ -32,9 +32,9 @@ import android.view.View;
 public class SqueezerPlaylistView extends SqueezerBaseItemView<SqueezerPlaylist> {
 	private static final int PLAYLISTS_CONTEXTMENU_DELETE_ITEM = 0;
 	private static final int PLAYLISTS_CONTEXTMENU_RENAME_ITEM = 1;
-	private static final int PLAYLISTS_CONTEXTMENU_BROWSE_SONGS = 2;
-	private static final int PLAYLISTS_CONTEXTMENU_PLAY_ITEM = 3;
-	private static final int PLAYLISTS_CONTEXTMENU_ADD_ITEM = 4;
+	private static final int PLAYLISTS_BROWSE_SONGS = 2;
+	private static final int PLAYLISTS_PLAY_NOW = 3;
+	private static final int PLAYLISTS_ADD_TO_END = 4;
 	private final SqueezerPlaylistsActivity activity;
 
 	public SqueezerPlaylistView(SqueezerPlaylistsActivity activity) {
@@ -58,9 +58,9 @@ public class SqueezerPlaylistView extends SqueezerBaseItemView<SqueezerPlaylist>
 
         menu.add(Menu.NONE, PLAYLISTS_CONTEXTMENU_DELETE_ITEM, 0, R.string.menu_item_delete);
 		menu.add(Menu.NONE, PLAYLISTS_CONTEXTMENU_RENAME_ITEM, 1, R.string.menu_item_rename);
-		menu.add(Menu.NONE, PLAYLISTS_CONTEXTMENU_BROWSE_SONGS, 2, R.string.CONTEXTMENU_BROWSE_SONGS);
-		menu.add(Menu.NONE, PLAYLISTS_CONTEXTMENU_PLAY_ITEM, 3, R.string.CONTEXTMENU_PLAY_ITEM);
-		menu.add(Menu.NONE, PLAYLISTS_CONTEXTMENU_ADD_ITEM, 4, R.string.CONTEXTMENU_ADD_ITEM);
+		menu.add(Menu.NONE, PLAYLISTS_BROWSE_SONGS, 2, R.string.BROWSE_SONGS);
+		menu.add(Menu.NONE, PLAYLISTS_PLAY_NOW, 3, R.string.PLAY_NOW);
+		menu.add(Menu.NONE, PLAYLISTS_ADD_TO_END, 4, R.string.ADD_TO_END);
     }
 
 	@Override
@@ -73,14 +73,14 @@ public class SqueezerPlaylistView extends SqueezerBaseItemView<SqueezerPlaylist>
 		case PLAYLISTS_CONTEXTMENU_RENAME_ITEM:
 			new SqueezerPlaylistsRenameDialog().show(activity.getSupportFragmentManager(), SqueezerPlaylistsRenameDialog.class.getName());
 			return true;
-		case PLAYLISTS_CONTEXTMENU_BROWSE_SONGS:
+		case PLAYLISTS_BROWSE_SONGS:
 			SqueezerPlaylistSongsActivity.show(getActivity(), selectedItem);
 			return true;
-		case PLAYLISTS_CONTEXTMENU_PLAY_ITEM:
+		case PLAYLISTS_PLAY_NOW:
 			getActivity().play(selectedItem);
                 NowPlayingActivity.show(getActivity());
 			return true;
-		case PLAYLISTS_CONTEXTMENU_ADD_ITEM:
+		case PLAYLISTS_ADD_TO_END:
 			getActivity().add(selectedItem);
 			return true;
 		}

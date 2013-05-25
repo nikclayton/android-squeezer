@@ -20,14 +20,14 @@
 
     <!-- Menu items that are always visible. -->
     <item android:id="@+id/browse_songs"
-        android:title="@string/CONTEXTMENU_BROWSE_SONGS" />
+        android:title="@string/BROWSE_SONGS" />
 
     <item android:id="@+id/play_now"
-        android:title="@string/CONTEXTMENU_PLAY_ITEM" />
+        android:title="@string/PLAY_NOW" />
 
     <item android:id="@+id/add_to_playlist"
-        android:title="@string/CONTEXTMENU_ADD_ITEM" />
+        android:title="@string/ADD_TO_END" />
 
     <item android:id="@+id/browse_artists"
-        android:title="@string/CONTEXTMENU_BROWSE_ARTISTS" />
+        android:title="@string/BROWSE_ARTISTS" />
 </menu>

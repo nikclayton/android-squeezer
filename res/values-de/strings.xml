@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+ Copyright (c) 2009 Google Inc.  All Rights Reserved.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<resources>
+    <string name="app_name">Squeezer</string>
+    <string name="disabled">Deaktiviert</string>
+    <string name="volume">Lautstärke %s</string>
+    <string name="menu_item_players">Abspielgeräte</string>
+    <string name="menu_item_search_label">Suchen</string>
+    <string name="menu_item_settings_label">Einstellungen</string>
+    <string name="menu_item_about_label">Über</string>
+    <string name="activity_settings_name">Einstellungen</string>
+    <string name="pref_cat_server">Server-Einstellungen</string>
+    <string name="settings_serveraddr_title">Server-Adresse</string>
+    <string name="settings_serveraddr_summary">IP-Adresse oder Name des Squeezebox-Servers, z.B.. 10.0.0.5.</string>
+    <string name="settings_serveraddr_hint">Name oder IP-Adresse des Servers</string>
+    <string name="settings_server_prompt">Wählen Sie einen Server</string>
+    <string name="settings_server_scan_start">Serversuche starten</string>
+    <string name="settings_server_scan_stop">Serversuche stoppen</string>
+    <string name="settings_server_scan_msg">Oder drücken Sie \'Serversuche starten\' um im lokalen Netz nach Servern zu suchen.</string>
+    <string name="settings_server_scanning_disabled_msg">Serversuche ist nur bei aktiviertem WLAN möglich.</string>
+    <string name="settings_username_hint">Benutzername (optional)</string>
+    <string name="settings_password_hint">Passwort (optional)</string>
+    <string name="settings_server_scan_progress">Suche nach Servern&#8230;</string>
+    <string name="settings_fadeinsecs_title">Einblenddauer</string>
+    <string name="settings_fadeinsecs_summary">Geben Sie die Einblenddauer in Sekunden an. Ein Wert von 0 deaktivert das Einblenden.</string>
+    <string name="settings_autoconnect_title">Automatisch verbinden</string>
+    <string name="settings_autoconnect_summary">WLAN aktivieren und verbinden, sobald WLAN verfügbar ist.</string>
+
+    <string name="settings_scrobble_title">Scrobbeln nach Last.fm</string>
+    <string name="settings_scrobble_on">Lied-Informationen werden an Last.fm gesendet</string>
+    <string name="settings_scrobble_off">Lied-Informationen werden nicht an Last.fm gesendet</string>
+    <string name="settings_scrobble_noapp">Keine Scrobble-Anwendung installiert</string>
+
+    <string name="menu_item_disconnect">Verbindung trennen</string>
+    <string name="menu_item_connect">Verbinden</string>
+    <string name="menu_item_poweron">Einschalten</string>
+    <string name="menu_item_poweroff">Ausschalten</string>
+    <string name="menu_item_main">Wird gespielt</string>
+    <string name="menu_item_home">Haupt-Menü</string>
+    <string name="menu_item_download">Herunterladen</string>
+    <string name="menu_item_fetch_all">Alle herunterladen</string>
+    <string name="menu_item_filter">Filter</string>
+    <string name="menu_item_sort">Sortierfolge</string>
+    <string name="menu_item_delete">Löschen</string>
+    <string name="menu_item_rename">Umbenennen</string>
+    <string name="menu_item_playlist">Wiedergabeliste</string>
+    <string name="menu_item_playlists_new">Neu</string>
+    <string name="menu_item_playlist_clear">Löschen</string>
+    <string name="menu_item_playlist_save">Speichern</string>
+    <string name="about_title">Squeezer v%s</string>
+    <string name="connecting_text">Verbinde</string>
+    <string name="connecting_to_text">Verbinde mit SqueezeBox CLI %s</string>
+    <string name="connection_failed_text">Verbindung fehlgeschlagen. Prüfen Sie die Einstellungen.</string>
+    <string name="login_failed_text">Anmeldung fehlgeschlagen. Bitte Benutzername und Passwort eingeben.</string>
+    <string name="disconnected_text">Verbindung getrennt</string>
+    <string name="wifi_disabled_text">WLAN ist deaktiviert</string>
+    <string name="enable_wifi_text">Aktiviert WLAN auf dem Android-Gerät. Sobald eine WLAN-Verbindung hergestellt ist, wird Squeezer automatisch versuchen, sich mit ihrem SqueezeBox-Server zu verbinden. Soll WLAN jetzt aktiviert werden?</string>
+    <string name="wifi_enabled_text">WLAN ist aktiviert. Bitte warten Sie auf den Verbindungsaufbau.</string>
+    <string name="notification_playing_text">Spiele %s </string>
+    <string name="notification_connected_text">Verbunden mit %s </string>
+    <string name="filter_text_hint">Suchen nach %s</string>
+    <string name="search_text_hint">Suchtext</string>
+    <string name="search_music_library_hint">Suche nach Künstler, Album, Genre oder Titel.</string>
+    <string name="move_to_dialog_title">Verschiebe Lied Nummer %s</string>
+    <string name="move_to_index_hint">Bitte neue Position für das Lied eingeben</string>
+    <string name="save_playlist_title">Wiedergabeliste speichern</string>
+    <string name="save_playlist_hint">Name für die Wiedergabeliste eingeben</string>
+    <string name="new_playlist_title">Neue Wiedergabeliste</string>
+    <string name="new_playlist_hint">Name für die Wiedergabeliste eingeben</string>
+    <string name="rename_title">%s umbenennen</string>
+    <string name="delete_title">%s löschen</string>
+    <string name="delete__message">Wirklich löschen?</string>
+    <string name="loading_text">Lade &#8230;</string>
+    <string name="browse_items_text">%2$d %1$s</string>
+    <string name="choose_sort_order">Sortierfolge für %s wählen</string>
+    <string name="genre_prompt">Genre auswählen</string>
+    <string name="year_prompt">Jahr auswählen</string>
+    <string name="track_label">Nummer</string>
+    <string name="artist_label">Künstler</string>
+    <string name="album_label">Album</string>
+    <string name="genre_label">Genre</string>
+    <string name="year_label">Jahr</string>
+    <string name="filter_label">Suchtext</string>
+
+    <string name="unknown_track">Unbekanntes Lied</string>
+    <string name="unknown_album">Unbekanntes Album</string>
+    <string name="unknown_artist">Unbekannter Künstler</string>
+
+    <string name="tips_title">Tipps</string>
+    <string name="tip_volume">Sie können die Musiklautstärke mit den Lautstärketasten des Geräts ändern.\n\nProbieren Sie es jetzt aus.</string>
+
+    <!-- Dialog buttons -->
+    <string name="dialog_license">Lizenz</string>
+
+    <string name="copyright_text">Copyright &#169; 2009 Google Inc.  Alle Rechte vorbehalten\nCopyright &#169; 2011 Kurt Aaholst.  Alle Rechte vorbehalten.</string>
+
+    <string name="BROWSE_SONGS">Lieder anzeigen</string>
+    <string name="BROWSE_ALBUMS">Alben anzeigen</string>
+    <string name="BROWSE_ARTISTS">Künstler anzeigen</string>
+    <string name="BROWSE_ALBUM_SONGS">Albumtitel anzeigen</string>
+    <string name="BROWSE_ARTIST_ALBUMS">Alben des Künstlers anzeigen</string>
+    <string name="BROWSE_ARTIST_SONGS">Titel des Künstlers anzeigen</string>
+    <string name="PLAY_NOW">Abspielen</string>
+    <string name="ADD_TO_END">Zur Wiedergabeliste hinzufügen</string>
+    <string name="PLAY_NEXT">Nach dem aktuellen Titel wiedergeben</string>
+    <string name="DOWNLOAD_ITEM">Herunterladen</string>
+
+    <string name="PLAYLIST_REMOVE_ITEM">Von der Wiedergabeliste entfernen</string>
+    <string name="PLAYLIST_MOVE_UP">Nach oben schieben</string>
+    <string name="PLAYLIST_MOVE_DOWN">Nach unten schieben</string>
+    <string name="PLAYLIST_MOVE">Verschiebe &#8230;</string>
+
+    <string name="ITEM_PLAYING">Spiele %s</string>
+    <string name="ITEM_ADDED">%s zur Wiedergabeliste hinzugefügt</string>
+    <string name="ITEM_INSERTED">%s wird unmittelbar nach dem aktuellen Stück abgespielt</string>
+  
+    <string name="PLAYLIST_EXISTS_MESSAGE">Die Wiedergabeliste %s existiert bereits</string>
+
+    <!-- Song sort orders -->
+    <string name="songs_sort_order_title">Titel</string>
+    <string name="songs_sort_order_tracknum">Nummer</string>
+
+    <!--  Crash notifications -->
+    <string name="crash_toast_text">Entschuldigung, es ist ein Fehler aufgetreten.</string>
+    <string name="crash_notif_ticker_text">Entschuldigung, Squeezer ist abgestürzt. Bitte senden Sie einen Fehlerbericht.</string>
+    <string name="crash_notif_title">Squeezer ist abgestürzt.</string>
+    <string name="crash_notif_text">Auswählen, um bei der Problembehebung zu helfen.</string>
+    <string name="crash_dialog_text">Ein unerwarteter Fehler hat Squeezer zum Absturz gebracht. Ein Fehlerbericht wurde erstellt. Wählen Sie OK aus, um ihn zu senden. Der Bericht enthält keine persönlichen Daten.</string>	
+    <string name="crash_dialog_comment_prompt">Hier können Sie weitere Kommentare eingeben, die bei der Behebung des Problems hilfreich sein können.</string>
+    <string name="crash_dialog_ok_toast">Vielen Dank für Ihre Hilfe, Squeezer zu Verbessern.</string>
+
+    <!--  ACRA preference strings -->
+    <string name="pref_cat_error_reports">Fehlerberichte und Statistiken</string>
+    <string name="pref_disable_acra">Fehlerberichte senden</string>
+    <string name="pref_acra_enabled">Sie haben die Möglichkeit, im Fehlerfall einen Bericht an die Entwickler zu senden.</string>
+    <string name="pref_acra_disabled">Es werden keine Fehlerberichte gesendet.</string>
+
+    <string name="pref_acra_alwaysaccept">Fehlerbericht automatisch senden</string>
+    <string name="pref_acra_alwaysaccept_enabled">Fehlerberichte werden automatisch gesendet.</string>
+    <string name="pref_acra_alwaysaccept_disabled">Fehlerberichte werden nicht automatisch gesendet.</string>
+
+    <!--  Analytics preference strings -->
+    <string name="pref_analytics_enable">Benutzungsstatistiken senden</string>
+    <string name="pref_analytics_enable_enabled">Anonyme Benutzungsstatistiken werden mit Google Analytics erstellt.</string>
+    <string name="pref_analytics_enable_disabled">Es werden keine Benutzungsstatistiken erstellt.</string>
+
+    <string name="home_item_artists">Künstler</string>
+    <string name="home_item_albums">Alben</string>
+    <string name="home_item_songs">Lieder</string>
+    <string name="home_item_genres">Genres</string>
+    <string name="home_item_years">Jahre</string>
+    <string name="home_item_new_music">Neue Musik</string>
+    <string name="home_item_music_folder">Musik-Ordner</string>
+    <string name="home_item_random_mix">Zufalls-Mix</string>
+    <string name="home_item_playlists">Wiedergabelisten</string>
+    <string name="home_item_radios">Internet-Radio</string>
+    <string name="home_item_favorites">Favoriten</string>
+    <string name="home_item_my_apps">Meine Apps</string>
+
+    <string name="randomplay_item_song_mix">Lieder-Mix</string>
+    <string name="randomplay_item_album_mix">Album-Mix</string>
+    <string name="randomplay_item_artist_mix">Künstler-Mix</string>
+    <string name="randomplay_item_year_mix">Jahre-Mix</string>
+    <string name="randomplay_item_choose_genres">Genres wählen</string>
+
+    <plurals name="seconds">
+        <item quantity="one">Sekunde</item>
+        <item quantity="other">Sekunden</item>
+    </plurals>
+
+    <plurals name="artist">
+        <item quantity="one">Künstler</item>
+        <item quantity="other">Künstler</item>
+    </plurals>
+
+    <plurals name="album">
+        <item quantity="one">Album</item>
+        <item quantity="other">Alben</item>
+    </plurals>
+
+    <plurals name="genre">
+        <item quantity="one">Genre</item>
+        <item quantity="other">Genres</item>
+    </plurals>
+
+    <plurals name="musicfolder">
+        <item quantity="one">Musik-Ordner</item>
+        <item quantity="other">Musik-Ordner</item>
+    </plurals>
+
+    <plurals name="year">
+        <item quantity="one">Jahr</item>
+        <item quantity="other">Jahre</item>
+    </plurals>
+
+    <plurals name="song">
+        <item quantity="one">Lied</item>
+        <item quantity="other">Lieder</item>
+    </plurals>
+
+    <plurals name="player">
+        <item quantity="one">Abspielgerät</item>
+        <item quantity="other">Abspielgeräte</item>
+    </plurals>
+
+    <plurals name="playlist">
+        <item quantity="one">Wiedergabeliste</item>
+        <item quantity="other">Wiedergabelisten</item>
+    </plurals>
+
+    <plurals name="radio">
+        <item quantity="one">Radiosender-Plugin</item>
+        <item quantity="other">Radiosender-Plugins</item>
+    </plurals>
+
+    <plurals name="application">
+        <item quantity="one">Anwendung</item>
+        <item quantity="other">Anwendungen</item>
+    </plurals>
+
+    <string name="settings_album_selectaction">Aktion bei Albumauswahl</string>
+    <string name="settings_album_selectaction_summary">Was soll bei Auswahl eines Albums geschehen</string>
+    <string name="settings_song_selectaction">Aktion bei Liedauswahl</string>
+    <string name="settings_song_selectaction_summary">Was soll bei Auswahl eines Lieds geschehen</string>
+</resources>

@@ -8,13 +8,13 @@ import uk.org.ngo.squeezer.framework.SqueezerPlaylistItem;
 public abstract class PlayableItemAction {
 	public static enum Type {
 		/** PLay song immediately */
-		PLAY(R.string.playable_item_action_play),
+		PLAY(R.string.PLAY_NOW),
 		/**Add the song to the playlist */
-		ADD(R.string.playable_item_action_add),
+		ADD(R.string.ADD_TO_END),
 		/** Play the song after the current song*/
-		INSERT(R.string.playable_item_action_insert),
+		INSERT(R.string.PLAY_NEXT),
 		/** Browse contents. */
-		BROWSE(R.string.playable_item_action_browse);
+		BROWSE(R.string.BROWSE_SONGS);
 		public final int labelId;
 		private Type(int label) {
 			this.labelId = label;

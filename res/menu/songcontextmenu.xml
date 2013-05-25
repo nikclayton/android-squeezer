@@ -20,30 +20,30 @@
 
     <!-- Menu items that are always visible. -->
     <item android:id="@+id/play_now"
-        android:title="@string/CONTEXTMENU_PLAY_ITEM" />
+        android:title="@string/PLAY_NOW" />
 
     <item android:id="@+id/play_next"
-        android:title="@string/CONTEXTMENU_INSERT_ITEM" />
+        android:title="@string/PLAY_NEXT" />
 
     <item android:id="@+id/add_to_playlist"
-        android:title="@string/CONTEXTMENU_ADD_ITEM" />
+        android:title="@string/ADD_TO_END" />
 
     <item android:id="@+id/download"
-        android:title="@string/CONTEXTMENU_DOWNLOAD_ITEM" />
+        android:title="@string/DOWNLOAD_ITEM" />
 
 
     <!-- Menu items that are enabled individually. -->
 
     <item android:id="@+id/view_this_album"
-        android:title="@string/CONTEXTMENU_BROWSE_ALBUM_SONGS"
+        android:title="@string/BROWSE_ALBUM_SONGS"
         android:visible="false" />
 
     <item android:id="@+id/view_albums_by_song"
-        android:title="@string/CONTEXTMENU_BROWSE_ARTIST_ALBUMS"
+        android:title="@string/BROWSE_ARTIST_ALBUMS"
         android:visible="false" />
 
     <item android:id="@+id/view_songs_by_artist"
-        android:title="@string/CONTEXTMENU_BROWSE_ARTIST_SONGS"
+        android:title="@string/BROWSE_ARTIST_SONGS"
         android:visible="false" />
 
 
@@ -53,15 +53,15 @@
         android:visible="false">
 
         <item android:id="@+id/remove_from_playlist"
-            android:title="@string/PLAYLIST_CONTEXTMENU_REMOVE_ITEM" />
+            android:title="@string/PLAYLIST_REMOVE_ITEM" />
 
         <item android:id="@+id/playlist_move_up"
-            android:title="@string/PLAYLIST_CONTEXTMENU_MOVE_UP" />
+            android:title="@string/PLAYLIST_MOVE_UP" />
 
         <item android:id="@+id/playlist_move_down"
-            android:title="@string/PLAYLIST_CONTEXTMENU_MOVE_DOWN" />
+            android:title="@string/PLAYLIST_MOVE_DOWN" />
 
         <item android:id="@+id/playlist_move"
-            android:title="@string/PLAYLIST_CONTEXTMENU_MOVE" />
+            android:title="@string/PLAYLIST_MOVE" />
     </group>
 </menu>

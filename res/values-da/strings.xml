@@ -110,21 +110,21 @@
 
     <string name="copyright_text">Copyright &#169; 2009 Google Inc.  Alle rettigheder forbeholdes\nCopyright &#169; 2011 Kurt Aaholst. Alle rettigheder forbeholdes.</string>
 
-	<string name="CONTEXTMENU_BROWSE_SONGS">Vis sange</string>
-	<string name="CONTEXTMENU_BROWSE_ALBUMS">Vis album</string>
-	<string name="CONTEXTMENU_BROWSE_ARTISTS">Vis kunstnere</string>
-    <string name="CONTEXTMENU_BROWSE_ALBUM_SONGS">Vis sange på album</string>
-    <string name="CONTEXTMENU_BROWSE_ARTIST_ALBUMS">Vis album med sange af kunster</string>
-    <string name="CONTEXTMENU_BROWSE_ARTIST_SONGS">Vis sange af kunster</string>
-	<string name="CONTEXTMENU_PLAY_ITEM">Afspil</string>
-	<string name="CONTEXTMENU_ADD_ITEM">Tilføj til afspilningsliste</string>
-	<string name="CONTEXTMENU_INSERT_ITEM">Afspil efter den sang der spilles nu</string>
-    <string name="CONTEXTMENU_DOWNLOAD_ITEM">Hent</string>
+	<string name="BROWSE_SONGS">Vis sange</string>
+	<string name="BROWSE_ALBUMS">Vis album</string>
+	<string name="BROWSE_ARTISTS">Vis kunstnere</string>
+    <string name="BROWSE_ALBUM_SONGS">Vis sange på album</string>
+    <string name="BROWSE_ARTIST_ALBUMS">Vis album med sange af kunster</string>
+    <string name="BROWSE_ARTIST_SONGS">Vis sange af kunster</string>
+	<string name="PLAY_NOW">Afspil</string>
+	<string name="ADD_TO_END">Tilføj til afspilningsliste</string>
+	<string name="PLAY_NEXT">Afspil efter den sang der spilles nu</string>
+    <string name="DOWNLOAD_ITEM">Hent</string>
 
-    <string name="PLAYLIST_CONTEXTMENU_REMOVE_ITEM">Fjern fra afspilningsliste</string>
-    <string name="PLAYLIST_CONTEXTMENU_MOVE_UP">Flyt op</string>
-    <string name="PLAYLIST_CONTEXTMENU_MOVE_DOWN">Flyt ned</string>
-    <string name="PLAYLIST_CONTEXTMENU_MOVE">Flyt &#8230;</string>
+    <string name="PLAYLIST_REMOVE_ITEM">Fjern fra afspilningsliste</string>
+    <string name="PLAYLIST_MOVE_UP">Flyt op</string>
+    <string name="PLAYLIST_MOVE_DOWN">Flyt ned</string>
+    <string name="PLAYLIST_MOVE">Flyt &#8230;</string>
 
 	<string name="ITEM_PLAYING">Spiller nu %s</string>
 	<string name="ITEM_ADDED">%s er tilføjet den nuværende afspilningsliste</string>

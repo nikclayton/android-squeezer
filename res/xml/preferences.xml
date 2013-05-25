@@ -56,8 +56,18 @@
      android:summaryOff="@string/settings_scrobble_off"
      android:persistent="true" />
 
+  <ListPreference 
+     android:key="squeezer.action.onselect.album" 
+     android:title="@string/settings_album_selectaction" 
+     android:summary="@string/settings_album_selectaction_summary"/>
+
+  <ListPreference 
+     android:key="squeezer.action.onselect.song"
+     android:title="@string/settings_song_selectaction" 
+     android:summary="@string/settings_song_selectaction_summary"/>
+
   <PreferenceCategory
-    android:title="@string/pref_cat_error_reports">
+     android:title="@string/pref_cat_error_reports">
 
     <CheckBoxPreference android:key="acra.enable"
         android:title="@string/pref_disable_acra"
@@ -77,4 +87,6 @@
         android:summaryOff="@string/pref_analytics_enable_disabled"
         android:defaultValue="true"/>
   </PreferenceCategory>
+  
+  
 </PreferenceScreen>

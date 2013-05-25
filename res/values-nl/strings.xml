@@ -95,21 +95,21 @@
     <string name="tips_title">Tips</string>
     <string name="tip_volume">Gebruik de volume knoppen van uw apparaat om het afspeel volume te veranderen. Probeer het nu uit.</string>
 
-    <string name="CONTEXTMENU_BROWSE_SONGS">Blader liedjes</string>
-    <string name="CONTEXTMENU_BROWSE_ALBUMS">Blader albums</string>
-    <string name="CONTEXTMENU_BROWSE_ARTISTS">Blader artiesten</string>
-    <string name="CONTEXTMENU_BROWSE_ALBUM_SONGS">Blader liedjes op album</string>
-    <string name="CONTEXTMENU_BROWSE_ARTIST_ALBUMS">Blader albums met liedjes van artiest</string>
-    <string name="CONTEXTMENU_BROWSE_ARTIST_SONGS">Blader liedjes per artiest</string>
-    <string name="CONTEXTMENU_PLAY_ITEM">Speel af</string>
-    <string name="CONTEXTMENU_ADD_ITEM">Voeg toe aan Playlist</string>
-    <string name="CONTEXTMENU_INSERT_ITEM">Speel af na huidige liedje</string>
-    <string name="CONTEXTMENU_DOWNLOAD_ITEM">Download</string>
+    <string name="BROWSE_SONGS">Blader liedjes</string>
+    <string name="BROWSE_ALBUMS">Blader albums</string>
+    <string name="BROWSE_ARTISTS">Blader artiesten</string>
+    <string name="BROWSE_ALBUM_SONGS">Blader liedjes op album</string>
+    <string name="BROWSE_ARTIST_ALBUMS">Blader albums met liedjes van artiest</string>
+    <string name="BROWSE_ARTIST_SONGS">Blader liedjes per artiest</string>
+    <string name="PLAY_NOW">Speel af</string>
+    <string name="ADD_TO_END">Voeg toe aan Playlist</string>
+    <string name="PLAY_NEXT">Speel af na huidige liedje</string>
+    <string name="DOWNLOAD_ITEM">Download</string>
 
-    <string name="PLAYLIST_CONTEXTMENU_REMOVE_ITEM">Verwijder van playlist</string>
-    <string name="PLAYLIST_CONTEXTMENU_MOVE_UP">Verplaats naar boven</string>
-    <string name="PLAYLIST_CONTEXTMENU_MOVE_DOWN">Verplaats naar beneden</string>
-    <string name="PLAYLIST_CONTEXTMENU_MOVE">Verplaats &#8230;</string>
+    <string name="PLAYLIST_REMOVE_ITEM">Verwijder van playlist</string>
+    <string name="PLAYLIST_MOVE_UP">Verplaats naar boven</string>
+    <string name="PLAYLIST_MOVE_DOWN">Verplaats naar beneden</string>
+    <string name="PLAYLIST_MOVE">Verplaats &#8230;</string>
 
     <string name="ITEM_PLAYING">Speelt nu %s</string>
     <string name="ITEM_ADDED">Heb %s aan huidige playlist toegevoegd</string>

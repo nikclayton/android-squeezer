@@ -16,10 +16,12 @@
 
 package uk.org.ngo.squeezer.itemlists;
 
+import uk.org.ngo.squeezer.Preferences;
 import uk.org.ngo.squeezer.framework.SqueezerItem;
 import uk.org.ngo.squeezer.framework.SqueezerItemView;
 import uk.org.ngo.squeezer.itemlists.GenreSpinner.GenreSpinnerCallback;
 import uk.org.ngo.squeezer.itemlists.YearSpinner.YearSpinnerCallback;
+import uk.org.ngo.squeezer.itemlists.actions.PlayableItemAction;
 import uk.org.ngo.squeezer.itemlists.dialogs.SqueezerSongFilterDialog;
 import uk.org.ngo.squeezer.itemlists.dialogs.SqueezerSongOrderDialog;
 import uk.org.ngo.squeezer.itemlists.dialogs.SqueezerSongOrderDialog.SongsSortOrder;
@@ -104,6 +106,13 @@ public class SqueezerSongListActivity extends SqueezerAbstractSongListActivity
         songViewLogic.setBrowseByArtist(artist != null);
     }
 
+    @Override
+    protected PlayableItemAction getOnSelectAction() {
+    	String actionType = preferences.getString(Preferences.KEY_ON_SELECT_SONG_ACTION, PlayableItemAction.Type.PLAY.name());
+    	return PlayableItemAction.createAction(this, actionType);
+    }
+    
+    
     public static void show(Context context, SqueezerItem... items) {
 	    final Intent intent = new Intent(context, SqueezerSongListActivity.class);
         for (SqueezerItem item: items)

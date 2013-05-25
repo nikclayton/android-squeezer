@@ -138,9 +138,9 @@ public class SqueezerPluginItemView extends SqueezerBaseItemView<SqueezerPluginI
         if (!((SqueezerPluginItem) menuInfo.item).isHasitems()) {
             super.onCreateContextMenu(menu, v, menuInfo);
 
-            menu.add(Menu.NONE, R.id.play_now, Menu.NONE, R.string.CONTEXTMENU_PLAY_ITEM);
-            menu.add(Menu.NONE, R.id.add_to_playlist, Menu.NONE, R.string.CONTEXTMENU_ADD_ITEM);
-            menu.add(Menu.NONE, R.id.play_next, Menu.NONE, R.string.CONTEXTMENU_INSERT_ITEM);
+            menu.add(Menu.NONE, R.id.play_now, Menu.NONE, R.string.PLAY_NOW);
+            menu.add(Menu.NONE, R.id.add_to_playlist, Menu.NONE, R.string.ADD_TO_END);
+            menu.add(Menu.NONE, R.id.play_next, Menu.NONE, R.string.PLAY_NEXT);
         }
     }
 

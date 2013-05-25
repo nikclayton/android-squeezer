@@ -43,7 +43,7 @@ import android.widget.Toast;
  *  @param <T> the SqueezerItem subclass this view represents.
  */
 public abstract class SqueezerBaseItemView<T extends SqueezerItem> implements SqueezerItemView<T> {
-    protected static final int CONTEXTMENU_BROWSE_ALBUMS = 1;
+    protected static final int BROWSE_ALBUMS = 1;
 
     private final SqueezerItemListActivity mActivity;
     private final LayoutInflater mLayoutInflater;
@@ -183,7 +183,7 @@ public abstract class SqueezerBaseItemView<T extends SqueezerItem> implements Sq
                 SqueezerSongListActivity.show(mActivity, selectedItem);
                 return true;
 
-            case CONTEXTMENU_BROWSE_ALBUMS:
+            case BROWSE_ALBUMS:
                 SqueezerAlbumListActivity.show(mActivity, selectedItem);
                 return true;
 

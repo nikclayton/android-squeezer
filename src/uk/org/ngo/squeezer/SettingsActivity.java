@@ -17,6 +17,7 @@
 package uk.org.ngo.squeezer;
 
 import uk.org.ngo.squeezer.dialogs.ServerAddressPreference;
+import uk.org.ngo.squeezer.itemlists.actions.PlayableItemAction;
 import uk.org.ngo.squeezer.service.ISqueezeService;
 import uk.org.ngo.squeezer.service.SqueezeService;
 import uk.org.ngo.squeezer.util.Scrobble;
@@ -33,6 +34,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.preference.CheckBoxPreference;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceActivity;
@@ -109,9 +111,41 @@ public class SettingsActivity extends PreferenceActivity implements
                 editor.remove(Preferences.KEY_SCROBBLE);
                 editor.commit();
             }
-        }
-    }
+		}
+		fillPlayableItemSelectionPreferences();
+	}
 
+	private void fillPlayableItemSelectionPreferences() {
+		String addLabel = getString(PlayableItemAction.Type.ADD.labelId);
+		String playLabel = getString(PlayableItemAction.Type.PLAY.labelId);
+		String insertLabel = getString(PlayableItemAction.Type.INSERT.labelId);
+		String browseLabel = getString(PlayableItemAction.Type.BROWSE.labelId);
+
+		ListPreference onSelectAlbumPref = (ListPreference) findPreference(Preferences.KEY_ON_SELECT_ALBUM_ACTION);
+		onSelectAlbumPref.setEntryValues(new String[] {
+				PlayableItemAction.Type.PLAY.name(),
+				PlayableItemAction.Type.INSERT.name(),
+				PlayableItemAction.Type.ADD.name(),
+				PlayableItemAction.Type.BROWSE.name() });
+		onSelectAlbumPref.setEntries(new String[] { playLabel, insertLabel,
+				addLabel, browseLabel });
+		onSelectAlbumPref.setDefaultValue(PlayableItemAction.Type.BROWSE.name());
+		if (onSelectAlbumPref.getValue() == null) {
+			onSelectAlbumPref.setValue(PlayableItemAction.Type.BROWSE.name());
+		}
+
+		ListPreference onSelectSongPref = (ListPreference) findPreference(Preferences.KEY_ON_SELECT_SONG_ACTION);
+		onSelectSongPref.setEntryValues(new String[] {
+				PlayableItemAction.Type.PLAY.name(),
+				PlayableItemAction.Type.INSERT.name(),
+				PlayableItemAction.Type.ADD.name() });
+		onSelectSongPref.setEntries(new String[] { playLabel, insertLabel,
+				addLabel });
+		onSelectSongPref.setDefaultValue(PlayableItemAction.Type.ADD.name());
+		if (onSelectSongPref.getValue() == null) {
+			onSelectSongPref.setValue(PlayableItemAction.Type.ADD.name());
+		}
+	}
     @Override
     public void onDestroy() {
         super.onDestroy();

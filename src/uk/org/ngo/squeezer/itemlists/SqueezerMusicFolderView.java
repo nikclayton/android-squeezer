@@ -131,12 +131,12 @@ public class SqueezerMusicFolderView extends SqueezerBaseItemView<SqueezerMusicF
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
 
-        menu.add(Menu.NONE, R.id.play_now, Menu.NONE, R.string.CONTEXTMENU_PLAY_ITEM);
-        menu.add(Menu.NONE, R.id.add_to_playlist, Menu.NONE, R.string.CONTEXTMENU_ADD_ITEM);
-        menu.add(Menu.NONE, R.id.play_next, Menu.NONE, R.string.CONTEXTMENU_INSERT_ITEM);
+        menu.add(Menu.NONE, R.id.play_now, Menu.NONE, R.string.PLAY_NOW);
+        menu.add(Menu.NONE, R.id.add_to_playlist, Menu.NONE, R.string.ADD_TO_END);
+        menu.add(Menu.NONE, R.id.play_next, Menu.NONE, R.string.PLAY_NEXT);
 
         if (((SqueezerMusicFolderItem) menuInfo.item).getType().equals("track")) {
-            menu.add(Menu.NONE, R.id.download, Menu.NONE, R.string.CONTEXTMENU_DOWNLOAD_ITEM);
+            menu.add(Menu.NONE, R.id.download, Menu.NONE, R.string.DOWNLOAD_ITEM);
         }
     }
 

@@ -494,8 +494,10 @@ public class NowPlayingFragment extends Fragment implements
             final SqueezerPlayerState.PlayStatus playStatus,
             final SqueezerPlayerState.ShuffleStatus shuffleStatus,
             final SqueezerPlayerState.RepeatStatus repeatStatus) {
-        shuffleButton.setImageResource(shuffleStatus.getIcon());
-        repeatButton.setImageResource(repeatStatus.getIcon());
+        if (mFullHeightLayout) {
+            shuffleButton.setImageResource(shuffleStatus.getIcon());
+            repeatButton.setImageResource(repeatStatus.getIcon());
+        }
         updatePlayPauseIcon(playStatus);
     }
 

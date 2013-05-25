@@ -234,5 +234,14 @@
         <item>Miks baseret på tilfældigt årstal</item>
         <item>Vælg genrer</item>
     </string-array>
-
+    
+    <string name="settings_album_selectaction">Handling ved valg af album</string>
+    <string name="settings_album_selectaction_summary">Hvad skal der gøres når et album vælges</string>
+    <string name="settings_song_selectaction">Handling ved valg af af sang</string>
+    <string name="settings_song_selectaction_summary">Hvad skal der gøres når en enkelt sang vælges</string>
+    <string name="playable_item_action_play">Afspil</string>
+    <string name="playable_item_action_add">Tilføj til afspilningsliste</string>
+    <string name="playable_item_action_insert">Afspil efter den sang der spilles nu</string>
+    <string name="playable_item_action_browse">Vis sange</string>
+    
 </resources>

@@ -45,6 +45,7 @@ public class SqueezerPlaylistView extends SqueezerBaseItemView<SqueezerPlaylist>
 
 	@Override
     public void onItemSelected(int index, SqueezerPlaylist item) throws RemoteException {
+        activity.setCurrentPlaylist(index, item);
         SqueezerPlaylistSongsActivity.show(getActivity(), item);
 	}
 

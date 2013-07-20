@@ -75,6 +75,12 @@ public abstract class SqueezerItemListActivity extends SqueezerBaseActivity {
             }
             mRegisteredCallbacks = false;
         }
+
+        // Any items coming in after callbacks have been unregistered are discarded.
+        // We cancel any outstanding orders, so items can be reordered after the
+        // activity resumes.
+        cancelOrders();
+
         super.onPause();
     }
 
@@ -104,7 +110,7 @@ public abstract class SqueezerItemListActivity extends SqueezerBaseActivity {
      * <p>
      * You must register a callback for {@link SqueezeService} to call when the ordered items
      * from {@link #orderPage(int)} are received from SqueezeServer. This callback must pass
-     * these items on to {@link SqueezerItemListAdapter#update(int, int, int, List)}.
+     * these items on to {@link SqueezerItemListAdapter#update(int, int, List)}.
      *
      * @throws RemoteException
      */
@@ -147,6 +153,18 @@ public abstract class SqueezerItemListActivity extends SqueezerBaseActivity {
 		orderedPages.clear();
 		maybeOrderPage(0);
 	}
+
+    /**
+     * Cancel outstanding orders, so items will be reloaded if necessary.
+     */
+    private void cancelOrders() {
+        // If would be more correct to just cancel the orders which have not
+        // yet been responded. This would however require the adapter to inform
+        // us when items arrive.
+        // This works because items are only reordered if it is missing when we
+        // attempt to use it.
+        orderedPages.clear();
+    }
 
     /**
      * Tracks scrolling activity.

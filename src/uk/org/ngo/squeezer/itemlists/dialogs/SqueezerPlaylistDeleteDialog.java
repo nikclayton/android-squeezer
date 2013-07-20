@@ -22,12 +22,7 @@ public class SqueezerPlaylistDeleteDialog extends DialogFragment {
         builder.setMessage(R.string.delete__message);
         builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
-                try {
-                    activity.getService().playlistsDelete(activity.getPlaylist());
-                    activity.finish();
-                } catch (RemoteException e) {
-                    Log.e(getTag(), "Error deleting playlist");
-                }
+                    activity.playlistDelete();
             }
         });
         builder.setNegativeButton(android.R.string.cancel, null);

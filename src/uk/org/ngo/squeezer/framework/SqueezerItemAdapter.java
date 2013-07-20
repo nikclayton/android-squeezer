@@ -229,14 +229,13 @@ public class SqueezerItemAdapter<T extends SqueezerItem> extends BaseAdapter imp
 	private void setItems(int start, List<T> items) {
 		T[] page = getPage(start);
 		int offset = start % pageSize;
-		Iterator<T> it = items.iterator();
-		while (it.hasNext()) {
+        for (T item : items) {
 			if (offset >= pageSize) {
 				start += offset;
 				page = getPage(start);
 				offset = 0;
 			}
-			page[offset++] = it.next();
+			page[offset++] = item;
 		}
 	}
 
@@ -249,6 +248,10 @@ public class SqueezerItemAdapter<T extends SqueezerItem> extends BaseAdapter imp
 		}
 		return item;
 	}
+
+    public void setItem(int position, T item) {
+        getPage(position)[position % pageSize] = item;
+    }
 
 	@Override
     public long getItemId(int position) {

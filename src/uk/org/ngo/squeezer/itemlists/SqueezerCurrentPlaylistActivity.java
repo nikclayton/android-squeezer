@@ -87,7 +87,7 @@ public class SqueezerCurrentPlaylistActivity extends SqueezerBaseListActivity<Sq
     @Override
     protected SqueezerItemAdapter<SqueezerSong> createItemListAdapter(
             SqueezerItemView<SqueezerSong> itemView) {
-        return new HighlightingListAdapter(itemView, mImageFetcher);
+        return new HighlightingListAdapter(itemView, getImageFetcher());
     }
 
     @Override

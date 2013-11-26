@@ -233,6 +233,15 @@ public abstract class SqueezerBaseListActivity<T extends SqueezerItem> extends S
         return itemAdapter;
     }
 
+    @Override
+    protected void clearItemAdapter() {
+        // TODO: This should be removed in favour of showing a progress spinner in the actionbar.
+        mListView.setVisibility(View.GONE);
+        loadingProgress.setVisibility(View.VISIBLE);
+
+        getItemAdapter().clear();
+    }
+
     /**
      * @return The {@link AbsListView} used by this activity
      */
@@ -245,7 +254,7 @@ public abstract class SqueezerBaseListActivity<T extends SqueezerItem> extends S
     }
 
     public void onItemsReceived(final int count, final int start, final List<T> items) {
-        super.onItemsReceived(count, start);
+        super.onItemsReceived(count, start, items.size());
 
 		getUIThreadHandler().post(new Runnable() {
             @Override
@@ -256,22 +265,6 @@ public abstract class SqueezerBaseListActivity<T extends SqueezerItem> extends S
             }
         });
 	}
-
-    @Override
-    public boolean maybeOrderPage(int pagePosition) {
-        // If page 0 was requested then this is the first page of data.  Hide the listview,
-        // and make loadingProgress visible to provide feedback to the user.
-        // TODO: This should be removed in favour of showing a progress spinner in the actionbar.
-        if (super.maybeOrderPage(pagePosition)) {
-            if (pagePosition == 0) {
-                mListView.setVisibility(View.GONE);
-                loadingProgress.setVisibility(View.VISIBLE);
-            }
-            return true;
-        } else {
-            return false;
-        }
-    }
 
     protected class ScrollListener extends SqueezerItemListActivity.ScrollListener {
         ScrollListener() {

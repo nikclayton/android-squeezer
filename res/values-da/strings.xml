@@ -41,31 +41,41 @@
     <string name="settings_fadeinsecs_title">Indtoningsperiode</string>
     <string name="settings_fadeinsecs_summary">Angiv hvor mange sekunder der indtones. Angiv 0 for at deaktivere indtoning.</string>
     <string name="settings_autoconnect_title">Forbind automatisk</string>
-    <string name="settings_autoconnect_summary">Tilbyd at aktivere Wi-Fi, og prøv at forbinde ved aktiv Wi-Fi forbindelse.</string>
+    <string name="settings_autoconnect_summary">Tilbyd at aktivere Wi-Fi, og prøv at forbinde ved aktiv Wi-Fi forbindelse</string>
+
+    <string name="settings_notifyofconnection_title">Notifikation ved forbindelse</string>
+    <string name="settings_notifyofconnection_on">Vis notifikation ved forbindelse, også når der ikke spilles musik</string>
+    <string name="settings_notifyofconnection_off">Vis kun notification når der spilles musik</string>
+
+    <string name="settings_category_ui">Squeezer grænseflade</string>
 
     <string name="settings_scrobble_title">Scrobble til Last.fm</string>
     <string name="settings_scrobble_on">Sang information sendes til Last.fm</string>
     <string name="settings_scrobble_off">Sang information sendes ikke til Last.fm</string>
     <string name="settings_scrobble_noapp">Der er ikke installeret noget program, der kan scrobble</string>
+    <string name="settings_market_not_found">Kunne ikke starte Google Play, er det installeret?</string>
 
     <string name="menu_item_disconnect">Afbryd</string>
     <string name="menu_item_connect">Forbind</string>
-    <string name="menu_item_poweron">Tænd</string>
-    <string name="menu_item_poweroff">Sluk</string>
+    <string name="menu_item_poweron">Tænd \"%s\"</string>
+    <string name="menu_item_poweroff">Sluk \"%s\"</string>
     <string name="menu_item_main">Nu spiller</string>
     <string name="menu_item_home">Hovedmenu</string>
     <string name="menu_item_fetch_all">Hent resten</string>
     <string name="menu_item_filter">Filter</string>
     <string name="menu_item_sort">Sortér</string>
+    <string name="menu_item_view">Visning</string>
     <string name="menu_item_delete">Slet</string>
     <string name="menu_item_rename">Omdøb</string>
     <string name="menu_item_playlists_new">Ny</string>
-    <string name="menu_item_playlist_clear">Ryd</string>
-    <string name="menu_item_playlist_save">Gem</string>
-    <string name="menu_item_volume">Lydstyrke</string>
+    <string name="menu_item_playlist_clear">Ryd afspilningsliste</string>
+    <string name="menu_item_playlist_save">Gem afspilningsliste</string>
+    <string name="menu_item_volume">Indstil lydstyrke</string>
     <string name="connecting_text">Forbinder</string>
+    <string name="connect_to_text">Forbinder til %s</string>
     <string name="connecting_to_text">Forbinder til SqueezeBox CLI på %s</string>
     <string name="connection_failed_text">Forbindelse mislykkedes. Kontrollér indstillingerne.</string>
+    <string name="not_connected">Squeezer er ikke forbundet til nogen SqueezeBoxServer.</string>
     <string name="login_failed_text">Login mislykkedes, indtast brugernavn og adgangskode.</string>
     <string name="disconnected_text">Afbrudt.</string>
     <string name="wifi_disabled_text">Wi-Fi er slået fra</string>
@@ -85,7 +95,7 @@
     <string name="rename_title">Omdøb %s</string>
     <string name="delete_title">Slet %s</string>
     <string name="delete__message">Er du sikker på at slette?</string>
-    <string name="loading_text">Henter &#8230;</string>
+    <string name="loading_text">Henter&#8230;</string>
     <string name="browse_items_text">%2$d %1$s</string>
     <string name="choose_sort_order">Vælg rækkefølge af %s</string>
     <string name="genre_prompt">Vælg genre</string>
@@ -97,9 +107,16 @@
     <string name="year_label">År</string>
     <string name="filter_label">Søgetekst</string>
 
+    <string name="albums_by_artist_header">Album med sange af %s</string>
+    <string name="albums_by_genre_header">Album med sange i genren \"%s\"</string>
+    <string name="albums_by_year_header">Album med sange fra %s</string>
+
+    <string name="songs_by_header">Sange af %s</string>
+
     <string name="unknown_track">Ukendt sang</string>
     <string name="unknown_album">Ukendt album</string>
     <string name="unknown_artist">Ukendt kunster</string>
+    <string name="unknown_year">Ukendt år</string>
 
     <string name="tips_title">Tips</string>
     <string name="tip_volume">Brug enhedens hardware lydstyrkeknapper for at ændre spille lydstyrken.\n\nPrøv det nu.</string>
@@ -124,7 +141,7 @@
     <string name="PLAYLIST_REMOVE_ITEM">Fjern fra afspilningsliste</string>
     <string name="PLAYLIST_MOVE_UP">Flyt op</string>
     <string name="PLAYLIST_MOVE_DOWN">Flyt ned</string>
-    <string name="PLAYLIST_MOVE">Flyt &#8230;</string>
+    <string name="PLAYLIST_MOVE">Flyt&#8230;</string>
 
 	<string name="ITEM_PLAYING">Spiller nu %s</string>
 	<string name="ITEM_ADDED">%s er tilføjet den nuværende afspilningsliste</string>
@@ -194,6 +211,11 @@
         <item quantity="other">album</item>
     </plurals>
 
+    <plurals name="favorites">
+        <item quantity="one">favorit</item>
+        <item quantity="other">favoritter</item>
+    </plurals>
+
     <plurals name="genre">
         <item quantity="one">genre</item>
         <item quantity="other">genrer</item>
@@ -234,6 +256,6 @@
         <item quantity="other">programmer</item>
     </plurals>
 
-    <string name="settings_album_selectaction">Album handling</string>
-    <string name="settings_song_selectaction">Sang handling</string>
+    <string name="settings_album_selectaction">Handling ved valg af album</string>
+    <string name="settings_song_selectaction">Handling ved valg af sang</string>
 </resources>

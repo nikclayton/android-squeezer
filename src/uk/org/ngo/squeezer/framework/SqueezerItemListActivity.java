@@ -209,6 +209,13 @@ public abstract class SqueezerItemListActivity extends SqueezerBaseActivity {
 	protected abstract void orderPage(int start) throws RemoteException;
 
     /**
+     * List can clear any information about which items have been received and ordered,
+     * by calling {@link #clearAndReOrderItems()}. This will call back to this method,
+     * which must clear any adapters holding items.
+     */
+    protected abstract void clearItemAdapter();
+
+    /**
      * Order a page worth of data, starting at the specified position, if it has not already been ordered.
      *
      * @param pagePosition position in the list to start the fetch.
@@ -254,18 +261,27 @@ public abstract class SqueezerItemListActivity extends SqueezerBaseActivity {
      * that internal bookkeeping about pages that have/have not been ordered is kept consistent.
      *
      * @param count The total number of items known by the server.
-     * @param start The number of items in this update.
+     * @param start The start position of this update.
+     * @param size The number of items in this update
      */
-    protected void onItemsReceived(final int count, final int start) {
-        Log.d(TAG, "onItemsReceived(): " + count + ", " + start);
+    protected void onItemsReceived(final int count, final int start, int size) {
+        Log.d(getTag(), "onItemsReceived(" + count + ", " + start + ", " + size + ")");
 
-        // Add this page of data to mReceivedPages and remove from mOrderedPages. However,
-        // because of "order one item first to learn the total number of items" behaviour,
-        // only do this if there's more than one item and start != 0, otherwise the very first
-        // page retrieved will be removed too early.
-        if (start > 0 || count == 0) {
-            mReceivedPages.add(start);
-            mOrderedPages.remove(start);
+        // Add this page of data to mReceivedPages and remove from mOrderedPages.
+        // Because we might receive a page in chunks, we test for the end of a page,
+        // before we register the page as being received.
+        if (((start+size) % mPageSize == 0) || (start + size == count)) {
+            int pageStart = (start + size == count) ? start : start + size - mPageSize;
+            mReceivedPages.add(pageStart);
+            mOrderedPages.remove(pageStart);
+
+
+
+
+
+
+
+
         }
     }
 
@@ -276,6 +292,7 @@ public abstract class SqueezerItemListActivity extends SqueezerBaseActivity {
         mOrderedPages.clear();
         mReceivedPages.clear();
         maybeOrderPage(0);
+        clearItemAdapter();
     }
 
     /**
@@ -299,7 +316,6 @@ public abstract class SqueezerItemListActivity extends SqueezerBaseActivity {
      */
     protected class ScrollListener implements AbsListView.OnScrollListener {
         private TouchListener mTouchListener = null;
-        private final int mPageSize = getResources().getInteger(R.integer.PageSize);
         private boolean mAttachedTouchListener = false;
 
         private int mPrevScrollState = OnScrollListener.SCROLL_STATE_IDLE;

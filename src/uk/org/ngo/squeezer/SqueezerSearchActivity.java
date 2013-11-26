@@ -144,12 +144,16 @@ public class SqueezerSearchActivity extends SqueezerItemListActivity {
 	private void doSearch(String searchString) {
         this.searchString = searchString;
 		if (searchString != null && searchString.length() > 0 && getService() != null) {
-			resultsExpandableListView.setVisibility(View.GONE);
-			loadingLabel.setVisibility(View.VISIBLE);
-			searchResultsAdapter.clear();
             clearAndReOrderItems();
 		}
 	}
+
+    @Override
+    protected void clearItemAdapter() {
+        resultsExpandableListView.setVisibility(View.GONE);
+        loadingLabel.setVisibility(View.VISIBLE);
+        searchResultsAdapter.clear();
+    }
 
     /**
      * Searches for the saved search query.
@@ -159,7 +163,7 @@ public class SqueezerSearchActivity extends SqueezerItemListActivity {
 	}
 
 	private <T extends SqueezerItem> void onItemsReceived(final int count, final int start, final List<T> items, final Class<T> clazz) {
-        super.onItemsReceived(count, start);
+        super.onItemsReceived(count, start, items.size());
 
 		getUIThreadHandler().post(new Runnable() {
 			@Override

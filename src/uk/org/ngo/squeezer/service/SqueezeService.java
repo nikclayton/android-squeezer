@@ -948,11 +948,6 @@ public class SqueezeService extends Service {
         }
 
         @Override
-        public String getString(int stringToken) {
-            return SqueezerServerString.values()[stringToken].getLocalizedString();
-        }
-
-        @Override
         public boolean powerOn() throws RemoteException {
             if (!isConnected()) return false;
             cli.sendPlayerCommand("power 1");

@@ -181,13 +181,7 @@ public abstract class SqueezerBaseActivity extends ActionBarActivity implements 
     }
 
     public String getServerString(SqueezerServerString stringToken) {
-        try {
-            return service.getString(stringToken.ordinal());
-        } catch (RemoteException e) {
-            Log.e(getClass().getSimpleName(), "Error requesting server string '" + stringToken + "': " + e);
-            e.printStackTrace();
-            return stringToken.name();
-        }
+        return SqueezerServerString.values()[stringToken.ordinal()].getLocalizedString();
     }
 
     // This section is just an easier way to call squeeze service

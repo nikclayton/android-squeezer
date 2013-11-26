@@ -81,9 +81,6 @@ interface ISqueezeService {
         // Returns the player we are currently controlling
         SqueezerPlayer getActivePlayer();
 
-        // Return a localized server string
-        String getString(int stringToken);
-
 	    ////////////////////
   	    // Depends on active player:
   	    

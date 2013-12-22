@@ -644,11 +644,9 @@ public class SqueezeService extends Service {
         HashMap<String, String> tokenMap = parseTokens(tokens);
 
         updatePowerStatus(Util.parseDecimalIntOrZero(tokenMap.get("power")) == 1);
-        updatePlayStatus(PlayStatus.valueOf(tokenMap.get("mode")));
-        updateShuffleStatus(ShuffleStatus
-                .valueOf(Util.parseDecimalIntOrZero(tokenMap.get("playlist shuffle"))));
-        updateRepeatStatus(
-                RepeatStatus.valueOf(Util.parseDecimalIntOrZero(tokenMap.get("playlist repeat"))));
+        updatePlayStatus(tokenMap.get("mode"));
+        updateShuffleStatus(tokenMap.get("playlist shuffle"));
+        updateRepeatStatus(tokenMap.get("playlist repeat"));
 
         playerState.setCurrentPlaylist(tokenMap.get("playlist_name"));
         playerState.setCurrentPlaylistIndex(
@@ -671,12 +669,12 @@ public class SqueezeService extends Service {
         boolean changed = false;
         if (oldPlayerId == null || !oldPlayerId.equals(playerId)) {
             if (oldPlayerId != null) {
-                // Unsubscribe from the old player's status.  (despite what
-                // the docs say, multiple subscribes can be active and flood us.)
+                // Unsubscribe from the old player's status.
                 cli.sendCommand(Util.encode(oldPlayerId) + " status - 1 subscribe:-");
             }
 
             connectionState.setActivePlayer(newPlayer);
+            playerState = new PlayerState();
             changed = true;
         }
 
@@ -778,9 +776,18 @@ public class SqueezeService extends Service {
         cli.sendCommandImmediately("getstring " + ServerString.values()[0].name());
     }
 
-    private void updatePlayStatus(PlayStatus state) {
-        if (playerState.getPlayStatus() != state) {
-            playerState.setPlayStatus(state);
+    private void updatePlayStatus(String token) {
+        if (token != null)
+            try {
+                updatePlayStatus(PlayStatus.valueOf(token));
+            } catch (IllegalArgumentException e) {
+                // Server sent us an unknown status, we skip the update
+            }
+    }
+
+    private void updatePlayStatus(PlayStatus playStatus) {
+        if (playerState.getPlayStatus() != playStatus) {
+            playerState.setPlayStatus(playStatus);
             //TODO when do we want to keep the wiFi lock ?
             connectionState.updateWifiLock(playerState.isPlaying());
             updateOngoingNotification();
@@ -789,7 +796,7 @@ public class SqueezeService extends Service {
             while (i > 0) {
                 i--;
                 try {
-                    mServiceCallbacks.getBroadcastItem(i).onPlayStatusChanged(state.name());
+                    mServiceCallbacks.getBroadcastItem(i).onPlayStatusChanged(playStatus.name());
                 } catch (RemoteException e) {
                     // The RemoteCallbackList will take care of removing
                     // the dead object for us.
@@ -799,38 +806,52 @@ public class SqueezeService extends Service {
         }
     }
 
-    private void updateShuffleStatus(ShuffleStatus shuffleStatus) {
-        if (shuffleStatus != playerState.getShuffleStatus()) {
-            boolean wasUnknown = playerState.getShuffleStatus() == null;
-            playerState.setShuffleStatus(shuffleStatus);
-            int i = mServiceCallbacks.beginBroadcast();
-            while (i > 0) {
-                i--;
-                try {
-                    mServiceCallbacks.getBroadcastItem(i)
-                            .onShuffleStatusChanged(wasUnknown, shuffleStatus.getId());
-                } catch (RemoteException e) {
-                }
+    private void updateShuffleStatus(String token) {
+        if (token != null) {
+            ShuffleStatus shuffleStatus = ShuffleStatus.valueOf(Util.parseDecimalIntOrZero(token));
+            if (shuffleStatus != playerState.getShuffleStatus()) {
+                boolean wasUnknown = playerState.getShuffleStatus() == null;
+                playerState.setShuffleStatus(shuffleStatus);
+                onShuffleStatusChanged(wasUnknown, shuffleStatus);
             }
-            mServiceCallbacks.finishBroadcast();
         }
     }
 
-    private void updateRepeatStatus(RepeatStatus repeatStatus) {
-        if (repeatStatus != playerState.getRepeatStatus()) {
-            boolean wasUnknown = playerState.getRepeatStatus() == null;
-            playerState.setRepeatStatus(repeatStatus);
-            int i = mServiceCallbacks.beginBroadcast();
-            while (i > 0) {
-                i--;
-                try {
-                    mServiceCallbacks.getBroadcastItem(i)
-                            .onRepeatStatusChanged(wasUnknown, repeatStatus.getId());
-                } catch (RemoteException e) {
-                }
+    private void onShuffleStatusChanged(boolean initial, ShuffleStatus shuffleStatus) {
+        int i = mServiceCallbacks.beginBroadcast();
+        while (i > 0) {
+            i--;
+            try {
+                mServiceCallbacks.getBroadcastItem(i)
+                        .onShuffleStatusChanged(initial, shuffleStatus.getId());
+            } catch (RemoteException e) {
             }
-            mServiceCallbacks.finishBroadcast();
         }
+        mServiceCallbacks.finishBroadcast();
+    }
+
+    private void updateRepeatStatus(String token) {
+        if (token != null) {
+            RepeatStatus repeatStatus = RepeatStatus.valueOf(Util.parseDecimalIntOrZero(token));
+            if (repeatStatus != playerState.getRepeatStatus()) {
+                boolean wasUnknown = playerState.getRepeatStatus() == null;
+                playerState.setRepeatStatus(repeatStatus);
+                onRepeatStatusChanged(wasUnknown, repeatStatus);
+            }
+        }
+    }
+
+    private void onRepeatStatusChanged(boolean wasUnknown, RepeatStatus repeatStatus) {
+        int i = mServiceCallbacks.beginBroadcast();
+        while (i > 0) {
+            i--;
+            try {
+                mServiceCallbacks.getBroadcastItem(i)
+                        .onRepeatStatusChanged(wasUnknown, repeatStatus.getId());
+            } catch (RemoteException e) {
+            }
+        }
+        mServiceCallbacks.finishBroadcast();
     }
 
     private void updateOngoingNotification() {

@@ -66,10 +66,10 @@ android {
             }
         } else {
             release {
-                storeFile file("keystore")
-                storePassword "fakeStorePassword"
+                storeFile file("squeezer-local-release-key.keystore")
+                storePassword "squeezer"
                 keyAlias "squeezer"
-                keyPassword "fakeKeyPassword"
+                keyPassword "squeezer"
             }
         }
     }

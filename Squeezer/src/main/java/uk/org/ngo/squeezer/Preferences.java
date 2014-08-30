@@ -135,4 +135,8 @@ public final class Preferences {
         return sharedPreferences.getBoolean(Preferences.KEY_AUTO_CONNECT, true);
     }
 
+    public boolean controlSqueezePlayer() {
+        return sharedPreferences.getBoolean(Preferences.KEY_SQUEEZEPLAYER_ENABLED, true);
+    }
+
 }

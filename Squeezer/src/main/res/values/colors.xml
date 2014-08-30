@@ -17,7 +17,6 @@
   -->
 
 <resources>
-    <color name="actionbar_title_color">#fff</color>
     <color name="panel_background_color">#444</color>
     <color name="list_item_current_background">#281b69</color>
 </resources>

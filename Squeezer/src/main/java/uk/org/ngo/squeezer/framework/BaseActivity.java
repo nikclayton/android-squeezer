@@ -365,7 +365,11 @@ public abstract class BaseActivity extends ActionBarActivity implements HasUiThr
     // This section is just an easier way to call squeeze service
 
     public void play(PlaylistItem item) {
-        playlistControl(PlaylistControlCmd.load, item, R.string.ITEM_PLAYING);
+        if (new Preferences(this).getPartyModeStatus()) {
+            playlistControl(PlaylistControlCmd.add, item, R.string.ITEM_ADDED);
+        } else {
+            playlistControl(PlaylistControlCmd.load, item, R.string.ITEM_PLAYING);
+        }
     }
 
     public void add(PlaylistItem item) {
@@ -373,7 +377,11 @@ public abstract class BaseActivity extends ActionBarActivity implements HasUiThr
     }
 
     public void insert(PlaylistItem item) {
-        playlistControl(PlaylistControlCmd.insert, item, R.string.ITEM_INSERTED);
+        if (new Preferences(this).getPartyModeStatus()) {
+            playlistControl(PlaylistControlCmd.add, item, R.string.ITEM_ADDED);
+        } else {
+            playlistControl(PlaylistControlCmd.insert, item, R.string.ITEM_INSERTED);
+        }
     }
 
     private void playlistControl(PlaylistControlCmd cmd, PlaylistItem item, int resId)

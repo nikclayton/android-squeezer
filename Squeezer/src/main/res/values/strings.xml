@@ -62,6 +62,13 @@
     <string name="settings_notifyofconnection_off">Show notification only while playing music
     </string>
 
+    <string name="settings_partymode_title">Party Mode</string>
+    <string name="settings_partymode_off">SqueezePlayer interface is unlocked
+    </string>
+    <string name="settings_partymode_on">SqueezePlayer interface is locked down preventing unauthorized
+        access to settings and modifying playlists.
+    </string>
+
     <string name="settings_scrobble_title">Scrobble to Last.fm</string>
     <string name="settings_scrobble_on">Song information is sent to Last.fm</string>
     <string name="settings_scrobble_off">Song information is not sent to Last.fm</string>

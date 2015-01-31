@@ -35,6 +35,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Base64;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 import com.google.common.base.Splitter;
@@ -153,6 +154,11 @@ public class SqueezeService extends Service implements ServiceCallbackList.Servi
     final CliClient cli = new CliClient(this);
 
     /**
+     * Are we having a party?
+     */
+    private boolean partyModeEnabled;
+
+    /**
      * Is scrobbling enabled?
      */
     private boolean scrobblingEnabled;
@@ -199,6 +205,7 @@ public class SqueezeService extends Service implements ServiceCallbackList.Servi
 
     private void getPreferences() {
         final SharedPreferences preferences = getSharedPreferences(Preferences.NAME, MODE_PRIVATE);
+        partyModeEnabled = preferences.getBoolean(Preferences.KEY_PARTYMODE_ENABLED, false);
         scrobblingEnabled = preferences.getBoolean(Preferences.KEY_SCROBBLE_ENABLED, false);
         mFadeInSecs = preferences.getInt(Preferences.KEY_FADE_IN_SECS, 0);
         mUpdateOngoingNotification = preferences
@@ -1141,16 +1148,23 @@ public class SqueezeService extends Service implements ServiceCallbackList.Servi
 
         @Override
         public void adjustVolumeTo(Player player, int newVolume) {
+            if(isPartyMode())
+                return;
+
             cli.sendPlayerCommand(player, "mixer volume " + Math.min(100, Math.max(0, newVolume)));
         }
 
         @Override
         public void adjustVolumeTo(int newVolume) {
+            if(isPartyMode())
+                return;
             cli.sendActivePlayerCommand("mixer volume " + Math.min(100, Math.max(0, newVolume)));
         }
 
         @Override
         public void adjustVolumeBy(int delta) {
+            if(isPartyMode())
+                return;
             if (delta > 0) {
                 cli.sendActivePlayerCommand("mixer volume %2B" + delta);
             } else if (delta < 0) {
@@ -1161,6 +1175,13 @@ public class SqueezeService extends Service implements ServiceCallbackList.Servi
         @Override
         public boolean isConnected() {
             return connectionState.isConnected();
+        }
+
+        public boolean isPartyMode(){
+            getPreferences();
+            if(partyModeEnabled)
+                Toast.makeText(getApplicationContext(), "Just enjoy the party!", Toast.LENGTH_LONG).show();
+            return partyModeEnabled;
         }
 
         @Override
@@ -1266,7 +1287,7 @@ public class SqueezeService extends Service implements ServiceCallbackList.Servi
 
         @Override
         public boolean togglePausePlay() {
-            if (!isConnected()) {
+            if (!isConnected() || isPartyMode()) {
                 return false;
             }
 
@@ -1306,7 +1327,7 @@ public class SqueezeService extends Service implements ServiceCallbackList.Servi
 
         @Override
         public boolean play() {
-            if (!isConnected()) {
+            if (!isConnected() || isPartyMode()) {
                 return false;
             }
             cli.sendActivePlayerCommand("play" + fadeInSecs());
@@ -1315,7 +1336,7 @@ public class SqueezeService extends Service implements ServiceCallbackList.Servi
 
         @Override
         public boolean stop() {
-            if (!isConnected()) {
+            if (!isConnected() || isPartyMode()) {
                 return false;
             }
             cli.sendActivePlayerCommand("stop");
@@ -1324,7 +1345,7 @@ public class SqueezeService extends Service implements ServiceCallbackList.Servi
 
         @Override
         public boolean nextTrack() {
-            if (!isConnected() || !isPlaying()) {
+            if (!isConnected() || !isPlaying() || isPartyMode()) {
                 return false;
             }
             cli.sendActivePlayerCommand("button jump_fwd");
@@ -1333,7 +1354,7 @@ public class SqueezeService extends Service implements ServiceCallbackList.Servi
 
         @Override
         public boolean previousTrack() {
-            if (!isConnected() || !isPlaying()) {
+            if (!isConnected() || !isPlaying() || isPartyMode()) {
                 return false;
             }
             cli.sendActivePlayerCommand("button jump_rew");
@@ -1342,7 +1363,7 @@ public class SqueezeService extends Service implements ServiceCallbackList.Servi
 
         @Override
         public boolean toggleShuffle() {
-            if (!isConnected()) {
+            if (!isConnected() || isPartyMode()) {
                 return false;
             }
             cli.sendActivePlayerCommand("playlist shuffle");
@@ -1351,7 +1372,7 @@ public class SqueezeService extends Service implements ServiceCallbackList.Servi
 
         @Override
         public boolean toggleRepeat() {
-            if (!isConnected()) {
+            if (!isConnected() || isPartyMode()) {
                 return false;
             }
             cli.sendActivePlayerCommand("playlist repeat");
@@ -1385,7 +1406,7 @@ public class SqueezeService extends Service implements ServiceCallbackList.Servi
          */
         @Override
         public boolean playlistIndex(int index) {
-            if (!isConnected()) {
+            if (!isConnected() || isPartyMode()) {
                 return false;
             }
             cli.sendActivePlayerCommand("playlist index " + index + fadeInSecs());
@@ -1394,7 +1415,7 @@ public class SqueezeService extends Service implements ServiceCallbackList.Servi
 
         @Override
         public boolean playlistRemove(int index) {
-            if (!isConnected()) {
+            if (!isConnected() || isPartyMode()) {
                 return false;
             }
             cli.sendActivePlayerCommand("playlist delete " + index);
@@ -1403,7 +1424,7 @@ public class SqueezeService extends Service implements ServiceCallbackList.Servi
 
         @Override
         public boolean playlistMove(int fromIndex, int toIndex) {
-            if (!isConnected()) {
+            if (!isConnected() || isPartyMode()) {
                 return false;
             }
             cli.sendActivePlayerCommand("playlist move " + fromIndex + " " + toIndex);
@@ -1412,7 +1433,7 @@ public class SqueezeService extends Service implements ServiceCallbackList.Servi
 
         @Override
         public boolean playlistClear() {
-            if (!isConnected()) {
+            if (!isConnected() || isPartyMode()) {
                 return false;
             }
             cli.sendActivePlayerCommand("playlist clear");
@@ -1421,7 +1442,7 @@ public class SqueezeService extends Service implements ServiceCallbackList.Servi
 
         @Override
         public boolean playlistSave(String name) {
-            if (!isConnected()) {
+            if (!isConnected() || isPartyMode()) {
                 return false;
             }
             cli.sendActivePlayerCommand("playlist save " + Util.encode(name));
@@ -1430,7 +1451,7 @@ public class SqueezeService extends Service implements ServiceCallbackList.Servi
 
         @Override
         public boolean pluginPlaylistControl(Plugin plugin, String cmd, String itemId) {
-            if (!isConnected()) {
+            if (!isConnected() || isPartyMode()) {
                 return false;
             }
             cli.sendActivePlayerCommand(plugin.getId() + " playlist " + cmd + " item_id:" + itemId);
@@ -1526,7 +1547,7 @@ public class SqueezeService extends Service implements ServiceCallbackList.Servi
 
         @Override
         public boolean setSecondsElapsed(int seconds) {
-            if (!isConnected()) {
+            if (!isConnected() || isPartyMode()) {
                 return false;
             }
             if (seconds < 0) {
@@ -1553,7 +1574,7 @@ public class SqueezeService extends Service implements ServiceCallbackList.Servi
             }
 
             getPreferences();
-        }
+         }
 
 
         @Override
@@ -1714,7 +1735,7 @@ public class SqueezeService extends Service implements ServiceCallbackList.Servi
 
         @Override
         public boolean playlistsDelete(Playlist playlist) {
-            if (!isConnected()) {
+            if (!isConnected() || isPartyMode()) {
                 return false;
             }
             cli.sendCommand("playlists delete " + playlist.getFilterParameter());
@@ -1723,7 +1744,7 @@ public class SqueezeService extends Service implements ServiceCallbackList.Servi
 
         @Override
         public boolean playlistsMove(Playlist playlist, int index, int toindex) {
-            if (!isConnected()) {
+            if (!isConnected() || isPartyMode()) {
                 return false;
             }
             cli.sendCommand("playlists edit cmd:move " + playlist.getFilterParameter()
@@ -1733,7 +1754,7 @@ public class SqueezeService extends Service implements ServiceCallbackList.Servi
 
         @Override
         public boolean playlistsNew(String name) {
-            if (!isConnected()) {
+            if (!isConnected() || isPartyMode()) {
                 return false;
             }
             cli.sendCommand("playlists new name:" + Util.encode(name));
@@ -1742,7 +1763,7 @@ public class SqueezeService extends Service implements ServiceCallbackList.Servi
 
         @Override
         public boolean playlistsRemove(Playlist playlist, int index) {
-            if (!isConnected()) {
+            if (!isConnected() || isPartyMode()) {
                 return false;
             }
             cli.sendCommand("playlists edit cmd:delete " + playlist.getFilterParameter() + " index:"
@@ -1752,7 +1773,7 @@ public class SqueezeService extends Service implements ServiceCallbackList.Servi
 
         @Override
         public boolean playlistsRename(Playlist playlist, String newname) {
-            if (!isConnected()) {
+            if (!isConnected() || isPartyMode()) {
                 return false;
             }
             cli.sendCommand(

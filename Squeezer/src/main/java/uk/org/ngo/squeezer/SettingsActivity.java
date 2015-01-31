@@ -115,6 +115,24 @@ public class SettingsActivity extends PreferenceActivity implements
         CheckBoxPreference startSqueezePlayerPref = (CheckBoxPreference) findPreference(
                 Preferences.KEY_SQUEEZEPLAYER_ENABLED);
         startSqueezePlayerPref.setChecked(preferences.getBoolean(Preferences.KEY_SQUEEZEPLAYER_ENABLED, true));
+
+        if(preferences.getBoolean(Preferences.KEY_PARTYMODE_ENABLED, false)) {
+            SetAllSettingEnabled(false);
+        }
+    }
+
+    private void SetAllSettingEnabled(boolean status)
+    {
+        findPreference(Preferences.KEY_SCROBBLE_ENABLED).setEnabled(status);
+        findPreference(Preferences.KEY_ANALYTICS_ENABLED).setEnabled(status);
+        findPreference(Preferences.KEY_FADE_IN_SECS).setEnabled(status);
+        findPreference(Preferences.KEY_SQUEEZEPLAYER_ENABLED).setEnabled(status);
+        findPreference(Preferences.KEY_NOTIFY_OF_CONNECTION).setEnabled(status);
+        findPreference(Preferences.KEY_AUTO_CONNECT).setEnabled(status);
+        findPreference(Preferences.KEY_SERVERADDR).setEnabled(status);
+        findPreference(Preferences.KEY_ON_THEME_SELECT_ACTION).setEnabled(status);
+        findPreference(Preferences.KEY_ON_SELECT_SONG_ACTION).setEnabled(status);
+        findPreference(Preferences.KEY_ON_SELECT_ALBUM_ACTION).setEnabled(status);
     }
 
     private void fillScrobblePreferences(SharedPreferences preferences) {
@@ -331,8 +349,11 @@ public class SettingsActivity extends PreferenceActivity implements
         } else {
             Log.v(TAG, "service is null!");
         }
-    }
 
+        if (Preferences.KEY_PARTYMODE_ENABLED.equals(key)) {
+            finish();
+        }
+    }
     @Override
     @Deprecated
     protected Dialog onCreateDialog(int id) {

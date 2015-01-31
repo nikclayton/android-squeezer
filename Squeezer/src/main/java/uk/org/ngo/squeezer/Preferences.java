@@ -60,6 +60,12 @@ public final class Preferences {
     // Fade-in period? (0 = disable fade-in)
     public static final String KEY_FADE_IN_SECS = "squeezer.fadeInSecs";
 
+    // Are we having a party?
+    public static final String KEY_PARTYMODE_ENABLED = "squeezer.partymode.enabled";
+
+    // Pin to disable the party mode
+    public static final String KEY_PARTYMODE_PIN = "squeezer.partymode.pin";
+
     // What do to when an album is selected in the list view
     public static final String KEY_ON_SELECT_ALBUM_ACTION = "squeezer.action.onselect.album";
 
@@ -86,6 +92,31 @@ public final class Preferences {
         sharedPreferences = context.getSharedPreferences(Preferences.NAME, Context.MODE_PRIVATE);
     }
 
+    public Boolean getPartyModeStatus() {
+        return sharedPreferences.getBoolean(Preferences.KEY_PARTYMODE_ENABLED, true);
+    }
+
+    public void setPartyModeStatus(Boolean status){
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        editor.putBoolean(Preferences.KEY_PARTYMODE_ENABLED, status);
+        editor.commit();
+    }
+
+    public String getPartyModePin() {
+        return getPartyModePin(null);
+    }
+
+    public String getPartyModePin(String defaultValue) {
+        return getStringPreference(Preferences.KEY_PARTYMODE_PIN, defaultValue);
+    }
+
+    public void setPartyModePin (String password){
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        editor.putString(Preferences.KEY_PARTYMODE_PIN, password);
+        editor.commit();
+    }
 
     private String getStringPreference(String preference, String defaultValue) {
         final String pref = sharedPreferences.getString(preference, null);

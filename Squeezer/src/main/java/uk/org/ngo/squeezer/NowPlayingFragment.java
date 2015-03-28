@@ -751,8 +751,15 @@ public class NowPlayingFragment extends Fragment implements
             if (mFullHeightLayout) {
                 artistText.setText(song.getArtist());
                 if (song.isRemote()) {
-                    nextButton.setEnabled(false);
-                    Util.setAlpha(nextButton, 0.25f);
+                    if (song.getButtons().length() == 0) {
+                        nextButton.setEnabled(false);
+                        Util.setAlpha(nextButton, 0.25f);
+                    } else {
+                        // TODO: figure out how to parse the buttons HASH;
+                        // for now just assume the next button is enabled
+                        nextButton.setEnabled(true);
+                        Util.setAlpha(nextButton, 1.0f);
+                    }
                     prevButton.setEnabled(false);
                     Util.setAlpha(prevButton, 0.25f);
                     btnContextMenu.setVisibility(View.GONE);

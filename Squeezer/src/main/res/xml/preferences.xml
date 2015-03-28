@@ -64,6 +64,13 @@
             android:summaryOff="@string/settings_notifyofconnection_off"
             android:persistent="true"/>
 
+        <uk.org.ngo.squeezer.dialog.PartyModePin
+            android:key="squeezer.partymode.enabled"
+            android:title="@string/settings_partymode_title"
+            android:summaryOn="@string/settings_partymode_on"
+            android:summaryOff="@string/settings_partymode_off"
+            android:persistent="true"/>
+
         <ListPreference
             android:key="squeezer.action.onselect.album"
             android:title="@string/settings_album_selectaction"/>

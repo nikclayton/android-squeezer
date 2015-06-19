@@ -35,64 +35,58 @@
 
     <TextView
         android:id="@+id/trackname"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
         android:layout_toRightOf="@id/album"
-        android:ellipsize="marquee"
         android:gravity="left"
-        android:hint="@string/unknown_track"
-        android:marqueeRepeatLimit="marquee_forever"
         android:paddingBottom="4dp"
         android:paddingLeft="8dp"
         android:paddingTop="8dp"
-        android:singleLine="true"
-        android:textAppearance="@style/SqueezerTextItem"/>
+        style="@style/SqueezerWidget.NowPlaying.SongName"/>
 
     <TextView
         android:id="@+id/albumname"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/trackname"
-        android:layout_toLeftOf="@id/context_menu"
+        android:layout_toLeftOf="@+id/context_menu_wrapper"
         android:layout_toRightOf="@id/album"
-        android:ellipsize="marquee"
         android:gravity="left"
-        android:hint="@string/unknown_album"
-        android:marqueeRepeatLimit="marquee_forever"
         android:paddingBottom="4dp"
         android:paddingLeft="8dp"
         android:paddingTop="4dp"
-        android:singleLine="true"
-        android:textAppearance="@style/SqueezerTextItemSmall"/>
+        style="@style/SqueezerWidget.NowPlaying.AlbumName"/>
 
     <TextView
         android:id="@+id/artistname"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
         android:layout_below="@id/albumname"
-        android:layout_toLeftOf="@id/context_menu"
+        android:layout_toLeftOf="@+id/context_menu_wrapper"
         android:layout_toRightOf="@id/album"
-        android:ellipsize="marquee"
         android:gravity="left"
-        android:hint="@string/unknown_artist"
-        android:marqueeRepeatLimit="marquee_forever"
         android:paddingBottom="4dp"
         android:paddingLeft="8dp"
         android:paddingTop="4dp"
-        android:singleLine="true"
-        android:textAppearance="@style/SqueezerTextItemSmall"/>
+        style="@style/SqueezerWidget.NowPlaying.ArtistName"/>
 
-    <uk.org.ngo.squeezer.widget.ListItemImageButton
-        android:id="@+id/context_menu"
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="48dp"
-        android:layout_height="64dp"
+    <!-- Wrap the context menu view in a LinearLayout so that
+         a gravity attribute can be applied to force the image
+         to the bottom of the container, roughly level with the
+         bottom of the artistname view. -->
+    <LinearLayout
+        android:id="@+id/context_menu_wrapper"
         android:layout_alignParentRight="true"
         android:layout_below="@id/trackname"
-        android:background="@drawable/list_selector_holo_dark"
-        android:contentDescription="@string/app_name"
-        android:minWidth="48dp"
-        android:src="@drawable/dropdown_ic_arrow_normal_holo_dark"/>
+        android:layout_alignBottom="@id/artistname"
+        android:layout_width="48dp"
+        android:gravity="bottom"
+        android:layout_height="64dp">
+        <uk.org.ngo.squeezer.widget.ListItemImageButton
+            android:id="@+id/context_menu"
+            android:layout_width="fill_parent"
+            android:layout_height="48dp"
+            android:background="@drawable/list_selector_holo_dark"
+            android:minWidth="48dp"
+            android:src="@drawable/dropdown_ic_arrow_normal_holo_dark"/>
+    </LinearLayout>
+
 
     <LinearLayout
         android:id="@+id/media_buttons"
@@ -108,23 +102,23 @@
 
         <ImageButton
             android:id="@+id/shuffle"
-            style="@style/MediaButton.Shuffle"/>
+            style="@style/SqueezerWidget.MediaButton.Shuffle"/>
 
         <uk.org.ngo.squeezer.widget.RepeatingImageButton
             android:id="@+id/prev"
-            style="@style/MediaButton.Previous"/>
+            style="@style/SqueezerWidget.MediaButton.Previous"/>
 
         <ImageButton
             android:id="@+id/pause"
-            style="@style/MediaButton.Play"/>
+            style="@style/SqueezerWidget.MediaButton.Play"/>
 
         <uk.org.ngo.squeezer.widget.RepeatingImageButton
             android:id="@+id/next"
-            style="@style/MediaButton.Next"/>
+            style="@style/SqueezerWidget.MediaButton.Next"/>
 
         <ImageButton
             android:id="@+id/repeat"
-            style="@style/MediaButton.Repeat"/>
+            style="@style/SqueezerWidget.MediaButton.Repeat"/>
     </LinearLayout>
 
     <SeekBar
@@ -138,23 +132,15 @@
 
     <TextView
         android:id="@+id/currenttime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:layout_above="@id/totaltime"
         android:layout_alignParentRight="true"
         android:layout_gravity="center_horizontal"
-        android:gravity="center_vertical"
-        android:text="0:00"
-        android:textAppearance="@style/SqueezerTextItemSmall"/>
+        style="@style/SqueezerWidget.NowPlaying.Timestamp"/>
 
     <TextView
         android:id="@+id/totaltime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_gravity="center_horizontal"
-        android:gravity="center_vertical"
-        android:text="0:00"
-        android:textAppearance="@style/SqueezerTextItemSmall"/>
+        style="@style/SqueezerWidget.NowPlaying.Timestamp"/>
 </RelativeLayout>

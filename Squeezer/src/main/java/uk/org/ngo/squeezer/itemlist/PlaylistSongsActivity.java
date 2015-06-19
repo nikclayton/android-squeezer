@@ -38,6 +38,9 @@ import uk.org.ngo.squeezer.service.ISqueezeService;
 import uk.org.ngo.squeezer.service.event.PlaylistCreateFailed;
 import uk.org.ngo.squeezer.service.event.PlaylistRenameFailed;
 
+/**
+ * Shows the songs in a playlist.
+ */
 public class PlaylistSongsActivity extends BaseListActivity<Song> {
 
     @Override
@@ -90,7 +93,9 @@ public class PlaylistSongsActivity extends BaseListActivity<Song> {
 
     @Override
     public ItemView<Song> createItemView() {
-        return new SongView(this) {
+        // XXX: Note, very similar to code in CurrentPlaylistActivity#createItemView,
+        // investigate opportunities to refactor.
+        SongViewWithArt view = new SongViewWithArt(this) {
             @Override
             public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
                 super.onCreateContextMenu(menu, v, menuInfo);
@@ -103,6 +108,10 @@ public class PlaylistSongsActivity extends BaseListActivity<Song> {
 
                 if (menuInfo.position == menuInfo.adapter.getCount() - 1) {
                     menu.findItem(R.id.playlist_move_down).setVisible(false);
+                }
+
+                if (menuInfo.adapter.getCount() == 1) {
+                    menu.findItem(R.id.playlist_move).setVisible(false);
                 }
             }
 
@@ -150,6 +159,10 @@ public class PlaylistSongsActivity extends BaseListActivity<Song> {
                 return super.doItemContext(menuItem, index, selectedItem);
             }
         };
+
+        view.setDetails(SongView.DETAILS_DURATION | SongView.DETAILS_ALBUM | SongView.DETAILS_ARTIST);
+
+        return view;
     }
 
     @Override

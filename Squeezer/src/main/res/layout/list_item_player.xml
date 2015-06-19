@@ -65,7 +65,7 @@ for the implementation.
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/icon"
-        android:textAppearance="@style/SqueezerTextItem"
+        android:textAppearance="@style/SqueezerTextAppearance.GridItem.Primary"
         tools:text="Player name" />
 
     <TextView
@@ -74,7 +74,7 @@ for the implementation.
         android:layout_height="wrap_content"
         android:layout_below="@+id/text1"
         android:layout_toRightOf="@+id/icon"
-        android:textAppearance="@style/SqueezerTextItemSmall"
+        android:textAppearance="@style/SqueezerTextAppearance.ListItem.Secondary"
         tools:text="Sleeping in ..."
         tools:visibility="visible"
         android:layout_above="@+id/volume_slider" />

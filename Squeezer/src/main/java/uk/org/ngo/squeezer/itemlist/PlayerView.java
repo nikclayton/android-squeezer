@@ -36,7 +36,6 @@ import uk.org.ngo.squeezer.model.PlayerState;
 import uk.org.ngo.squeezer.model.Song;
 import uk.org.ngo.squeezer.service.ISqueezeService;
 import uk.org.ngo.squeezer.service.ServerString;
-import uk.org.ngo.squeezer.util.ImageFetcher;
 
 public class PlayerView extends BaseItemView<Player> {
     private static final Map<String, Integer> modelIcons = initializeModelIcons();
@@ -62,7 +61,7 @@ public class PlayerView extends BaseItemView<Player> {
     }
 
     @Override
-    public void bindView(View view, Player item, ImageFetcher imageFetcher) {
+    public void bindView(View view, Player item) {
         final PlayerListActivity activity = (PlayerListActivity) getActivity();
         PlayerState playerState = activity.getPlayerState(item.getId());
         PlayerViewHolder viewHolder = (PlayerViewHolder) view.getTag();

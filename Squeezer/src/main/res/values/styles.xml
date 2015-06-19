@@ -37,6 +37,8 @@
         <item name="ic_action_view_as_list">@drawable/ic_action_view_as_list</item>
 
         <item name="playing_item">@drawable/abc_list_pressed_holo_dark</item>
+
+        <item name="floatLabelColor">@color/float_label_dark</item>
     </style>
 
     <style name="AppTheme.Light.DarkActionBar" parent="Theme.AppCompat.Light.DarkActionBar">
@@ -58,13 +60,47 @@
         <item name="ic_action_view_as_list">@drawable/ic_action_view_as_list_light</item>
 
         <item name="playing_item">@drawable/abc_list_pressed_holo_light</item>
+
+        <item name="floatLabelColor">@color/float_label_light</item>
     </style>
 
-    <!-- Text Styles -->
-    <style name="SqueezerTextItem" parent="@android:style/TextAppearance.Medium" />
-    <style name="SqueezerCurrentTextItem" parent="style/SqueezerTextItem" />
-    <style name="SqueezerTextItemSmall" parent="@android:style/TextAppearance.Small" />
-    <style name="SqueezerCurrentTextItemSmall" parent="style/SqueezerTextItemSmall" />
+    <!-- Text Styles. Apply these to the android:textAppearance attribute of the views. -->
+
+    <!-- Base styles that the rest of the app inherits from. -->
+    <style name="SqueezerTextAppearance.Large" parent="@android:style/TextAppearance.Large"/>
+    <style name="SqueezerTextAppearance.Medium" parent="@android:style/TextAppearance.Medium"/>
+    <style name="SqueezerTextAppearance.Small" parent="@android:style/TextAppearance.Small"/>
+
+    <!-- Text in list items -->
+    <style name="SqueezerTextAppearance.ListItem.Primary" parent="SqueezerTextAppearance.Medium"/>
+    <style name="SqueezerTextAppearance.ListItem.Secondary" parent="SqueezerTextAppearance.Small"/>
+
+    <!-- Text in grid items -->
+    <style name="SqueezerTextAppearance.GridItem.Primary" parent="SqueezerTextAppearance.Medium"/>
+    <style name="SqueezerTextAppearance.GridItem.Secondary" parent="SqueezerTextAppearance.Small"/>
+
+    <!-- Anywhere we want to display information about a song in an activity (and not in a list). -->
+    <style name="SqueezerTextAppearance.SongInfo.Primary" parent="SqueezerTextAppearance.Medium"/>
+    <style name="SqueezerTextAppearance.SongInfo.Secondary" parent="SqueezerTextAppearance.Small"/>
+    <style name="SqueezerTextAppearance.SongInfo.Tertiary" parent="SqueezerTextAppearance.Small"/>
+
+    <!-- Text on the NowPlayingFragment. -->
+    <style name="SqueezerTextAppearance.NowPlaying.Primary" parent="SqueezerTextAppearance.SongInfo.Primary"/>
+    <style name="SqueezerTextAppearance.NowPlaying.Secondary" parent="SqueezerTextAppearance.SongInfo.Secondary"/>
+    <style name="SqueezerTextAppearance.NowPlaying.Tertiary" parent="SqueezerTextAppearance.SongInfo.Tertiary"/>
+
+    <style name="SqueezerTextAppearance.NowPlaying.SongName" parent="SqueezerTextAppearance.NowPlaying.Primary"/>
+    <style name="SqueezerTextAppearance.NowPlaying.AlbumName" parent="SqueezerTextAppearance.NowPlaying.Secondary"/>
+    <style name="SqueezerTextAppearance.NowPlaying.ArtistName" parent="SqueezerTextAppearance.NowPlaying.Secondary"/>
+
+    <!-- Text on the NowPlayingFragment mini player. -->
+    <style name="SqueezerTextAppearance.NowPlayingMini.Primary" parent="SqueezerTextAppearance.SongInfo.Primary"/>
+    <style name="SqueezerTextAppearance.NowPlayingMini.Secondary" parent="SqueezerTextAppearance.SongInfo.Secondary"/>
+    <style name="SqueezerTextAppearance.NowPlayingMini.Tertiary" parent="SqueezerTextAppearance.SongInfo.Tertiary"/>
+
+    <style name="SqueezerTextAppearance.NowPlayingMini.SongName" parent="SqueezerTextAppearance.NowPlayingMini.Primary"/>
+    <style name="SqueezerTextAppearance.NowPlayingMini.AlbumName" parent="SqueezerTextAppearance.NowPlayingMini.Secondary"/>
+    <style name="SqueezerTextAppearance.NowPlayingMini.ArtistName" parent="SqueezerTextAppearance.NowPlayingMini.Secondary"/>
 
     <style name="SqueezerNotificationTitle">
         <item name="android:textColor">?android:attr/textColorPrimaryInverse</item>
@@ -75,31 +111,99 @@
         <item name="android:textColor">?android:attr/textColorPrimaryInverse</item>
     </style>
 
-    <!-- Media controller styles -->
-    <style name="MediaButton">
-        <item name="android:background">@drawable/list_selector_holo_dark</item>
-        <item name="android:layout_weight">1</item>
-        <item name="android:layout_width">0dip</item>
-        <item name="android:layout_height">52dip</item>
+    <style name="SqueezerTextAppearance.FloatLabel" parent="SqueezerTextAppearance.Small">
+        <item name="android:textColor">?attr/floatLabelColor</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:textStyle">bold</item>
     </style>
 
-    <style name="MediaButton.Previous">
+    <!-- Widget appearance. Apply these using the "style" attribute. -->
+    <style name="SqueezerWidget"/>
+
+    <style name="SqueezerWidget.NowPlaying"/>
+
+    <style name="SqueezerWidget.NowPlaying.SongName">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:ellipsize">marquee</item>
+        <item name="android:focusable">true</item>
+        <item name="android:focusableInTouchMode">true</item>
+        <item name="android:hint">@string/unknown_track</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textAppearance">@style/SqueezerTextAppearance.NowPlaying.SongName</item>
+    </style>
+
+    <style name="SqueezerWidget.NowPlaying.AlbumName">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:hint">@string/unknown_album</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textAppearance">@style/SqueezerTextAppearance.NowPlaying.AlbumName</item>
+    </style>
+
+    <style name="SqueezerWidget.NowPlaying.ArtistName">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:hint">@string/unknown_artist</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textAppearance">@style/SqueezerTextAppearance.NowPlaying.ArtistName</item>
+    </style>
+
+    <style name="SqueezerWidget.NowPlaying.Timestamp">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center_horizontal</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:text">0:00</item>
+        <item name="android:textAppearance">@style/SqueezerTextAppearance.NowPlaying.Tertiary</item>
+    </style>
+
+    <style name="SqueezerWidget.NowPlayingMini"/>
+
+    <style name="SqueezerWidget.NowPlayingMini.SongName">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:ellipsize">marquee</item>
+        <item name="android:focusable">true</item>
+        <item name="android:focusableInTouchMode">true</item>
+        <item name="android:hint">@string/unknown_track</item>
+        <item name="android:marqueeRepeatLimit">marquee_forever</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textAppearance">@style/SqueezerTextAppearance.NowPlayingMini.SongName</item>
+    </style>
+
+    <style name="SqueezerWidget.NowPlayingMini.AlbumName">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:hint">@string/unknown_album</item>
+        <item name="android:singleLine">true</item>
+    </style>
+
+    <!-- Media controller styles -->
+    <style name="SqueezerWidget.MediaButton">
+        <item name="android:layout_width">0dip</item>
+        <item name="android:layout_height">52dip</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:background">@drawable/list_selector_holo_dark</item>
+    </style>
+
+    <style name="SqueezerWidget.MediaButton.Previous">
         <item name="android:src">?attr/ic_action_av_previous</item>
     </style>
 
-    <style name="MediaButton.Next">
+    <style name="SqueezerWidget.MediaButton.Next">
         <item name="android:src">?attr/ic_action_av_next</item>
     </style>
 
-    <style name="MediaButton.Play">
+    <style name="SqueezerWidget.MediaButton.Play">
         <item name="android:src">?attr/ic_action_av_play</item>
     </style>
 
-    <style name="MediaButton.Shuffle">
+    <style name="SqueezerWidget.MediaButton.Shuffle">
         <item name="android:src">?attr/ic_action_av_shuffle_off</item>
     </style>
 
-    <style name="MediaButton.Repeat">
+    <style name="SqueezerWidget.MediaButton.Repeat">
         <item name="android:src">?attr/ic_action_av_repeat_off</item>
     </style>
 
@@ -109,11 +213,5 @@
 
     <style name="VolumeDialogAnimation">
         <item name="android:windowExitAnimation">@android:anim/fade_out</item>
-    </style>
-
-    <style name="TextAppearance.Squeezer.FloatLabel" parent="android:TextAppearance.Small">
-        <item name="android:textColor">@drawable/float_label</item>
-        <item name="android:textSize">11sp</item>
-        <item name="android:textStyle">bold</item>
     </style>
 </resources>

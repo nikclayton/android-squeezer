@@ -45,7 +45,6 @@ import uk.org.ngo.squeezer.model.Album;
 import uk.org.ngo.squeezer.model.Artist;
 import uk.org.ngo.squeezer.model.Genre;
 import uk.org.ngo.squeezer.model.Song;
-import uk.org.ngo.squeezer.util.ImageFetcher;
 
 public class SearchAdapter extends BaseExpandableListAdapter implements
         OnCreateContextMenuListener {
@@ -61,12 +60,12 @@ public class SearchAdapter extends BaseExpandableListAdapter implements
     private final Map<Class<? extends Item>, ItemAdapter<? extends Item>> childAdapterMap
             = new HashMap<Class<? extends Item>, ItemAdapter<? extends Item>>();
 
-    public SearchAdapter(SearchActivity activity, ImageFetcher imageFetcher) {
+    public SearchAdapter(SearchActivity activity) {
         this.activity = activity;
 
         ItemAdapter<?>[] adapters = {
-                new ItemAdapter<Song>(new SongViewWithArt(activity), imageFetcher),
-                new ItemAdapter<Album>(new AlbumView(activity), imageFetcher),
+                new ItemAdapter<Song>(new SongViewWithArt(activity)),
+                new ItemAdapter<Album>(new AlbumView(activity)),
                 new ItemAdapter<Artist>(new ArtistView(activity)),
                 new ItemAdapter<Genre>(new GenreView(activity)),
         };

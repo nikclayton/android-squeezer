@@ -119,6 +119,7 @@ public class Player extends Item {
         return mConnected;
     }
 
+    @NonNull
     public PlayerState getPlayerState() {
         return mPlayerState;
     }

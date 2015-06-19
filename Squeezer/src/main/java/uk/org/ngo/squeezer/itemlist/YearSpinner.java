@@ -27,9 +27,9 @@ import java.util.Map;
 import uk.org.ngo.squeezer.Util;
 import uk.org.ngo.squeezer.framework.ItemAdapter;
 import uk.org.ngo.squeezer.framework.ItemListActivity;
+import uk.org.ngo.squeezer.framework.SpinnerItemAdapter;
 import uk.org.ngo.squeezer.model.Year;
 import uk.org.ngo.squeezer.service.ISqueezeService;
-import uk.org.ngo.squeezer.util.ImageFetcher;
 
 public class YearSpinner {
 
@@ -64,8 +64,7 @@ public class YearSpinner {
                         YearView itemView = new YearView(activity) {
                             @Override
                             public View getAdapterView(View convertView, ViewGroup parent,
-                                    Year item,
-                                    ImageFetcher unused) {
+                                    Year item) {
                                 return Util.getSpinnerItemView(getActivity(), convertView, parent,
                                         item.getName());
                             }
@@ -77,7 +76,7 @@ public class YearSpinner {
                                         label);
                             }
                         };
-                        adapter = new ItemAdapter<Year>(itemView, true, null);
+                        adapter = new SpinnerItemAdapter<Year>(itemView, true);
                         spinner.setAdapter(adapter);
                     }
                     adapter.update(count, start, list);

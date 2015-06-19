@@ -18,15 +18,20 @@ package uk.org.ngo.squeezer.service.event;
 
 import android.support.annotation.NonNull;
 
+import uk.org.ngo.squeezer.model.Player;
 import uk.org.ngo.squeezer.model.PlayerState;
 
-/** Event sent when the track the active player is playing changes. */
+/** Event sent when the track the player is playing changes. */
 public class MusicChanged {
+    /** The player with changed state. */
+    @NonNull public final Player player;
+
     /** The active player's new state. */
     @NonNull
     public final PlayerState playerState;
 
-    public MusicChanged(@NonNull PlayerState playerState) {
+    public MusicChanged(@NonNull Player player, @NonNull PlayerState playerState) {
+        this.player = player;
         this.playerState = playerState;
     }
 }

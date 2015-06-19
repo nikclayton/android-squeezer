@@ -117,10 +117,6 @@ public interface ISqueezeService {
 
     PlayerState getPlayerState();
     String getCurrentPlaylist();
-    String getAlbumArtUrl(String artworkTrackId) throws SqueezeService.HandshakeNotCompleteException;
-    String getIconUrl(String icon) throws SqueezeService.HandshakeNotCompleteException;
-
-    String getSongDownloadUrl(String songTrackId) throws SqueezeService.HandshakeNotCompleteException;
 
     /**
      * Sets the volume to the absolute volume in newVolume, which will be clamped to the

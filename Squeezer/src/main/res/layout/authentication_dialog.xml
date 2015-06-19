@@ -28,7 +28,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        app:floatLabelTextAppearance="@style/TextAppearance.Squeezer.FloatLabel"
+        app:floatLabelTextAppearance="@style/SqueezerTextAppearance.FloatLabel"
         app:floatLabelTrigger="focus">
 
         <EditText
@@ -47,7 +47,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        app:floatLabelTextAppearance="@style/TextAppearance.Squeezer.FloatLabel"
+        app:floatLabelTextAppearance="@style/SqueezerTextAppearance.FloatLabel"
         app:floatLabelTrigger="focus">
 
         <EditText

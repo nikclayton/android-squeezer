@@ -17,7 +17,6 @@
 package uk.org.ngo.squeezer.framework;
 
 
-import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -37,8 +36,6 @@ import uk.org.ngo.squeezer.menu.MenuFragment;
 import uk.org.ngo.squeezer.service.ISqueezeService;
 import uk.org.ngo.squeezer.service.SqueezeService;
 import uk.org.ngo.squeezer.service.event.HandshakeComplete;
-import uk.org.ngo.squeezer.util.ImageCache;
-import uk.org.ngo.squeezer.util.ImageFetcher;
 import uk.org.ngo.squeezer.util.RetainFragment;
 
 /**
@@ -83,21 +80,6 @@ public abstract class ItemListActivity extends BaseActivity {
      */
     private static final String TAG_RECEIVED_PAGES = "mReceivedPages";
 
-    /**
-     * An ImageFetcher for loading thumbnails.
-     */
-    private ImageFetcher mImageFetcher;
-
-    /**
-     * Tag for _mImageFetcher in mRetainFragment.
-     */
-    public static final String TAG_IMAGE_FETCHER = "imageFetcher";
-
-    /**
-     * ImageCache parameters for the album art.
-     */
-    private ImageCache.ImageCacheParams mImageCacheParams;
-
     /* Fragment to retain information across orientation changes. */
     private RetainFragment mRetainFragment;
 
@@ -120,61 +102,13 @@ public abstract class ItemListActivity extends BaseActivity {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-
-        getImageFetcher().addImageCache(getSupportFragmentManager(), mImageCacheParams);
-        mImageFetcher.setExitTasksEarly(false);
-    }
-
-    @Override
     public void onPause() {
         super.onPause();
-
-        if (mImageFetcher != null) {
-            mImageFetcher.setExitTasksEarly(true);
-            mImageFetcher.setPauseWork(false);
-            mImageFetcher.closeCache();
-        }
 
         // Any items coming in after callbacks have been unregistered are discarded.
         // We cancel any outstanding orders, so items can be reordered after the
         // activity resumes.
         cancelOrders();
-    }
-
-    protected ImageFetcher createImageFetcher(int height, int width) {
-        // Get an ImageFetcher to scale artwork to the supplied size.
-        int iconSize = (Math.max(height, width));
-        ImageFetcher imageFetcher = new ImageFetcher(this, iconSize);
-        imageFetcher.setLoadingImage(R.drawable.icon_pending_artwork);
-        return imageFetcher;
-    }
-
-    protected ImageFetcher createImageFetcher() {
-        // Get an ImageFetcher to scale artwork to the size of the icon view.
-        Resources resources = getResources();
-        return createImageFetcher(
-                resources.getDimensionPixelSize(R.dimen.album_art_icon_height),
-                resources.getDimensionPixelSize(R.dimen.album_art_icon_width));
-    }
-
-    protected void createImageCacheParams() {
-        mImageCacheParams = new ImageCache.ImageCacheParams(this, "artwork");
-        mImageCacheParams.setMemCacheSizePercent(this, 0.12f);
-    }
-
-    public ImageFetcher getImageFetcher() {
-        if (mImageFetcher == null) {
-            mImageFetcher = (ImageFetcher) mRetainFragment.get(TAG_IMAGE_FETCHER);
-            if (mImageFetcher == null) {
-                mImageFetcher = createImageFetcher();
-                createImageCacheParams();
-                mRetainFragment.put(TAG_IMAGE_FETCHER, mImageFetcher);
-            }
-        }
-
-        return mImageFetcher;
     }
 
     /**

@@ -18,7 +18,11 @@ package uk.org.ngo.squeezer.service.event;
 
 import uk.org.ngo.squeezer.service.ConnectionState;
 
+/**
+ * Event posted whenever the connection state to the server changes.
+ */
 public class ConnectionChanged {
+    /** The new connection state. */
     @ConnectionState.ConnectionStates
     public int connectionState;
 

@@ -28,7 +28,7 @@
     <TextView android:id="@android:id/message"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="@style/SqueezerTextItemSmall"
+        android:textAppearance="@style/SqueezerTextAppearance.Medium"
         android:paddingTop="16dp"
         android:paddingBottom="16dp"
         android:text="You need to install a scrobbling app before this feature works.\n\nHere are three that are known to work. Touch one to start Google Play for installation."/>

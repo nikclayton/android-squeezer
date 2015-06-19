@@ -72,7 +72,7 @@ public class AlbumView extends AlbumArtView<Album> {
     }
 
     @Override
-    public void bindView(View view, Album item, ImageFetcher imageFetcher) {
+    public void bindView(View view, Album item) {
         ViewHolder viewHolder = (ViewHolder) view.getTag();
 
         viewHolder.text1.setText(item.getName());
@@ -86,11 +86,12 @@ public class AlbumView extends AlbumArtView<Album> {
         }
         viewHolder.text2.setText(text2);
 
-        String artworkUrl = getAlbumArtUrl(item.getArtwork_track_id());
-        if (artworkUrl == null) {
+        String artworkUrl = item.getArtworkUrl();
+        if ("".equals(artworkUrl)) {
             viewHolder.icon.setImageResource(R.drawable.icon_album_noart);
         } else {
-            imageFetcher.loadImage(artworkUrl, viewHolder.icon);
+            ImageFetcher.getInstance(getActivity()).loadImage(artworkUrl, viewHolder.icon,
+                    mIconWidth, mIconHeight);
         }
     }
 

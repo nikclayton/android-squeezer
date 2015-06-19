@@ -20,13 +20,19 @@ package uk.org.ngo.squeezer;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.IntDef;
 import android.view.View;
+import android.widget.TextView;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 import uk.org.ngo.squeezer.dialog.InfoDialog;
 import uk.org.ngo.squeezer.dialog.ServerAddressView;
 import uk.org.ngo.squeezer.framework.BaseActivity;
 import uk.org.ngo.squeezer.service.ConnectionState;
 import uk.org.ngo.squeezer.service.event.ConnectionChanged;
+import uk.org.ngo.squeezer.service.event.HandshakeComplete;
 
 /**
  * An activity for when the user is not connected to a Squeezeserver.
@@ -35,10 +41,21 @@ import uk.org.ngo.squeezer.service.event.ConnectionChanged;
  * connects.
  */
 public class DisconnectedActivity extends BaseActivity {
-    private static final String EXTRA_IS_LOGIN_FAILURE = "login_failure";
+
+    @IntDef({MANUAL_DISCONNECT, CONNECTION_FAILED, LOGIN_FAILED})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface DisconnectionReasons {}
+    public static final int MANUAL_DISCONNECT = 0;
+    public static final int CONNECTION_FAILED = 1;
+    public static final int LOGIN_FAILED = 2;
+
+    private static final String EXTRA_DISCONNECTION_REASON = "reason";
 
     private ServerAddressView serverAddressView;
-    private boolean isLoginFailure;
+
+    private TextView mHeaderMessage;
+
+    @DisconnectionReasons private int mDisconnectionReason = MANUAL_DISCONNECT;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -46,14 +63,15 @@ public class DisconnectedActivity extends BaseActivity {
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            isLoginFailure = extras.getBoolean(EXTRA_IS_LOGIN_FAILURE, false);
+            //noinspection ResourceType
+            mDisconnectionReason = extras.getInt(EXTRA_DISCONNECTION_REASON);
         }
 
         setContentView(R.layout.disconnected);
         serverAddressView = (ServerAddressView) findViewById(R.id.server_address_view);
-        View headerMessage = findViewById(R.id.header_message);
-        headerMessage.setVisibility(isLoginFailure ? View.VISIBLE : View.GONE);
-        headerMessage.setOnClickListener(new View.OnClickListener() {
+        mHeaderMessage = (TextView) findViewById(R.id.header_message);
+        setHeaderMessageFromReason(mDisconnectionReason);
+        mHeaderMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 InfoDialog.show(getSupportFragmentManager(), R.string.login_failed_info_text);
@@ -70,18 +88,47 @@ public class DisconnectedActivity extends BaseActivity {
      * The pending transition is overridden to animate the activity in place, rather than having it
      * appear to move in from off-screen.
      *
-     * @param isLoginFailure If set also show the informational message on how to resolve connection problems
+     * @param disconnectionReason identifies why the activity is being shown.
      */
-    private static void show(Activity activity, boolean isLoginFailure) {
-        // Check if this activity is already running
-        if (activity instanceof DisconnectedActivity) return;
+    private static void show(Activity activity, @DisconnectionReasons int disconnectionReason) {
+        // If the activity is already running then make sure the header message is appropriate
+        // and stop, as there's no need to start another instance of the activity.
+        if (activity instanceof DisconnectedActivity) {
+            ((DisconnectedActivity) activity).setHeaderMessageFromReason(disconnectionReason);
+            return;
+        }
 
         final Intent intent = new Intent(activity, DisconnectedActivity.class)
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        if (isLoginFailure) intent.putExtra(EXTRA_IS_LOGIN_FAILURE, true);
+
+        intent.putExtra(EXTRA_DISCONNECTION_REASON, disconnectionReason);
         activity.startActivity(intent);
         activity.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+    }
+
+    /**
+     * Set the text and visibility of the optional header message that's shown to the user
+     * based on the reason for the activity being shown.
+     *
+     * @param disconnectionReason The reason.
+     */
+    private void setHeaderMessageFromReason(@DisconnectionReasons int disconnectionReason) {
+        switch (disconnectionReason) {
+            case MANUAL_DISCONNECT:
+                mHeaderMessage.setVisibility(View.GONE);
+                return;
+
+            case CONNECTION_FAILED:
+                mHeaderMessage.setText(R.string.connection_failed_text);
+                break;
+
+            case LOGIN_FAILED:
+                mHeaderMessage.setText(R.string.login_failed_text);
+                break;
+        }
+
+        mHeaderMessage.setVisibility(View.VISIBLE);
     }
 
     /**
@@ -89,7 +136,7 @@ public class DisconnectedActivity extends BaseActivity {
      * @see #show(android.app.Activity)
      */
     public static void show(Activity activity) {
-        show(activity, false);
+        show(activity, MANUAL_DISCONNECT);
     }
 
     /**
@@ -97,7 +144,11 @@ public class DisconnectedActivity extends BaseActivity {
      * @see #show(android.app.Activity)
      */
     public static void showLoginFailed(Activity activity) {
-        show(activity, true);
+        show(activity, LOGIN_FAILED);
+    }
+
+    public static void showConnectionFailed(Activity activity) {
+        show(activity, CONNECTION_FAILED);
     }
 
     /**
@@ -112,16 +163,14 @@ public class DisconnectedActivity extends BaseActivity {
         fragment.startVisibleConnection();
     }
 
-    public void onEventMainThread(ConnectionChanged event) {
-        if (event.connectionState == ConnectionState.LOGIN_COMPLETED) {
-            // The user requested a connection to the server, which succeeded.  There's
-            // no prior activity to go to, so launch HomeActivity, with flags to
-            // clear other activities so hitting "back" won't show this activity again.
-            final Intent intent = new Intent(this, HomeActivity.class)
-                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            this.startActivity(intent);
-            this.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-        }
+    public void onEventMainThread(HandshakeComplete event) {
+        // The user requested a connection to the server, which succeeded.  There's
+        // no prior activity to go to, so launch HomeActivity, with flags to
+        // clear other activities so hitting "back" won't show this activity again.
+        final Intent intent = new Intent(this, HomeActivity.class)
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        this.startActivity(intent);
+        this.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
 }

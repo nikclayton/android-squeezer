@@ -36,7 +36,7 @@ limitations under the License.
 
         <TextView
             android:id="@+id/about_title"
-            style="?android:attr/textAppearanceLarge"
+            style="@style/SqueezerTextAppearance.Large"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_toRightOf="@id/icon"
@@ -45,7 +45,7 @@ limitations under the License.
 
         <TextView
             android:id="@+id/version_text"
-            style="@style/SqueezerTextItemSmall"
+            android:textAppearance="@style/SqueezerTextAppearance.Small"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/about_title"
@@ -54,7 +54,7 @@ limitations under the License.
 
         <TextView
             android:id="@+id/copyright"
-            style="@style/SqueezerTextItemSmall"
+            android:textAppearance="@style/SqueezerTextAppearance.Small"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/icon"
@@ -64,7 +64,7 @@ limitations under the License.
 
         <TextView
             android:id="@+id/team"
-            style="@style/SqueezerTextItem"
+            android:textAppearance="@style/SqueezerTextAppearance.Medium"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/copyright"
@@ -73,7 +73,7 @@ limitations under the License.
 
         <TextView
             android:id="@+id/authors"
-            style="@style/SqueezerTextItemSmall"
+            android:textAppearance="@style/SqueezerTextAppearance.Small"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/team"
@@ -82,7 +82,7 @@ limitations under the License.
 
         <TextView
             android:id="@+id/support"
-            style="@style/SqueezerTextItem"
+            android:textAppearance="@style/SqueezerTextAppearance.Medium"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/authors"
@@ -90,7 +90,7 @@ limitations under the License.
             android:text="Support"/>
 
         <TextView
-            style="@style/SqueezerTextItemSmall"
+            android:textAppearance="@style/SqueezerTextAppearance.Small"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/support"

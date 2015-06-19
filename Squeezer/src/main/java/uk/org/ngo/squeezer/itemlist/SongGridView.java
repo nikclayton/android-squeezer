@@ -32,6 +32,8 @@ public class SongGridView extends SongViewWithArt {
 
     @Override
     public View getAdapterView(View convertView, ViewGroup parent, @ViewParam int viewParams) {
+        mIconWidth = getActivity().getResources().getDimensionPixelSize(R.dimen.album_art_icon_grid_width);
+        mIconHeight = getActivity().getResources().getDimensionPixelSize(R.dimen.album_art_icon_grid_height);
         return getAdapterView(convertView, parent, viewParams, R.layout.grid_item);
     }
 }

@@ -17,13 +17,17 @@
 package uk.org.ngo.squeezer.model;
 
 import android.os.Parcel;
+import android.support.annotation.NonNull;
+
+import com.bluelinelabs.logansquare.annotation.JsonObject;
+import com.google.common.base.Strings;
 
 import java.util.Map;
 
 import uk.org.ngo.squeezer.Util;
 import uk.org.ngo.squeezer.framework.ArtworkItem;
 
-
+@JsonObject
 public class Album extends ArtworkItem {
 
     @Override
@@ -41,6 +45,18 @@ public class Album extends ArtworkItem {
     @Override
     public String getName() {
         return name;
+    }
+
+    @NonNull
+    private String mArtworkUrl = "";
+
+    @NonNull
+    public String getArtworkUrl() {
+        return mArtworkUrl;
+    }
+
+    public void setArtworkUrl(@NonNull String artworkUrl) {
+        mArtworkUrl = artworkUrl;
     }
 
     public Album setName(String name) {
@@ -79,6 +95,7 @@ public class Album extends ArtworkItem {
         setArtist(record.get("artist"));
         setYear(Util.parseDecimalIntOrZero(record.get("year")));
         setArtwork_track_id(record.get("artwork_track_id"));
+        mArtworkUrl = Strings.nullToEmpty(record.get("artwork_url"));
     }
 
     public static final Creator<Album> CREATOR = new Creator<Album>() {
@@ -93,12 +110,17 @@ public class Album extends ArtworkItem {
         }
     };
 
+    public Album() {
+
+    }
+
     private Album(Parcel source) {
         setId(source.readString());
         name = source.readString();
         artist = source.readString();
         year = source.readInt();
         setArtwork_track_id(source.readString());
+        mArtworkUrl = source.readString();
     }
 
     @Override
@@ -108,6 +130,7 @@ public class Album extends ArtworkItem {
         dest.writeString(artist);
         dest.writeInt(year);
         dest.writeString(getArtwork_track_id());
+        dest.writeString(mArtworkUrl);
     }
 
     @Override

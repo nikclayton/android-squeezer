@@ -46,7 +46,7 @@
             android:layout_height="wrap_content"
             android:padding="9dp"
             android:text="@string/loading_text"
-            android:textAppearance="@style/SqueezerTextItem"/>
+            android:textAppearance="@style/SqueezerTextAppearance.Medium"/>
     </LinearLayout>
 
     <fragment

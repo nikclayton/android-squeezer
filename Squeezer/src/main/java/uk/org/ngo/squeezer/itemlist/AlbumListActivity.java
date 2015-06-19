@@ -20,7 +20,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -46,7 +45,6 @@ import uk.org.ngo.squeezer.model.Genre;
 import uk.org.ngo.squeezer.model.Song;
 import uk.org.ngo.squeezer.model.Year;
 import uk.org.ngo.squeezer.service.ISqueezeService;
-import uk.org.ngo.squeezer.util.ImageFetcher;
 
 /**
  * Lists albums, optionally filtered to match specific criteria.
@@ -118,21 +116,6 @@ public class AlbumListActivity extends BaseListActivity<Album>
     @Override
     public ItemView<Album> createItemView() {
         return (listLayout == AlbumViewDialog.AlbumListLayout.grid) ? new AlbumGridView(this) : new AlbumView(this);
-    }
-
-    @Override
-    protected ImageFetcher createImageFetcher() {
-        // Get an ImageFetcher to scale artwork to the size of the icon view.
-        Resources resources = getResources();
-        int height, width;
-        if (listLayout == AlbumViewDialog.AlbumListLayout.grid) {
-            height = resources.getDimensionPixelSize(R.dimen.album_art_icon_grid_height);
-            width = resources.getDimensionPixelSize(R.dimen.album_art_icon_grid_width);
-        } else {
-            height = resources.getDimensionPixelSize(R.dimen.album_art_icon_height);
-            width = resources.getDimensionPixelSize(R.dimen.album_art_icon_width);
-        }
-        return super.createImageFetcher(height, width);
     }
 
     @Override

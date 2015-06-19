@@ -27,7 +27,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        app:floatLabelTextAppearance="@style/TextAppearance.Squeezer.FloatLabel"
+        app:floatLabelTextAppearance="@style/SqueezerTextAppearance.FloatLabel"
         app:floatLabelTrigger="text">
 
         <EditText
@@ -45,7 +45,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        app:floatLabelTextAppearance="@style/TextAppearance.Squeezer.FloatLabel"
+        app:floatLabelTextAppearance="@style/SqueezerTextAppearance.FloatLabel"
         app:floatLabelTrigger="text">
 
         <EditText
@@ -63,7 +63,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        app:floatLabelTextAppearance="@style/TextAppearance.Squeezer.FloatLabel"
+        app:floatLabelTextAppearance="@style/SqueezerTextAppearance.FloatLabel"
         app:floatLabelTrigger="text">
 
         <EditText
@@ -105,7 +105,7 @@
         android:paddingBottom="4dp"
         android:paddingTop="4dp"
         android:text="@string/settings_server_scanning_disabled_msg"
-        android:textAppearance="@style/SqueezerTextItem"/>
+        android:textAppearance="@style/SqueezerTextAppearance.Medium"/>
 
     <LinearLayout
         android:id="@+id/scan_results"
@@ -129,7 +129,7 @@
             android:layout_gravity="center"
             android:paddingLeft="8dp"
             android:visibility="gone"
-            android:textAppearance="@style/SqueezerTextItem"/>
+            android:textAppearance="@style/SqueezerTextAppearance.Medium"/>
 
         <Spinner
             android:id="@+id/found_servers"

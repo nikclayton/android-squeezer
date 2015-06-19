@@ -2,15 +2,18 @@ buildscript {
     repositories {
         mavenCentral()
         maven { url 'http://download.crashlytics.com/maven' }
+        jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.1.0'
+        classpath 'com.android.tools.build:gradle:1.2.3'
         classpath 'com.crashlytics.tools.gradle:crashlytics-gradle:1.+'
+        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.4'
     }
 }
 
 apply plugin: 'com.android.application'
 apply plugin: 'crashlytics'
+apply plugin: 'com.neenbedankt.android-apt'
 
 repositories {
     mavenCentral()
@@ -25,18 +28,25 @@ dependencies {
     //       Support Repository" to be installed via the SDK manager.
     compile 'com.android.support:support-v4:21.0.2'
     compile 'com.android.support:appcompat-v7:20.0.0'
-    compile 'com.android.support:support-annotations:20.0.0'
+    compile 'com.android.support:support-annotations:22.2.0'
 
     // Third party libraries
     compile 'com.google.guava:guava:18.0'
+
     // findbugs is required for Proguard to work with Guava.
     compile 'com.google.code.findbugs:jsr305:2.0.2'
 
     // EventBus, https://github.com/greenrobot/EventBus.
-    compile 'de.greenrobot:eventbus:2.4.0'
+    compile project(':libs:eventbus:EventBus')
 
     // Changelogs, see https://github.com/cketti/ckChangeLog.
     compile 'de.cketti.library.changelog:ckchangelog:1.2.0'
+
+    // LoganSquare JSON
+    apt 'com.bluelinelabs:logansquare-compiler:1.0.6'
+    compile 'com.bluelinelabs:logansquare:1.0.6'
+
+    // Crashlytics.
     compile 'com.crashlytics.android:crashlytics:1.+'
 
     // JVM tests

@@ -27,7 +27,6 @@ import uk.org.ngo.squeezer.framework.ItemListActivity;
 import uk.org.ngo.squeezer.framework.PlaylistItemView;
 import uk.org.ngo.squeezer.itemlist.action.PlayableItemAction;
 import uk.org.ngo.squeezer.model.MusicFolderItem;
-import uk.org.ngo.squeezer.util.ImageFetcher;
 
 /**
  * View for one entry in a {@link MusicFolderListActivity}.
@@ -50,7 +49,7 @@ public class MusicFolderView extends PlaylistItemView<MusicFolderItem> {
     }
 
     @Override
-    public void bindView(View view, MusicFolderItem item, ImageFetcher imageFetcher) {
+    public void bindView(View view, MusicFolderItem item) {
         ViewHolder viewHolder = (ViewHolder) view.getTag();
 
         viewHolder.text1.setText(item.getName());

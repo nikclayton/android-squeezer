@@ -16,15 +16,23 @@
 
 package uk.org.ngo.squeezer.service.event;
 
-/** Event sent when the power status of the active player has changed. */
+import android.support.annotation.NonNull;
+
+import uk.org.ngo.squeezer.model.Player;
+
+/** Event sent when the power status of the player has changed. */
 public class PowerStatusChanged {
+    /** The player with changed state. */
+    @NonNull public final Player player;
+
     /** Whether the active player supports being powered on by the server. */
     public final boolean canPowerOn;
 
     /** Whether the active player supports being turned off by the server. */
     public final boolean canPowerOff;
 
-    public PowerStatusChanged(boolean canPowerOn, boolean canPowerOff) {
+    public PowerStatusChanged(@NonNull Player player, boolean canPowerOn, boolean canPowerOff) {
+        this.player = player;
         this.canPowerOn = canPowerOn;
         this.canPowerOff = canPowerOff;
     }

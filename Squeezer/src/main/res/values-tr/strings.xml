@@ -1,0 +1,319 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+  <string name="app_name">Squeezer</string>
+  <string name="disabled">Devre Dışı</string>
+  <string name="menu_item_players">Oynatıcılar</string>
+  <string name="menu_item_search_label">Ara</string>
+  <string name="menu_item_settings_label">Ayarlar</string>
+  <string name="menu_item_about_label">Hakkında</string>
+  <string name="activity_settings_name">Ayarlar</string>
+  <string name="pref_cat_server">Sunucu ayarları</string>
+  <string name="settings_serveraddr_title">Sunucu Adresi</string>
+  <string name="settings_serveraddr_summary">Squeezebox Sunucu adı veya IP adresi, ör:
+        10.0.0.5.
+    </string>
+  <string name="settings_serveraddr_hint">Sunucu adı veya IP adresi</string>
+  <string name="settings_server_prompt">Bir sunucu seçin</string>
+  <string name="settings_server_scan_start">Aramayı başlat</string>
+  <string name="settings_server_scan_stop">Aramayı durdur</string>
+  <string name="settings_username_hint">Kullanıcı adı (isteğe bağlı)</string>
+  <string name="settings_password_hint">Şifre (isteğe bağlı)</string>
+  <string name="settings_server_scan_progress">Sunucular aranıyor...</string>
+  <string name="settings_autoconnect_title">Otomatik bağlan</string>
+  <string name="settings_scrobble_on">Şarkı bilgisi Last.fm sitesine gönderildi</string>
+  <string name="settings_market_not_found">Google Play başlatılamıyor, yüklü mü?</string>
+  <string name="settings_squeezeplayer_title">SqueezePlayer\'ı başlat</string>
+  <string name="settings_category_ui">Squeezer arayüz</string>
+  <string name="menu_item_disconnect">Bağlantıyı Kes</string>
+  <string name="menu_item_connect">Bağlan</string>
+  <string name="menu_item_poweron">\"%s\" aç</string>
+  <string name="menu_item_poweroff">\"%s\" kapat</string>
+  <string name="menu_item_main">Şu an çalan</string>
+  <string name="menu_item_home">Ana Menü</string>
+  <string name="menu_item_delete">Sil</string>
+  <string name="menu_item_rename">Yeniden Adlandır</string>
+  <string name="menu_item_playlist">Çalma Listesi</string>
+  <string name="menu_item_playlists_new">Yeni</string>
+  <string name="menu_item_playlist_clear">Çalma listesini temizle</string>
+  <string name="menu_item_playlist_save">Çalma listesi olarak kaydet</string>
+  <string name="connecting_text">Bağlanıyor</string>
+  <string name="connect_to_text">%s bağlan</string>
+  <string name="connection_failed_text">Bağlantı başarız. Ayarları kontrol edin.</string>
+  <string name="login_failed_text">Giriş başarısız. Kullanıcı adı ve şifre girin.</string>
+  <string name="disconnected_text">Bağlantı kesildi.</string>
+  <string name="wifi_disabled_text">Wi-Fi devre dışı</string>
+  <string name="notification_playing_text">%s çalıyor</string>
+  <string name="notification_connected_text">%s bağlandı</string>
+  <string name="filter_text_hint">%s ara</string>
+  <string name="save_playlist_title">Çalma listesini kaydet</string>
+  <string name="save_playlist_hint">Çalma listesi adı girin</string>
+  <string name="new_playlist_title">Yeni çalma listesi</string>
+  <string name="new_playlist_hint">Çalma listesi adı girin</string>
+  <string name="rename_title">%s yeniden adlandır</string>
+  <string name="delete_title">%s sil</string>
+  <string name="delete__message">Silmek istediğinizden emin misiniz?</string>
+  <string name="loading_text">Yükleniyor...</string>
+  <string name="browse_items_text">%2$d %1$s</string>
+  <string name="genre_prompt">Tür seç</string>
+  <string name="year_prompt">Yıl seç</string>
+  <string name="track_label">Parça</string>
+  <string name="artist_label">Sanatçı</string>
+  <string name="album_label">Albüm</string>
+  <string name="genre_label">Tür</string>
+  <string name="year_label">Yıl</string>
+  <string name="filter_label">Metin ara</string>
+  <string name="unknown_track">Bilinmeyen parça</string>
+  <string name="unknown_album">Bilinmeyen albüm</string>
+  <string name="unknown_artist">Bilinmeyen sanatçı</string>
+  <string name="unknown_year">Bilinmeyen yıl</string>
+  <!--Reporting errors that from the server.-->
+  <string name="server_error">%1$s bir hata bildirdi: \"%2$s\".</string>
+  <string name="menu_item_power_off">Kapat</string>
+  <string name="menu_item_power_on">Aç</string>
+  <!--Dialog buttons-->
+  <string name="dialog_license">Lisans</string>
+  <string name="license_text" tools:ignore="TypographyOther">&lt;p&gt;Apache License&lt;br /&gt;
+Version 2.0, January 2004&lt;br /&gt;
+http://www.apache.org/licenses/&lt;/p&gt;
+
+&lt;p&gt;TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION&lt;/p&gt;
+
+&lt;p&gt;1. Definitions.&lt;/p&gt;
+
+&lt;p&gt;\"License\" shall mean the terms and conditions for use, reproduction,
+and distribution as defined by Sections 1 through 9 of this document.&lt;/p&gt;
+
+&lt;p&gt;\"Licensor\" shall mean the copyright owner or entity authorized by
+the copyright owner that is granting the License.&lt;/p&gt;
+
+&lt;p&gt;\"Legal Entity\" shall mean the union of the acting entity and all
+other entities that control, are controlled by, or are under common
+control with that entity. For the purposes of this definition,
+\"control\" means (i) the power, direct or indirect, to cause the
+direction or management of such entity, whether by contract or
+otherwise, or (ii) ownership of fifty percent (50%%) or more of the
+outstanding shares, or (iii) beneficial ownership of such entity.&lt;/p&gt;
+
+&lt;p&gt;\"You\" (or \"Your\") shall mean an individual or Legal Entity
+exercising permissions granted by this License.&lt;/p&gt;
+
+&lt;p&gt;\"Source\" form shall mean the preferred form for making modifications,
+including but not limited to software source code, documentation
+source, and configuration files.&lt;/p&gt;
+
+&lt;p&gt;\"Object\" form shall mean any form resulting from mechanical
+transformation or translation of a Source form, including but
+not limited to compiled object code, generated documentation,
+and conversions to other media types.&lt;/p&gt;
+
+&lt;p&gt;\"Work\" shall mean the work of authorship, whether in Source or
+Object form, made available under the License, as indicated by a
+copyright notice that is included in or attached to the work
+(an example is provided in the Appendix below).&lt;/p&gt;
+
+&lt;p&gt;\"Derivative Works\" shall mean any work, whether in Source or Object
+form, that is based on (or derived from) the Work and for which the
+editorial revisions, annotations, elaborations, or other modifications
+represent, as a whole, an original work of authorship. For the purposes
+of this License, Derivative Works shall not include works that remain
+separable from, or merely link (or bind by name) to the interfaces of,
+the Work and Derivative Works thereof.&lt;/p&gt;
+
+&lt;p&gt;\"Contribution\" shall mean any work of authorship, including
+the original version of the Work and any modifications or additions
+to that Work or Derivative Works thereof, that is intentionally
+submitted to Licensor for inclusion in the Work by the copyright owner
+or by an individual or Legal Entity authorized to submit on behalf of
+the copyright owner. For the purposes of this definition, \"submitted\"
+means any form of electronic, verbal, or written communication sent
+to the Licensor or its representatives, including but not limited to
+communication on electronic mailing lists, source code control systems,
+and issue tracking systems that are managed by, or on behalf of, the
+Licensor for the purpose of discussing and improving the Work, but
+excluding communication that is conspicuously marked or otherwise
+designated in writing by the copyright owner as \"Not a Contribution.\"&lt;/p&gt;
+
+&lt;p&gt;\"Contributor\" shall mean Licensor and any individual or Legal Entity
+on behalf of whom a Contribution has been received by Licensor and
+subsequently incorporated within the Work.&lt;/p&gt;
+
+&lt;p&gt;2. Grant of Copyright License. Subject to the terms and conditions of
+this License, each Contributor hereby grants to You a perpetual,
+worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+copyright license to reproduce, prepare Derivative Works of,
+publicly display, publicly perform, sublicense, and distribute the
+Work and such Derivative Works in Source or Object form.&lt;/p&gt;
+
+&lt;p&gt;3. Grant of Patent License. Subject to the terms and conditions of
+this License, each Contributor hereby grants to You a perpetual,
+worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+(except as stated in this section) patent license to make, have made,
+use, offer to sell, sell, import, and otherwise transfer the Work,
+where such license applies only to those patent claims licensable
+by such Contributor that are necessarily infringed by their
+Contribution(s) alone or by combination of their Contribution(s)
+with the Work to which such Contribution(s) was submitted. If You
+institute patent litigation against any entity (including a
+cross-claim or counterclaim in a lawsuit) alleging that the Work
+or a Contribution incorporated within the Work constitutes direct
+or contributory patent infringement, then any patent licenses
+granted to You under this License for that Work shall terminate
+as of the date such litigation is filed.&lt;/p&gt;
+
+&lt;p&gt;4. Redistribution. You may reproduce and distribute copies of the
+Work or Derivative Works thereof in any medium, with or without
+modifications, and in Source or Object form, provided that You
+meet the following conditions:&lt;/p&gt;
+
+&lt;p&gt;(a) You must give any other recipients of the Work or
+Derivative Works a copy of this License; and&lt;/p&gt;
+
+&lt;p&gt;(b) You must cause any modified files to carry prominent notices
+stating that You changed the files; and&lt;/p&gt;
+
+&lt;p&gt;(c) You must retain, in the Source form of any Derivative Works
+that You distribute, all copyright, patent, trademark, and
+attribution notices from the Source form of the Work,
+excluding those notices that do not pertain to any part of
+the Derivative Works; and&lt;/p&gt;
+
+&lt;p&gt;(d) If the Work includes a \"NOTICE\" text file as part of its
+distribution, then any Derivative Works that You distribute must
+include a readable copy of the attribution notices contained
+within such NOTICE file, excluding those notices that do not
+pertain to any part of the Derivative Works, in at least one
+of the following places: within a NOTICE text file distributed
+as part of the Derivative Works; within the Source form or
+documentation, if provided along with the Derivative Works; or,
+within a display generated by the Derivative Works, if and
+wherever such third-party notices normally appear. The contents
+of the NOTICE file are for informational purposes only and
+do not modify the License. You may add Your own attribution
+notices within Derivative Works that You distribute, alongside
+or as an addendum to the NOTICE text from the Work, provided
+that such additional attribution notices cannot be construed
+as modifying the License.&lt;/p&gt;
+
+&lt;p&gt;You may add Your own copyright statement to Your modifications and
+may provide additional or different license terms and conditions
+for use, reproduction, or distribution of Your modifications, or
+for any such Derivative Works as a whole, provided Your use,
+reproduction, and distribution of the Work otherwise complies with
+the conditions stated in this License.&lt;/p&gt;
+
+&lt;p&gt;5. Submission of Contributions. Unless You explicitly state otherwise,
+any Contribution intentionally submitted for inclusion in the Work
+by You to the Licensor shall be under the terms and conditions of
+this License, without any additional terms or conditions.
+Notwithstanding the above, nothing herein shall supersede or modify
+the terms of any separate license agreement you may have executed
+with Licensor regarding such Contributions.&lt;/p&gt;
+
+&lt;p&gt;6. Trademarks. This License does not grant permission to use the trade
+names, trademarks, service marks, or product names of the Licensor,
+except as required for reasonable and customary use in describing the
+origin of the Work and reproducing the content of the NOTICE file.&lt;/p&gt;
+
+&lt;p&gt;7. Disclaimer of Warranty. Unless required by applicable law or
+agreed to in writing, Licensor provides the Work (and each
+Contributor provides its Contributions) on an \"AS IS\" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+implied, including, without limitation, any warranties or conditions
+of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+PARTICULAR PURPOSE. You are solely responsible for determining the
+appropriateness of using or redistributing the Work and assume any
+risks associated with Your exercise of permissions under this License.&lt;/p&gt;
+
+&lt;p&gt;8. Limitation of Liability. In no event and under no legal theory,
+whether in tort (including negligence), contract, or otherwise,
+unless required by applicable law (such as deliberate and grossly
+negligent acts) or agreed to in writing, shall any Contributor be
+liable to You for damages, including any direct, indirect, special,
+incidental, or consequential damages of any character arising as a
+result of this License or out of the use or inability to use the
+Work (including but not limited to damages for loss of goodwill,
+work stoppage, computer failure or malfunction, or any and all
+other commercial damages or losses), even if such Contributor
+has been advised of the possibility of such damages.&lt;/p&gt;
+
+&lt;p&gt;9. Accepting Warranty or Additional Liability. While redistributing
+the Work or Derivative Works thereof, You may choose to offer,
+and charge a fee for, acceptance of support, warranty, indemnity,
+or other liability obligations and/or rights consistent with this
+License. However, in accepting such obligations, You may act only
+on Your own behalf and on Your sole responsibility, not on behalf
+of any other Contributor, and only if You agree to indemnify,
+defend, and hold each Contributor harmless for any liability
+incurred by, or claims asserted against, such Contributor by reason
+of your accepting any such warranty or additional liability.&lt;/p&gt;</string>
+  <string name="NO_ACTION">Yok</string>
+  <string name="PLAY_NOW">Oynat</string>
+  <string name="ADD_TO_END">Çalma listesine ekle</string>
+  <string name="DOWNLOAD_ITEM">İndir</string>
+  <string name="PLAYLIST_REMOVE_ITEM">Çalma listesinden kaldır</string>
+  <string name="PLAYLIST_MOVE_UP">Yukarı taşı</string>
+  <string name="PLAYLIST_MOVE_DOWN">Aşağı taşı</string>
+  <string name="PLAYLIST_MOVE">Taşı...</string>
+  <string name="ITEM_ADDED">%s geçerli çalma listesine eklendi</string>
+  <string name="PLAYLIST_EXISTS_MESSAGE">%s çalma listesi zaten mevcut</string>
+  <!--Song display options-->
+  <string name="songs_sort_order_title">Başlık</string>
+  <string name="songs_sort_order_tracknum">Parça</string>
+  <!--Analytics preference strings-->
+  <string name="pref_cat_error_reports">Hata raporları ve istatistikler</string>
+  <string name="pref_analytics_enable">Kullanım istatistiklerini gönder</string>
+  <string name="home_item_artists">Sanatçılar</string>
+  <string name="home_item_albums">Albümler</string>
+  <string name="home_item_songs">Şarkılar</string>
+  <string name="home_item_genres">Türler</string>
+  <string name="home_item_years">Yıllar</string>
+  <string name="home_item_new_music">Yeni Müzik</string>
+  <string name="home_item_music_folder">Müzik Klasörü</string>
+  <string name="home_item_playlists">Çalma Listeleri</string>
+  <string name="home_item_my_apps">Uygulamalarım</string>
+  <string name="randomplay_item_choose_genres">Türleri seç</string>
+  <plurals name="seconds">
+    <item quantity="one">saniye</item>
+    <item quantity="other">saniye</item>
+  </plurals>
+  <plurals name="artist">
+    <item quantity="one">sanatçı</item>
+    <item quantity="other">sanatçılar</item>
+  </plurals>
+  <plurals name="album">
+    <item quantity="one">albüm</item>
+    <item quantity="other">albümler</item>
+  </plurals>
+  <plurals name="genre">
+    <item quantity="one">tür</item>
+    <item quantity="other">türler</item>
+  </plurals>
+  <plurals name="musicfolder">
+    <item quantity="one">müzik klasörü</item>
+    <item quantity="other">müzik klasörleri</item>
+  </plurals>
+  <plurals name="year">
+    <item quantity="one">yıl</item>
+    <item quantity="other">yıllar</item>
+  </plurals>
+  <plurals name="song">
+    <item quantity="one">şarkı</item>
+    <item quantity="other">şarkılar</item>
+  </plurals>
+  <plurals name="player">
+    <item quantity="one">oynatıcı</item>
+    <item quantity="other">oynatıcılar</item>
+  </plurals>
+  <plurals name="playlist">
+    <item quantity="one">çalma listesi</item>
+    <item quantity="other">çalma listeleri</item>
+  </plurals>
+  <plurals name="radio">
+    <item quantity="one">Radyo istasyonu eklentisi</item>
+    <item quantity="other">Radyo istasyonu eklentileri</item>
+  </plurals>
+  <plurals name="application">
+    <item quantity="one">uygulama</item>
+    <item quantity="other">uygulamalar</item>
+  </plurals>
+</resources>

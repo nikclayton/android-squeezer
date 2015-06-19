@@ -42,31 +42,19 @@
 
     <TextView
         android:id="@+id/trackname"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
         android:layout_below="@id/progressbar"
         android:layout_toLeftOf="@id/pause"
         android:layout_toRightOf="@id/album"
-        android:ellipsize="marquee"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:hint="@string/unknown_track"
-        android:marqueeRepeatLimit="marquee_forever"
         android:paddingLeft="4dp"
-        android:singleLine="true"
-        android:textAppearance="@style/SqueezerTextItem"/>
+        style="@style/SqueezerWidget.NowPlayingMini.SongName"/>
 
     <TextView
         android:id="@+id/albumname"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
         android:layout_below="@id/trackname"
         android:layout_toLeftOf="@id/pause"
         android:layout_toRightOf="@id/album"
-        android:hint="@string/unknown_album"
         android:paddingLeft="4dp"
-        android:singleLine="true"
-        android:textAppearance="@style/SqueezerTextItemSmall"/>
+        style="@style/SqueezerWidget.NowPlayingMini.AlbumName"/>
 
     <ImageButton
         android:id="@+id/pause"

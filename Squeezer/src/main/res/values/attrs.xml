@@ -53,5 +53,6 @@
             <enum name="focus" value="1" />
         </attr>
         <attr name="floatLabelSidePadding" format="reference|dimension" />
+        <attr name="floatLabelColor" format="reference|color"/>
     </declare-styleable>
 </resources>

@@ -19,7 +19,6 @@ package uk.org.ngo.squeezer.itemlist;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
@@ -132,6 +131,7 @@ public class SongListActivity extends BaseListActivity<Song>
 
         // Set the album header.
         if (album != null) {
+            ImageView artwork = (ImageView) findViewById(R.id.album);
             TextView albumView = (TextView) findViewById(R.id.albumname);
             TextView artistView = (TextView) findViewById(R.id.artistname);
             TextView yearView = (TextView) findViewById(R.id.yearname);
@@ -141,6 +141,14 @@ public class SongListActivity extends BaseListActivity<Song>
             artistView.setText(album.getArtist());
             if (album.getYear() != 0) {
                 yearView.setText(Integer.toString(album.getYear()));
+            }
+
+            String artworkUrl = album.getArtworkUrl();
+
+            if ("".equals(artworkUrl)) {
+                artwork.setImageResource(R.drawable.icon_album_noart);
+            } else {
+                ImageFetcher.getInstance(this).loadImage(artworkUrl, artwork);
             }
 
             btnContextMenu.setOnCreateContextMenuListener(this);
@@ -206,14 +214,12 @@ public class SongListActivity extends BaseListActivity<Song>
         // Set artwork that requires a service connection.
         if (album != null) {
             ImageView artwork = (ImageView) findViewById(R.id.album);
+            String artworkUrl = album.getArtworkUrl();
 
-            String artworkUrl = ((SongView) getItemView())
-                    .getAlbumArtUrl(album.getArtwork_track_id());
-
-            if (artworkUrl == null) {
+            if ("".equals(artworkUrl)) {
                 artwork.setImageResource(R.drawable.icon_album_noart);
             } else {
-                getImageFetcher().loadImage(artworkUrl, artwork);
+                ImageFetcher.getInstance(this).loadImage(artworkUrl, artwork);
             }
         }
     }
@@ -259,21 +265,6 @@ public class SongListActivity extends BaseListActivity<Song>
 
     private SongViewWithArt songViewLogicFromListLayout() {
         return (listLayout == SongViewDialog.SongListLayout.grid) ? new SongGridView(this) : new SongViewWithArt(this);
-    }
-
-    @Override
-    protected ImageFetcher createImageFetcher() {
-        // Get an ImageFetcher to scale artwork to the size of the icon view.
-        Resources resources = getResources();
-        int height, width;
-        if (listLayout == SongViewDialog.SongListLayout.grid) {
-            height = resources.getDimensionPixelSize(R.dimen.album_art_icon_grid_height);
-            width = resources.getDimensionPixelSize(R.dimen.album_art_icon_grid_width);
-        } else {
-            height = resources.getDimensionPixelSize(R.dimen.album_art_icon_height);
-            width = resources.getDimensionPixelSize(R.dimen.album_art_icon_width);
-        }
-        return super.createImageFetcher(height, width);
     }
 
     @Override

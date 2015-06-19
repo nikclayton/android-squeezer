@@ -146,20 +146,42 @@ public class Util {
         }
     }
 
+    /**
+     *
+     * @param context
+     * @param convertView
+     * @param parent
+     * @param label
+     * @return a view suitable for use as a spinner view.
+     */
     public static View getSpinnerItemView(Context context, View convertView, ViewGroup parent,
-            String label) {
-        return getSpinnerItemView(context, convertView, parent, label,
+                                          String label) {
+        return getSpinnerView(context, convertView, parent, label,
+                android.R.layout.simple_spinner_item);
+    }
+
+    /**
+     *
+     * @param context
+     * @param convertView
+     * @param parent
+     * @param label
+     * @return a view suitable for use in a spinner's dropdown menu.
+     */
+    public static View getSpinnerDropDownView(Context context, View convertView, ViewGroup parent,
+                                      String label) {
+        return getSpinnerView(context, convertView, parent, label,
                 android.R.layout.simple_spinner_dropdown_item);
     }
 
     public static View getActionBarSpinnerItemView(Context context, View convertView,
                                                    ViewGroup parent, String label) {
-        return getSpinnerItemView(context, convertView, parent, label,
+        return getSpinnerView(context, convertView, parent, label,
                 android.support.v7.appcompat.R.layout.support_simple_spinner_dropdown_item);
     }
 
-    private static View getSpinnerItemView(Context context, View convertView, ViewGroup parent,
-                                          String label, int layout) {
+    private static View getSpinnerView(Context context, View convertView, ViewGroup parent,
+                                       String label, int layout) {
         TextView view;
         view = (TextView) (convertView != null
                 && TextView.class.isAssignableFrom(convertView.getClass())

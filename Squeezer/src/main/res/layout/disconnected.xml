@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:padding="16dp"
-        style="@style/SqueezerTextItem"
+        android:textAppearance="@style/SqueezerTextAppearance.Medium"
         android:drawableLeft="@android:drawable/ic_menu_info_details"
         android:drawablePadding="4dp"
         android:text="@string/login_failed_text"/>

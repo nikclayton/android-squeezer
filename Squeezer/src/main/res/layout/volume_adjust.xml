@@ -30,7 +30,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="14dp"
         android:id="@+id/message"
-        android:textAppearance="@style/SqueezerTextItem"
+        android:textAppearance="@style/SqueezerTextAppearance.Medium"
         android:textColor="@android:color/primary_text_dark"
         tools:text="Squeezer volume"/>
 
@@ -38,7 +38,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/additional_message"
-        android:textAppearance="@style/SqueezerTextItemSmall"
+        android:textAppearance="@style/SqueezerTextAppearance.Small"
         android:textColor="@android:color/secondary_text_dark"
         tools:text="Lounge Squeezebox"/>
 

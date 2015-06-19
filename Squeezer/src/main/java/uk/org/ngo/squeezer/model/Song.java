@@ -19,6 +19,7 @@ package uk.org.ngo.squeezer.model;
 import android.os.Parcel;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
@@ -30,6 +31,7 @@ import uk.org.ngo.squeezer.framework.ArtworkItem;
 import uk.org.ngo.squeezer.service.ISqueezeService;
 
 public class Song extends ArtworkItem {
+    private static final String TAG = "Song";
 
     @Override
     public String getPlaylistTag() {
@@ -115,11 +117,20 @@ public class Song extends ArtworkItem {
         return mTrackNum;
     }
 
+    /** The URL of the track on the server. This is the file:/// URL, not the URL to download it. */
     @NonNull private final String mUrl;
 
     @NonNull
     public String getUrl() {
         return mUrl;
+    }
+
+    /** The URL to use to download the song. */
+    @NonNull private String mDownloadUrl = "";
+
+    @NonNull
+    public String getDownloadUrl() {
+        return mDownloadUrl;
     }
 
     @NonNull private final String mButtons;
@@ -135,27 +146,12 @@ public class Song extends ArtworkItem {
      * @return Whether the song has artwork associated with it.
      */
     public boolean hasArtwork() {
-        if (!mRemote) {
-            return getArtwork_track_id() != null;
-        } else {
-            return ! "".equals(mArtworkUrl);
-        }
+        return ! "".equals(mArtworkUrl);
     }
 
     @NonNull
     public String getArtworkUrl() {
         return mArtworkUrl;
-    }
-
-    @Nullable
-    public String getArtworkUrl(ISqueezeService service) {
-        if (getArtwork_track_id() != null) {
-            if (service == null) {
-                return null;
-            }
-            return service.getAlbumArtUrl(getArtwork_track_id());
-        }
-        return getArtworkUrl();
     }
 
     public Song(Map<String, String> record) {
@@ -180,29 +176,15 @@ public class Song extends ArtworkItem {
         mTrackNum = Util.parseDecimalInt(record.get("tracknum"), 1);
         mArtworkUrl = Strings.nullToEmpty(record.get("artwork_url"));
         mUrl = Strings.nullToEmpty(record.get("url"));
+        mDownloadUrl = Strings.nullToEmpty(record.get("download_url"));
         mButtons = Strings.nullToEmpty(record.get("buttons"));
 
-        // Work around a (possible) bug in the Squeezeserver.
-        //
-        // I've seen tracks where the "coverart" tag comes back positive (1)
-        // but there's no "artwork_track_id" tag. If that happens, use this
-        // song's ID as the artwork_track_id.
         String artworkTrackId = record.get("artwork_track_id");
-        if (artworkTrackId != null) {
-            setArtwork_track_id(artworkTrackId);
-        } else {
-            // If there's no cover art then the server doesn't respond
-            // "coverart:0" or something useful like that, it just doesn't
-            // include a response.  Hence these shenanigans.
-            String coverArt = record.get("coverart");
-            if ("1".equals(coverArt)) {
-                setArtwork_track_id(getId());
-            }
-        }
 
         Album album = new Album(mAlbumId, mAlbumName);
         album.setArtist(mCompilation ? "Various" : mArtist);
         album.setArtwork_track_id(artworkTrackId);
+        album.setArtworkUrl(mArtworkUrl);
         album.setYear(mYear);
         mAlbum = album;
     }
@@ -233,6 +215,7 @@ public class Song extends ArtworkItem {
         mTrackNum = source.readInt();
         mUrl = source.readString();
         mButtons = source.readString();
+        mDownloadUrl = source.readString();
     }
 
     @Override
@@ -250,6 +233,7 @@ public class Song extends ArtworkItem {
         dest.writeInt(mTrackNum);
         dest.writeString(mUrl);
         dest.writeString(mButtons);
+        dest.writeString(mDownloadUrl);
     }
 
     @Override

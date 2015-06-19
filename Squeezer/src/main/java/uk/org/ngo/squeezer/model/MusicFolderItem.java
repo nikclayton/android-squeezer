@@ -17,7 +17,10 @@
 package uk.org.ngo.squeezer.model;
 
 import android.os.Parcel;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
+import com.google.common.base.Strings;
 
 import java.util.Map;
 
@@ -94,11 +97,21 @@ public class MusicFolderItem extends PlaylistItem {
         this.url = url;
     }
 
+    /** The URL to use to download the song. */
+    @NonNull
+    private String mDownloadUrl = "";
+
+    @NonNull
+    public String getDownloadUrl() {
+        return mDownloadUrl;
+    }
+
     public MusicFolderItem(Map<String, String> record) {
         setId(record.get("id"));
         name = record.get("filename");
         type = record.get("type");
         url = record.get("url");
+        mDownloadUrl = Strings.nullToEmpty(record.get("download_url"));
     }
 
     public static final Creator<MusicFolderItem> CREATOR = new Creator<MusicFolderItem>() {
@@ -118,6 +131,7 @@ public class MusicFolderItem extends PlaylistItem {
         name = source.readString();
         type = source.readString();
         url = source.readString();
+        mDownloadUrl = source.readString();
     }
 
     @Override
@@ -126,6 +140,7 @@ public class MusicFolderItem extends PlaylistItem {
         dest.writeString(name);
         dest.writeString(type);
         dest.writeString(url);
+        dest.writeString(mDownloadUrl);
     }
 
     @Override

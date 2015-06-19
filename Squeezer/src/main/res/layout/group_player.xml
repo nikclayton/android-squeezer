@@ -31,7 +31,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
-        android:textAppearance="@style/SqueezerTextItem"
+        android:textAppearance="@style/SqueezerTextAppearance.ListItem.Primary"
         tools:text="Group name" />
 
     <TextView
@@ -40,6 +40,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/text1"
         android:gravity="center_vertical"
-        android:textAppearance="@style/SqueezerTextItemSmall"
+        android:textAppearance="@style/SqueezerTextAppearance.ListItem.Secondary"
         tools:text="Song name" />
 </RelativeLayout>

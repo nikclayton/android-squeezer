@@ -28,7 +28,6 @@ import android.widget.BaseAdapter;
 import java.util.List;
 
 import uk.org.ngo.squeezer.R;
-import uk.org.ngo.squeezer.util.ImageFetcher;
 
 
 /**
@@ -65,22 +64,17 @@ public class ItemAdapter<T extends Item> extends BaseAdapter implements
     /**
      * This is set if the list shall start with an empty item.
      */
-    private final boolean mEmptyItem;
+    protected final boolean mEmptyItem;
 
     /**
      * Text to display before the items are received from SqueezeServer
      */
-    private final String loadingText;
+    protected final String loadingText;
 
     /**
      * Number of elements to by fetched at a time
      */
     private final int pageSize;
-
-    /**
-     * ImageFetcher for thumbnails
-     */
-    private final ImageFetcher mImageFetcher;
 
     public int getPageSize() {
         return pageSize;
@@ -93,31 +87,20 @@ public class ItemAdapter<T extends Item> extends BaseAdapter implements
      *
      * @param itemView The {@link ItemView} to use with this adapter
      * @param emptyItem If set the list of items shall start with an empty item
-     * @param imageFetcher ImageFetcher to use for loading thumbnails
      */
-    public ItemAdapter(ItemView<T> itemView, boolean emptyItem,
-            ImageFetcher imageFetcher) {
+    public ItemAdapter(ItemView<T> itemView, boolean emptyItem) {
         mItemView = itemView;
         mEmptyItem = emptyItem;
-        mImageFetcher = imageFetcher;
         loadingText = itemView.getActivity().getString(R.string.loading_text);
         pageSize = itemView.getActivity().getResources().getInteger(R.integer.PageSize);
         pages.clear();
     }
 
     /**
-     * Calls {@link #ItemAdapter(ItemView, boolean, ImageFetcher)}, with emptyItem = false
-     */
-    public ItemAdapter(ItemView<T> itemView, ImageFetcher imageFetcher) {
-        this(itemView, false, imageFetcher);
-    }
-
-    /**
-     * Calls {@link #ItemAdapter(ItemView, boolean, ImageFetcher)}, with emptyItem = false
-     * and a null ImageFetcher.
+     * Calls {@link #ItemAdapter(ItemView, boolean)}, with emptyItem = false
      */
     public ItemAdapter(ItemView<T> itemView) {
-        this(itemView, false, null);
+        this(itemView, false);
     }
 
     private int pageNumber(int position) {
@@ -136,15 +119,7 @@ public class ItemAdapter<T extends Item> extends BaseAdapter implements
     public View getView(int position, View convertView, ViewGroup parent) {
         T item = getItem(position);
         if (item != null) {
-            // XXX: This is ugly -- not all adapters need an ImageFetcher.
-            // We should really have subclasses of types in the model classes,
-            // with the hierarchy probably being:
-            //
-            // [basic item] -> [item with artwork] -> [artwork is downloaded]
-            //
-            // instead of special-casing whether or not mImageFetcher is null
-            // in getAdapterView().
-            return mItemView.getAdapterView(convertView, parent, item, mImageFetcher);
+            return mItemView.getAdapterView(convertView, parent, item);
         }
 
         return mItemView.getAdapterView(convertView, parent,

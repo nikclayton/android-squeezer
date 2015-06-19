@@ -16,8 +16,6 @@
 
 package uk.org.ngo.squeezer.framework;
 
-import com.google.common.base.Joiner;
-
 import android.os.Parcelable.Creator;
 import android.support.annotation.IntDef;
 import android.view.ContextMenu;
@@ -30,16 +28,17 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.common.base.Joiner;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Field;
 
 import uk.org.ngo.squeezer.R;
-import uk.org.ngo.squeezer.util.Reflection;
 import uk.org.ngo.squeezer.itemlist.AlbumListActivity;
 import uk.org.ngo.squeezer.itemlist.ArtistListActivity;
 import uk.org.ngo.squeezer.itemlist.SongListActivity;
-import uk.org.ngo.squeezer.util.ImageFetcher;
+import uk.org.ngo.squeezer.util.Reflection;
 import uk.org.ngo.squeezer.widget.ListItemImageButton;
 import uk.org.ngo.squeezer.widget.SquareImageView;
 
@@ -62,7 +61,7 @@ import uk.org.ngo.squeezer.widget.SquareImageView;
  * if the primary state should show a context button you may not want to show that button while
  * waiting for data to arrive.
  * <p/>
- * Override {@link #bindView(View, Item, ImageFetcher)} and {@link #bindView(View, String)} to
+ * Override {@link #bindView(View, Item)} and {@link #bindView(View, String)} to
  * control how data from the item is inserted in to the view.
  * <p/>
  * If you need a completely custom view hierarchy then override {@link #getAdapterView(View,
@@ -95,7 +94,6 @@ public abstract class BaseItemView<T extends Item> implements ItemView<T> {
     /** Adds a button, with click handler, to display the context menu. */
     public static final int VIEW_PARAM_CONTEXT_BUTTON = 1 << 2;
 
-
     /**
      * View parameters for a filled-in view.  One primary line with context button.
      */
@@ -104,7 +102,13 @@ public abstract class BaseItemView<T extends Item> implements ItemView<T> {
     /**
      * View parameters for a view that is loading data.  Primary line only.
      */
-    @ViewParam private int mLoadingViewParams = 0;;
+    @ViewParam private int mLoadingViewParams = 0;
+
+    /** Width of the icon, if VIEW_PARAM_ICON is used. */
+    protected int mIconWidth;
+
+    /** Height of the icon, if VIEW_PARAM_ICON is used. */
+    protected int mIconHeight;
 
     /**
      * A ViewHolder for the views that make up a complete list item.
@@ -128,8 +132,10 @@ public abstract class BaseItemView<T extends Item> implements ItemView<T> {
     protected static final Joiner mJoiner = Joiner.on(" - ").skipNulls();
 
     public BaseItemView(ItemListActivity activity) {
-        this.mActivity = activity;
+        mActivity = activity;
         mLayoutInflater = activity.getLayoutInflater();
+        mIconWidth = mActivity.getResources().getDimensionPixelSize(R.dimen.album_art_icon_width);
+        mIconHeight = mActivity.getResources().getDimensionPixelSize(R.dimen.album_art_icon_height);
     }
 
     @Override
@@ -198,24 +204,22 @@ public abstract class BaseItemView<T extends Item> implements ItemView<T> {
      * uses a different layout.
      */
     @Override
-    public View getAdapterView(View convertView, ViewGroup parent, T item,
-            ImageFetcher imageFetcher) {
+    public View getAdapterView(View convertView, ViewGroup parent, T item) {
         View view = getAdapterView(convertView, parent, mViewParams);
-        bindView(view, item, imageFetcher);
+        bindView(view, item);
         return view;
     }
 
     /**
      * Binds the item's name to {@link ViewHolder#text1}.
      * <p/>
-     * OVerride this instead of {@link #getAdapterView(View, ViewGroup, Item, ImageFetcher)} if the
+     * OVerride this instead of {@link #getAdapterView(View, ViewGroup, Item)} if the
      * default layouts are sufficient.
      *
      * @param view The view that contains the {@link ViewHolder}
      * @param item The item to be bound
-     * @param imageFetcher An {@link ImageFetcher} (may be <code>null</code>)
      */
-    public void bindView(View view, T item, ImageFetcher imageFetcher) {
+    public void bindView(View view, T item) {
         ViewHolder viewHolder = (ViewHolder) view.getTag();
 
         viewHolder.text1.setText(item.getName());
@@ -224,7 +228,7 @@ public abstract class BaseItemView<T extends Item> implements ItemView<T> {
     /**
      * Returns a view suitable for displaying the "Loading..." text.
      * <p/>
-     * Override this method and {@link #getAdapterView(View, ViewGroup, Item, ImageFetcher)} if your
+     * Override this method and {@link #getAdapterView(View, ViewGroup, Item)} if your
      * extension uses a different layout.
      */
     @Override

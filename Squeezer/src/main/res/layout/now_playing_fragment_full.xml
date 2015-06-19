@@ -49,45 +49,30 @@
             android:id="@+id/trackname"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:ellipsize="marquee"
             android:gravity="left|top"
-            android:hint="@string/unknown_track"
-            android:marqueeRepeatLimit="marquee_forever"
             android:paddingRight="8dp"
             android:paddingTop="2dp"
-            android:singleLine="true"
-            android:focusableInTouchMode="true"
-            android:focusable="true"
-            android:textAppearance="@style/SqueezerTextItem"/>
+            style="@style/SqueezerWidget.NowPlaying.SongName"/>
     </LinearLayout>
 
     <TextView
         android:id="@+id/albumname"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
         android:layout_below="@id/track_wrapper"
         android:layout_toLeftOf="@id/context_menu"
         android:gravity="left|top"
-        android:hint="@string/unknown_album"
         android:paddingTop="4dp"
-        android:singleLine="true"
-        android:textAppearance="@style/SqueezerTextItemSmall"/>
+        style="@style/SqueezerWidget.NowPlaying.AlbumName"/>
 
     <TextView
         android:id="@+id/artistname"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
         android:layout_below="@id/albumname"
         android:layout_toLeftOf="@id/context_menu"
         android:gravity="left|top"
-        android:hint="@string/unknown_artist"
         android:paddingTop="4dp"
-        android:singleLine="true"
-        android:textAppearance="@style/SqueezerTextItemSmall"/>
+        style="@style/SqueezerWidget.NowPlaying.ArtistName"/>
 
     <uk.org.ngo.squeezer.widget.ListItemImageButton
         android:id="@+id/context_menu"
-        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_alignBottom="@+id/artistname"
@@ -100,17 +85,12 @@
 
     <TextView
         android:id="@+id/currenttime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:layout_above="@+id/media_buttons"
         android:layout_alignBottom="@+id/seekbar"
         android:layout_alignParentLeft="true"
         android:layout_alignTop="@+id/seekbar"
         android:layout_below="@id/artistname"
-        android:layout_gravity="center_horizontal"
-        android:gravity="center_vertical"
-        android:text="0:00"
-        android:textAppearance="@style/SqueezerTextItemSmall"/>
+        style="@style/SqueezerWidget.NowPlaying.Timestamp"/>
 
     <SeekBar
         android:id="@+id/seekbar"
@@ -123,18 +103,13 @@
 
     <TextView
         android:id="@+id/totaltime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:layout_above="@id/media_buttons"
         android:layout_alignBottom="@id/seekbar"
         android:layout_alignParentRight="true"
         android:layout_alignTop="@+id/seekbar"
         android:layout_below="@id/context_menu"
-        android:layout_gravity="center_horizontal"
-        android:gravity="center_vertical"
         android:paddingRight="8dp"
-        android:text="0:00"
-        android:textAppearance="@style/SqueezerTextItemSmall"/>
+        style="@style/SqueezerWidget.NowPlaying.Timestamp"/>
 
     <LinearLayout
         android:id="@+id/media_buttons"
@@ -149,23 +124,23 @@
 
         <ImageButton
             android:id="@+id/shuffle"
-            style="@style/MediaButton.Shuffle"/>
+            style="@style/SqueezerWidget.MediaButton.Shuffle"/>
 
         <uk.org.ngo.squeezer.widget.RepeatingImageButton
             android:id="@+id/prev"
-            style="@style/MediaButton.Previous"/>
+            style="@style/SqueezerWidget.MediaButton.Previous"/>
 
         <ImageButton
             android:id="@+id/pause"
-            style="@style/MediaButton.Play"/>
+            style="@style/SqueezerWidget.MediaButton.Play"/>
 
         <uk.org.ngo.squeezer.widget.RepeatingImageButton
             android:id="@+id/next"
-            style="@style/MediaButton.Next"/>
+            style="@style/SqueezerWidget.MediaButton.Next"/>
 
         <ImageButton
             android:id="@+id/repeat"
-            style="@style/MediaButton.Repeat"/>
+            style="@style/SqueezerWidget.MediaButton.Repeat"/>
     </LinearLayout>
 </RelativeLayout>
 

@@ -25,6 +25,7 @@ import android.content.ServiceConnection;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
+import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringDef;
@@ -52,6 +53,7 @@ import uk.org.ngo.squeezer.service.ISqueezeService;
 import uk.org.ngo.squeezer.service.ServerString;
 import uk.org.ngo.squeezer.service.SqueezeService;
 import uk.org.ngo.squeezer.service.event.PlayerVolume;
+import uk.org.ngo.squeezer.util.ImageFetcher;
 import uk.org.ngo.squeezer.util.SqueezePlayer;
 import uk.org.ngo.squeezer.util.ThemeManager;
 
@@ -152,6 +154,9 @@ public abstract class BaseActivity extends ActionBarActivity implements HasUiThr
         if (SqueezePlayer.hasSqueezePlayer(this) && new Preferences(this).controlSqueezePlayer()) {
             squeezePlayer = new SqueezePlayer(this);
         }
+
+        // Ensure that any image fetching tasks started by this activity do not finish prematurely.
+        ImageFetcher.getInstance(this).setExitTasksEarly(false);
     }
 
     @Override
@@ -174,7 +179,20 @@ public abstract class BaseActivity extends ActionBarActivity implements HasUiThr
             mRegisteredOnEventBus = false;
         }
 
+        // Ensure that any pending image fetching tasks are unpaused, and finish quickly.
+        ImageFetcher imageFetcher = ImageFetcher.getInstance(this);
+        imageFetcher.setExitTasksEarly(true);
+        imageFetcher.setPauseWork(false);
+
         super.onPause();
+    }
+
+    /**
+     * Clear the image memory cache if memory gets low.
+     */
+    @Override
+    public void onLowMemory() {
+        ImageFetcher.onLowMemory();
     }
 
     @Override
@@ -219,6 +237,7 @@ public abstract class BaseActivity extends ActionBarActivity implements HasUiThr
      *
      * @param service The connection to the bound service.
      */
+    @CallSuper
     protected void onServiceConnected(@NonNull ISqueezeService service) {
         supportInvalidateOptionsMenu();
         maybeRegisterOnEventBus(service);
@@ -301,6 +320,7 @@ public abstract class BaseActivity extends ActionBarActivity implements HasUiThr
      * changing.
      */
     @Override
+    @CallSuper
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {
             case KeyEvent.KEYCODE_VOLUME_UP:
@@ -313,6 +333,7 @@ public abstract class BaseActivity extends ActionBarActivity implements HasUiThr
     }
 
     @Override
+    @CallSuper
     public boolean onKeyUp(int keyCode, @NonNull KeyEvent event) {
         switch (keyCode) {
             case KeyEvent.KEYCODE_VOLUME_UP:
@@ -351,13 +372,6 @@ public abstract class BaseActivity extends ActionBarActivity implements HasUiThr
 
     public boolean isConnected() {
         return mService != null && mService.isConnected();
-    }
-
-    public String getIconUrl(String icon) {
-        if (mService == null || icon == null) {
-            return null;
-        }
-        return mService.getIconUrl(icon);
     }
 
     public String getServerString(ServerString stringToken) {

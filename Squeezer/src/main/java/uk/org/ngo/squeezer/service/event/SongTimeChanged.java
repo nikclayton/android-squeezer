@@ -16,15 +16,24 @@
 
 package uk.org.ngo.squeezer.service.event;
 
+import android.support.annotation.NonNull;
+
+import uk.org.ngo.squeezer.model.Player;
+
 /** Event sent when the duration or current play position of the current song has changed. */
 public class SongTimeChanged {
+    /** The player with changed state. */
+    @NonNull
+    public final Player player;
+
     /** The current position of the player in the song, measured in seconds. */
     public final int currentPosition;
 
     /** The song's duration, measured in seconds. */
     public final int duration;
 
-    public SongTimeChanged(int currentPosition, int duration) {
+    public SongTimeChanged(@NonNull Player player, int currentPosition, int duration) {
+        this.player = player;
         this.currentPosition = currentPosition;
         this.duration = duration;
     }

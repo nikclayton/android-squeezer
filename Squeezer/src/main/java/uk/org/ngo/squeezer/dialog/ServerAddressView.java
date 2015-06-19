@@ -30,6 +30,7 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
@@ -157,7 +158,7 @@ public class ServerAddressView extends LinearLayout implements ScanNetworkTask.S
 
     /**
      * Called when server scanning has finished.
-     * @param serverMap Discovered servers
+     * @param serverMap Discovered servers, key is the server name, value is the IP address.
      */
     public void onScanFinished(TreeMap<String, String> serverMap) {
         mScanResults.setVisibility(VISIBLE);

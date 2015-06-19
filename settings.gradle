@@ -1,1 +1,1 @@
-include ':Squeezer'
+include ':Squeezer', ':libs:eventbus:EventBus'

@@ -39,7 +39,6 @@ import uk.org.ngo.squeezer.R;
 import uk.org.ngo.squeezer.framework.ItemAdapter;
 import uk.org.ngo.squeezer.model.Player;
 import uk.org.ngo.squeezer.model.Song;
-import uk.org.ngo.squeezer.util.ImageFetcher;
 
 class PlayerListAdapter extends BaseExpandableListAdapter implements View.OnCreateContextMenuListener {
 
@@ -57,17 +56,14 @@ class PlayerListAdapter extends BaseExpandableListAdapter implements View.OnCrea
 
     private final List<Player> mPlayers = new ImmutableList.Builder<Player>().build();
 
-    private final ImageFetcher mImageFetcher;
-
     /** Joins elements together with ' - ', skipping nulls. */
     private static final Joiner mJoiner = Joiner.on(" - ").skipNulls();
 
     /** Count of how many players are in the adapter. */
     private int mPlayerCount;
 
-    public PlayerListAdapter(PlayerListActivity activity, ImageFetcher imageFetcher) {
+    public PlayerListAdapter(PlayerListActivity activity) {
         mActivity = activity;
-        mImageFetcher = imageFetcher;
     }
 
     public void onChildClick(int groupPosition, int childPosition) {
@@ -97,7 +93,7 @@ class PlayerListAdapter extends BaseExpandableListAdapter implements View.OnCrea
         Collections.sort(masters);
 
         for (String masterId : masters) {
-            ItemAdapter<Player> childAdapter = new ItemAdapter<Player>(new PlayerView(mActivity), mImageFetcher);
+            ItemAdapter<Player> childAdapter = new ItemAdapter<Player>(new PlayerView(mActivity));
 
             List<Player> slaves = new ArrayList<Player>(playerSyncGroups.get(masterId));
             mPlayerCount += slaves.size();

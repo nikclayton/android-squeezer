@@ -18,14 +18,19 @@ package uk.org.ngo.squeezer.framework;
 
 import android.os.Parcelable;
 
+import com.bluelinelabs.logansquare.annotation.JsonField;
+import com.bluelinelabs.logansquare.annotation.JsonObject;
+
 /**
  * Base class for SqueezeServer data. Specializations must implement all the necessary boilerplate
  * code. This is okay for now, because we only have few data types.
  *
  * @author Kurt Aaholst
  */
+@JsonObject
 public abstract class Item implements Parcelable {
 
+    @JsonField
     private String id;
 
     public void setId(String id) {
@@ -37,6 +42,10 @@ public abstract class Item implements Parcelable {
     }
 
     abstract public String getName();
+
+    public Item() {
+
+    }
 
     @Override
     public int describeContents() {

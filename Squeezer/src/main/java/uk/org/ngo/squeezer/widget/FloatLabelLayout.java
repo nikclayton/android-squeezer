@@ -16,6 +16,7 @@
 
 package uk.org.ngo.squeezer.widget;
 
+import android.support.annotation.NonNull;
 import android.widget.FrameLayout;
 
 import android.content.Context;
@@ -140,7 +141,7 @@ public class FloatLabelLayout extends FrameLayout {
     }
 
     @Override
-    public void addView(View child, int index, ViewGroup.LayoutParams params) {
+    public void addView(@NonNull View child, int index, ViewGroup.LayoutParams params) {
         if (child instanceof EditText) {
             // Update the layout params so that the EditText is at the bottom, with enough top
             // margin to show the label

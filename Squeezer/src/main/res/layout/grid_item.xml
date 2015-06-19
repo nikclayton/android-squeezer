@@ -68,7 +68,7 @@ for the implementation.
         android:ellipsize="end"
         android:paddingTop="4dp"
         android:singleLine="true"
-        android:textAppearance="@style/SqueezerTextItem"
+        android:textAppearance="@style/SqueezerTextAppearance.GridItem.Primary"
         tools:text="Album name"/>
 
     <TextView
@@ -79,7 +79,7 @@ for the implementation.
         android:layout_toLeftOf="@id/context_menu"
         android:ellipsize="end"
         android:singleLine="true"
-        android:textAppearance="@style/SqueezerTextItemSmall"
+        android:textAppearance="@style/SqueezerTextAppearance.GridItem.Secondary"
         tools:text="Artist info"/>
 
     <include

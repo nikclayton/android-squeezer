@@ -44,7 +44,6 @@ import uk.org.ngo.squeezer.service.event.MusicChanged;
 import uk.org.ngo.squeezer.service.event.PlayersChanged;
 import uk.org.ngo.squeezer.service.event.PlaylistTracksAdded;
 import uk.org.ngo.squeezer.service.event.PlaylistTracksDeleted;
-import uk.org.ngo.squeezer.util.ImageFetcher;
 
 import static uk.org.ngo.squeezer.framework.BaseItemView.ViewHolder;
 
@@ -68,9 +67,8 @@ public class CurrentPlaylistActivity extends BaseListActivity<Song> {
      */
     private class HighlightingListAdapter extends ItemAdapter<Song> {
 
-        public HighlightingListAdapter(ItemView<Song> itemView,
-                ImageFetcher imageFetcher) {
-            super(itemView, imageFetcher);
+        public HighlightingListAdapter(ItemView<Song> itemView) {
+            super(itemView);
         }
 
         @Override
@@ -83,7 +81,7 @@ public class CurrentPlaylistActivity extends BaseListActivity<Song> {
                 ViewHolder viewHolder = (ViewHolder) viewTag;
                 if (position == currentPlaylistIndex) {
                     viewHolder.text1
-                            .setTextAppearance(getActivity(), R.style.SqueezerCurrentTextItem);
+                            .setTextAppearance(getActivity(), R.style.SqueezerTextAppearance_ListItem_Primary);
 
                     // Changing the background resource to a 9-patch drawable causes the padding
                     // to be reset. See http://www.mail-archive.com/android-developers@googlegroups.com/msg09595.html
@@ -98,7 +96,7 @@ public class CurrentPlaylistActivity extends BaseListActivity<Song> {
 
                     view.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom);
                 } else {
-                    viewHolder.text1.setTextAppearance(getActivity(), R.style.SqueezerTextItem);
+                    viewHolder.text1.setTextAppearance(getActivity(), R.style.SqueezerTextAppearance_ListItem_Primary);
                     view.setBackgroundColor(getAttributeValue(R.attr.background));
                 }
             }
@@ -109,7 +107,7 @@ public class CurrentPlaylistActivity extends BaseListActivity<Song> {
     @Override
     protected ItemAdapter<Song> createItemListAdapter(
             ItemView<Song> itemView) {
-        return new HighlightingListAdapter(itemView, getImageFetcher());
+        return new HighlightingListAdapter(itemView);
     }
 
     @Override
@@ -136,12 +134,19 @@ public class CurrentPlaylistActivity extends BaseListActivity<Song> {
                 menu.findItem(R.id.add_to_playlist).setVisible(false);
                 menu.findItem(R.id.play_next).setVisible(false);
 
+                // First item? Disable "move up" menu entry.
                 if (menuInfo.position == 0) {
                     menu.findItem(R.id.playlist_move_up).setVisible(false);
                 }
 
+                // Last item? Disable "move down" menu entry.
                 if (menuInfo.position == menuInfo.adapter.getCount() - 1) {
                     menu.findItem(R.id.playlist_move_down).setVisible(false);
+                }
+
+                // Only item? Disable "move" menu entry.
+                if (menuInfo.adapter.getCount() == 1) {
+                    menu.findItem(R.id.playlist_move).setVisible(false);
                 }
             }
 
@@ -244,22 +249,26 @@ public class CurrentPlaylistActivity extends BaseListActivity<Song> {
     }
 
     public void onEventMainThread(MusicChanged event) {
-        Log.d(getTag(), "onMusicChanged " + event.playerState.getCurrentSong());
-        currentPlaylistIndex = event.playerState.getCurrentPlaylistIndex();
-        getItemAdapter().notifyDataSetChanged();
+        if (event.player.equals(getService().getActivePlayer())) {
+            Log.d(getTag(), "onMusicChanged " + event.playerState.getCurrentSong());
+            currentPlaylistIndex = event.playerState.getCurrentPlaylistIndex();
+            getItemAdapter().notifyDataSetChanged();
+        }
     }
 
     public void onEventMainThread(PlayersChanged event) {
         supportInvalidateOptionsMenu();
 
-        if (event.activePlayer == null) {
+        Player activePlayer = getService().getActivePlayer();
+
+        if (activePlayer == null) {
             player = null;
             clearItems();
             return;
         }
 
-        if (!event.activePlayer.equals(player)) {
-            player = event.activePlayer;
+        if (!activePlayer.equals(player)) {
+            player = activePlayer;
             clearAndReOrderItems();
         }
     }

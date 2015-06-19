@@ -127,7 +127,7 @@ public class PlayerListActivity extends ItemListActivity implements
         if (savedInstanceState != null)
             currentPlayer = savedInstanceState.getParcelable(CURRENT_PLAYER);
 
-        mResultsAdapter = new PlayerListAdapter(this, getImageFetcher());
+        mResultsAdapter = new PlayerListAdapter(this);
         mResultsExpandableListView = (ExpandableListView) findViewById(R.id.expandable_list);
 
         mResultsExpandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {

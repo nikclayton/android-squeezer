@@ -38,6 +38,7 @@ import java.util.Map;
 import uk.org.ngo.squeezer.R;
 import uk.org.ngo.squeezer.itemlist.IServiceItemListCallback;
 import uk.org.ngo.squeezer.service.event.HandshakeComplete;
+import uk.org.ngo.squeezer.util.ImageFetcher;
 import uk.org.ngo.squeezer.util.RetainFragment;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -248,7 +249,7 @@ public abstract class BaseListActivity<T extends Item> extends ItemListActivity 
     }
 
     protected ItemAdapter<T> createItemListAdapter(ItemView<T> itemView) {
-        return new ItemAdapter<T>(itemView, getImageFetcher());
+        return new ItemAdapter<T>(itemView);
     }
 
     public void onItemsReceived(final int count, final int start, final List<T> items) {
@@ -290,9 +291,9 @@ public abstract class BaseListActivity<T extends Item> extends ItemListActivity 
 
             if (scrollState == AbsListView.OnScrollListener.SCROLL_STATE_FLING ||
                     scrollState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
-                getImageFetcher().setPauseWork(true);
+                ImageFetcher.getInstance(BaseListActivity.this).setPauseWork(true);
             } else {
-                getImageFetcher().setPauseWork(false);
+                ImageFetcher.getInstance(BaseListActivity.this).setPauseWork(false);
             }
         }
     }

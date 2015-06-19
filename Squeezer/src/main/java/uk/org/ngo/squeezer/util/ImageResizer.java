@@ -102,8 +102,8 @@ public class ImageResizer extends ImageWorker {
 
     @Override
     @Nullable
-    protected Bitmap processBitmap(Object data) {
-        return processBitmap(Integer.parseInt(String.valueOf(data)));
+    protected Bitmap processBitmap(BitmapWorkerTaskParams params) {
+        return processBitmap(Integer.parseInt(String.valueOf(params.data)));
     }
 
     /**

@@ -50,30 +50,20 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_toRightOf="@id/album"
-            android:ellipsize="marquee"
-            android:focusable="true"
             android:paddingLeft="8dp"
             android:paddingBottom="2dp"
-            android:focusableInTouchMode="true"
             android:hint="@string/unknown_track"
-            android:marqueeRepeatLimit="marquee_forever"
-            android:singleLine="true"
-            android:textAppearance="@style/SqueezerTextItem"/>
+            android:textAppearance="@style/SqueezerTextAppearance.SongInfo.Primary"/>
 
         <TextView
             android:id="@+id/artistname"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:ellipsize="marquee"
             android:paddingLeft="8dp"
             android:paddingTop="2dp"
             android:paddingBottom="2dp"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
             android:hint="@string/unknown_artist"
-            android:marqueeRepeatLimit="marquee_forever"
-            android:singleLine="true"
-            android:textAppearance="@style/SqueezerTextItemSmall"
+            android:textAppearance="@style/SqueezerTextAppearance.SongInfo.Secondary"
             android:layout_toRightOf="@id/album"
             android:layout_below="@id/albumname"/>
 
@@ -81,14 +71,11 @@
             android:id="@+id/yearname"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:ellipsize="marquee"
             android:hint="@string/unknown_year"
-            android:marqueeRepeatLimit="marquee_forever"
             android:paddingLeft="8dp"
             android:paddingTop="2dp"
             android:paddingBottom="2dp"
-            android:singleLine="true"
-            android:textAppearance="@style/SqueezerTextItemSmall"
+            android:textAppearance="@style/SqueezerTextAppearance.SongInfo.Secondary"
             android:layout_toRightOf="@id/album"
             android:layout_below="@id/artistname"/>
 

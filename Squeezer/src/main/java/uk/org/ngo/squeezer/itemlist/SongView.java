@@ -32,7 +32,6 @@ import uk.org.ngo.squeezer.itemlist.action.PlayableItemAction;
 import uk.org.ngo.squeezer.model.Artist;
 import uk.org.ngo.squeezer.model.Song;
 import uk.org.ngo.squeezer.service.ISqueezeService;
-import uk.org.ngo.squeezer.util.ImageFetcher;
 
 import static android.text.format.DateUtils.formatElapsedTime;
 
@@ -99,7 +98,7 @@ public class SongView extends PlaylistItemView<Song> {
     }
 
     @Override
-    public void bindView(View view, Song item, ImageFetcher imageFetcher) {
+    public void bindView(View view, Song item) {
         ViewHolder viewHolder = (ViewHolder) view.getTag();
 
         viewHolder.text1.setText(item.getName());
@@ -128,26 +127,6 @@ public class SongView extends PlaylistItemView<Song> {
 
         viewHolder.text1.setText(label);
         viewHolder.text2.setText("");
-    }
-
-    /**
-     * Returns the URL to download the specified album artwork, or null if the artwork does not
-     * exist, or there was a problem with the service.
-     *
-     * @param artwork_track_id
-     *
-     * @return
-     */
-    protected String getAlbumArtUrl(String artwork_track_id) {
-        if (artwork_track_id == null) {
-            return null;
-        }
-
-        ISqueezeService service = getActivity().getService();
-        if (service == null) {
-            return null;
-        }
-        return service.getAlbumArtUrl(artwork_track_id);
     }
 
     @Override

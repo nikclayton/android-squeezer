@@ -36,7 +36,7 @@
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
         android:paddingTop="4dp"
-        android:textAppearance="@style/SqueezerTextItem"
+        android:textAppearance="@style/SqueezerTextAppearance.Medium"
         android:visibility="gone"/>
 
     <ListView

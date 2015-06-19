@@ -56,25 +56,4 @@ public abstract class AlbumArtView<T extends ArtworkItem> extends
         viewHolder.text1.setText(text);
         viewHolder.text2.setText("");
     }
-
-    /**
-     * Returns the URL to download the specified album artwork, or null if the artwork does not
-     * exist, or there was a problem with the service.
-     *
-     * @param artwork_track_id
-     *
-     * @return
-     */
-    protected String getAlbumArtUrl(String artwork_track_id) {
-        if (artwork_track_id == null) {
-            return null;
-        }
-
-        ISqueezeService service = getActivity().getService();
-        if (service == null) {
-            return null;
-        }
-
-        return service.getAlbumArtUrl(artwork_track_id);
-    }
 }

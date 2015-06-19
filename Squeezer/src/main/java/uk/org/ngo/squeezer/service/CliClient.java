@@ -253,8 +253,9 @@ class CliClient {
                 new ExtendedQueryFormatCmd(
                         "apps",
                         new HashSet<String>(Arrays.asList("sort", "charset")),
-                        "icon",
-                        new PluginListHandler())
+                        new PluginListHandler(),
+                        "cmd", "name", "type", "icon", "weight"
+                )
         );
         list.add(
                 new ExtendedQueryFormatCmd(

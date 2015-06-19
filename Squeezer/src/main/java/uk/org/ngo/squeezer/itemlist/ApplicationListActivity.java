@@ -23,11 +23,11 @@ import uk.org.ngo.squeezer.framework.ItemView;
 import uk.org.ngo.squeezer.model.Plugin;
 import uk.org.ngo.squeezer.model.PluginItem;
 
-public class ApplicationListActivity extends PluginItemListActivity {
+public class ApplicationListActivity extends PluginListActivity {
 
     @Override
-    public ItemView<PluginItem> createItemView() {
-        return new ApplicationView(this);
+    public ItemView<Plugin> createItemView() {
+        return new RadioView(this);
     }
 
     public static void show(Activity activity) {

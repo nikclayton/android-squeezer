@@ -181,20 +181,20 @@ public class AlarmsActivity extends BaseListActivity<Alarm> implements AlarmSett
 
         @Override
         public void onItemsReceived(final int count, final int start, Map<String, String> parameters, final List<AlarmPlaylist> items, Class<AlarmPlaylist> dataType) {
-            if (start == 0) {
-                mAlarmPlaylists.clear();
-            }
+            getUIThreadHandler().post(new Runnable() {
+                @Override
+                public void run() {
+                    if (start == 0) {
+                        mAlarmPlaylists.clear();
+                    }
 
-            mAlarmPlaylists.addAll(items);
-            if (start + items.size() >= count) {
-                getUIThreadHandler().post(new Runnable() {
-                    @Override
-                    public void run() {
+                    mAlarmPlaylists.addAll(items);
+                    if (start + items.size() >= count) {
                         mAlarmView.setAlarmPlaylists(mAlarmPlaylists);
                         getItemAdapter().notifyDataSetChanged();
                     }
-                });
-            }
+                }
+            });
         }
 
         @Override

@@ -47,8 +47,9 @@
         android:orientation="horizontal">
 
         <uk.org.ngo.squeezer.widget.FloatLabelLayout
-            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_marginTop="16dp"
             app:floatLabelTextAppearance="@style/SqueezerTextAppearance.FloatLabel"
             app:floatLabelTrigger="focus">
@@ -57,16 +58,15 @@
                 android:id="@+id/search_input"
                 android:hint="@string/search_text_hint"
                 android:inputType="textNoSuggestions"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"/>
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
         </uk.org.ngo.squeezer.widget.FloatLabelLayout>
 
         <ImageButton
             android:id="@+id/search_button"
             android:src="@drawable/icon_search"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="match_parent"/>
     </LinearLayout>
 
     <ListView android:id="@+id/item_list"

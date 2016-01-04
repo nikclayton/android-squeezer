@@ -48,25 +48,25 @@ public class Scrobble {
         Log.d("Scrobble", "Scrobbling, playing is: " + (PlayerState.PLAY_STATE_PLAY.equals(playStatus)));
         Intent i = new Intent();
 
-        if (Scrobble.haveScrobbleDroid()) {
-            // http://code.google.com/p/scrobbledroid/wiki/DeveloperAPI
-            i.setAction("net.jjc1138.android.scrobbler.action.MUSIC_STATUS");
-            i.putExtra("playing", PlayerState.PLAY_STATE_PLAY.equals(playStatus));
-            i.putExtra("track", currentSong.getName());
-            i.putExtra("album", currentSong.getAlbum());
-            i.putExtra("artist", currentSong.getArtist());
-            i.putExtra("secs", currentSong.getDuration());
-            i.putExtra("source", "P");
-        } else if (Scrobble.haveSls()) {
+        if (Scrobble.haveSls()) {
             // http://code.google.com/p/a-simple-lastfm-scrobbler/wiki/Developers
             i.setAction("com.adam.aslfms.notify.playstatechanged");
             i.putExtra("state", PlayerState.PLAY_STATE_PLAY.equals(playStatus) ? 0 : 2);
             i.putExtra("app-name", context.getText(R.string.app_name));
             i.putExtra("app-package", "uk.org.ngo.squeezer");
             i.putExtra("track", currentSong.getName());
-            i.putExtra("album", currentSong.getAlbum());
+            i.putExtra("album", currentSong.getAlbumName());
             i.putExtra("artist", currentSong.getArtist());
             i.putExtra("duration", currentSong.getDuration());
+            i.putExtra("source", "P");
+        } else if (Scrobble.haveScrobbleDroid()) {
+            // http://code.google.com/p/scrobbledroid/wiki/DeveloperAPI
+            i.setAction("net.jjc1138.android.scrobbler.action.MUSIC_STATUS");
+            i.putExtra("playing", PlayerState.PLAY_STATE_PLAY.equals(playStatus));
+            i.putExtra("track", currentSong.getName());
+            i.putExtra("album", currentSong.getAlbumName());
+            i.putExtra("artist", currentSong.getArtist());
+            i.putExtra("secs", currentSong.getDuration());
             i.putExtra("source", "P");
         }
         context.sendBroadcast(i);

@@ -33,6 +33,7 @@ import com.google.common.collect.Multimap;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import uk.org.ngo.squeezer.R;
 import uk.org.ngo.squeezer.framework.ItemAdapter;
@@ -93,17 +94,20 @@ class PlayerListAdapter extends BaseExpandableListAdapter implements View.OnCrea
         prevPlayerSyncGroups = HashMultimap.create(playerSyncGroups);
         clear();
 
-        List<String> masters = new ArrayList<String>(playerSyncGroups.keySet());
-        Collections.sort(masters);
+        ArrayList<Player> masters = new ArrayList<Player>(playerSyncGroups.values());
+        Collections.sort(masters); // sort player list alphabetically by player name
 
-        for (String masterId : masters) {
-            ItemAdapter<Player> childAdapter = new ItemAdapter<Player>(new PlayerView(mActivity));
+        for (Player master : masters) {
+            String masterId = master.getId();
+            if (playerSyncGroups.containsKey(masterId)) { // masterId doesn't have to be present in the playerSyncGroups key list
+                ItemAdapter<Player> childAdapter = new ItemAdapter<Player>(new PlayerView(mActivity));
 
-            List<Player> slaves = new ArrayList<Player>(playerSyncGroups.get(masterId));
-            mPlayerCount += slaves.size();
-            Collections.sort(slaves, Player.compareById);
-            childAdapter.update(slaves.size(), 0, slaves);
-            mChildAdapters.add(childAdapter);
+                List<Player> slaves = new ArrayList<Player>(playerSyncGroups.get(masterId));
+                mPlayerCount += slaves.size();
+                Collections.sort(slaves); // order slaves alphabetically too
+                childAdapter.update(slaves.size(), 0, slaves);
+                mChildAdapters.add(childAdapter);
+            }
         }
 
         notifyDataSetChanged();

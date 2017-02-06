@@ -1176,6 +1176,7 @@ class CliClient implements IClient {
                     boolean changedPower = playerState.setPoweredOn(Util.parseDecimalIntOrZero(tokenMap.get("power")) == 1);
                     boolean changedShuffleStatus = playerState.setShuffleStatus(tokenMap.get("playlist shuffle"));
                     boolean changedRepeatStatus = playerState.setRepeatStatus(tokenMap.get("playlist repeat"));
+                    boolean changedCurrentPlaylistTracksNum = playerState.setCurrentPlaylistTracksNum(Util.parseDecimalIntOrZero(tokenMap.get("playlist_tracks")));
                     boolean changedCurrentPlaylistIndex = playerState.setCurrentPlaylistIndex(Util.parseDecimalIntOrZero(tokenMap.get("playlist_cur_index")));
                     boolean changedCurrentPlaylist = playerState.setCurrentPlaylist(tokenMap.get("playlist_name"));
                     boolean changedSleep = playerState.setSleep(Util.parseDecimalIntOrZero(tokenMap.get("will_sleep_in")));

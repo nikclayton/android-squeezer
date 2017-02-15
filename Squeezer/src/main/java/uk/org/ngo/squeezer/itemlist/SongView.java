@@ -17,8 +17,6 @@
 package uk.org.ngo.squeezer.itemlist;
 
 
-import android.os.RemoteException;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.View;
 
@@ -40,9 +38,6 @@ import static android.text.format.DateUtils.formatElapsedTime;
  * A view that shows a single song with its artwork, and a context menu.
  */
 public class SongView extends PlaylistItemView<Song> {
-
-    @SuppressWarnings("unused")
-    private static final String TAG = "SongView";
 
     /**
      * Which details to show in the second line of text.
@@ -120,7 +115,7 @@ public class SongView extends PlaylistItemView<Song> {
         viewHolder.text1.setText(item.getName());
 
         viewHolder.text2.setText(mJoiner.join(
-                mDetails.contains(Details.TRACK_NO) ? item.getTracknum() : null,
+                mDetails.contains(Details.TRACK_NO) ? item.getTrackNum() : null,
                 mDetails.contains(Details.DURATION) ? formatElapsedTime(item.getDuration()) : null,
                 mDetails.contains(Details.ARTIST) ? item.getArtist() : null,
                 mDetails.contains(Details.ARTIST_IF_COMPILATION) && item.getCompilation() ? item
@@ -162,13 +157,7 @@ public class SongView extends PlaylistItemView<Song> {
         if (service == null) {
             return null;
         }
-
-        try {
-            return service.getAlbumArtUrl(artwork_track_id);
-        } catch (RemoteException e) {
-            Log.e(getClass().getSimpleName(), "Error requesting album art url: " + e);
-            return null;
-        }
+        return service.getAlbumArtUrl(artwork_track_id);
     }
 
     @Override
@@ -190,22 +179,21 @@ public class SongView extends PlaylistItemView<Song> {
 
         menuInfo.menuInflater.inflate(R.menu.songcontextmenu, menu);
 
-        if (((Song) menuInfo.item).getAlbum_id() != null && !browseByAlbum) {
+        if (((Song) menuInfo.item).getAlbumId().equals("") && !browseByAlbum) {
             menu.findItem(R.id.view_this_album).setVisible(true);
         }
 
-        if (((Song) menuInfo.item).getArtist_id() != null) {
+        if (((Song) menuInfo.item).getArtistId().equals("")) {
             menu.findItem(R.id.view_albums_by_song).setVisible(true);
         }
 
-        if (((Song) menuInfo.item).getArtist_id() != null && !browseByArtist) {
+        if (((Song) menuInfo.item).getArtistId().equals("") && !browseByArtist) {
             menu.findItem(R.id.view_songs_by_artist).setVisible(true);
         }
     }
 
     @Override
-    public boolean doItemContext(android.view.MenuItem menuItem, int index, Song selectedItem)
-            throws RemoteException {
+    public boolean doItemContext(android.view.MenuItem menuItem, int index, Song selectedItem) {
         switch (menuItem.getItemId()) {
             case R.id.view_this_album:
                 SongListActivity.show(getActivity(), selectedItem.getAlbum());
@@ -214,16 +202,12 @@ public class SongView extends PlaylistItemView<Song> {
             // XXX: Is this actually "view albums by artist"?
             case R.id.view_albums_by_song:
                 AlbumListActivity.show(getActivity(),
-                        new Artist(selectedItem.getArtist_id(), selectedItem.getArtist()));
+                        new Artist(selectedItem.getArtistId(), selectedItem.getArtist()));
                 return true;
 
             case R.id.view_songs_by_artist:
                 SongListActivity.show(getActivity(),
-                        new Artist(selectedItem.getArtist_id(), selectedItem.getArtist()));
-                return true;
-
-            case R.id.download:
-                getActivity().downloadSong(selectedItem);
+                        new Artist(selectedItem.getArtistId(), selectedItem.getArtist()));
                 return true;
         }
 

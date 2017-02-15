@@ -19,13 +19,10 @@ package uk.org.ngo.squeezer.itemlist;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.RemoteException;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
-
-import java.util.List;
 
 import uk.org.ngo.squeezer.R;
 import uk.org.ngo.squeezer.framework.BaseListActivity;
@@ -56,10 +53,12 @@ public class PlaylistsActivity extends BaseListActivity<Playlist> {
     }
 
     @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        currentIndex = savedInstanceState.getInt(CURRENT_INDEX);
-        currentPlaylist = savedInstanceState.getParcelable(CURRENT_PLAYLIST);
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (savedInstanceState != null) {
+            currentIndex = savedInstanceState.getInt(CURRENT_INDEX);
+            currentPlaylist = savedInstanceState.getParcelable(CURRENT_PLAYLIST);
+        }
     }
 
     @Override
@@ -81,14 +80,10 @@ public class PlaylistsActivity extends BaseListActivity<Playlist> {
      * Rename the playlist previously set as context.
      */
     public void playlistRename(String newName) {
-        try {
-            getService().playlistsRename(currentPlaylist, newName);
-            oldName = currentPlaylist.getName();
-            currentPlaylist.setName(newName);
-            getItemAdapter().notifyDataSetChanged();
-        } catch (RemoteException e) {
-            Log.e(getTag(), "Error renaming playlist to '" + newName + "': " + e);
-        }
+        getService().playlistsRename(currentPlaylist, newName);
+        oldName = currentPlaylist.getName();
+        currentPlaylist.setName(newName);
+        getItemAdapter().notifyDataSetChanged();
     }
 
     @Override
@@ -97,20 +92,14 @@ public class PlaylistsActivity extends BaseListActivity<Playlist> {
     }
 
     @Override
-    protected void registerCallback() throws RemoteException {
-        getService().registerPlaylistsCallback(playlistsCallback);
+    protected void registerCallback() {
+        super.registerCallback();
         getService().registerPlaylistMaintenanceCallback(playlistMaintenanceCallback);
     }
 
     @Override
-    protected void unregisterCallback() throws RemoteException {
-        getService().unregisterPlaylistsCallback(playlistsCallback);
-        getService().unregisterPlaylistMaintenanceCallback(playlistMaintenanceCallback);
-    }
-
-    @Override
-    protected void orderPage(int start) throws RemoteException {
-        getService().playlists(start);
+    protected void orderPage(int start) {
+        getService().playlists(start, this);
     }
 
     @Override
@@ -150,15 +139,6 @@ public class PlaylistsActivity extends BaseListActivity<Playlist> {
         context.startActivity(intent);
     }
 
-    private final IServicePlaylistsCallback playlistsCallback
-            = new IServicePlaylistsCallback.Stub() {
-        @Override
-        public void onPlaylistsReceived(int count, int start, List<Playlist> items)
-                throws RemoteException {
-            onItemsReceived(count, start, items);
-        }
-    };
-
     private void showServiceMessage(final String msg) {
         getUIThreadHandler().post(new Runnable() {
             @Override
@@ -170,10 +150,10 @@ public class PlaylistsActivity extends BaseListActivity<Playlist> {
     }
 
     private final IServicePlaylistMaintenanceCallback playlistMaintenanceCallback
-            = new IServicePlaylistMaintenanceCallback.Stub() {
+            = new IServicePlaylistMaintenanceCallback() {
 
         @Override
-        public void onRenameFailed(String msg) throws RemoteException {
+        public void onRenameFailed(String msg) {
             if (currentIndex != -1) {
                 currentPlaylist.setName(oldName);
             }
@@ -181,10 +161,14 @@ public class PlaylistsActivity extends BaseListActivity<Playlist> {
         }
 
         @Override
-        public void onCreateFailed(String msg) throws RemoteException {
+        public void onCreateFailed(String msg) {
             showServiceMessage(msg);
         }
 
+        @Override
+        public Object getClient() {
+            return PlaylistsActivity.this;
+        }
     };
 
 }

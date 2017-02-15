@@ -1,12 +1,12 @@
 package uk.org.ngo.squeezer.dialog;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.widget.EditText;
 
@@ -18,27 +18,25 @@ public class AuthenticationDialog extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        final SharedPreferences preferences = getActivity()
-                .getSharedPreferences(Preferences.NAME, Context.MODE_PRIVATE);
+        final FragmentActivity activity = getActivity();
+        final Preferences preferences = new Preferences(activity);
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 
-        View form = getActivity().getLayoutInflater().inflate(R.layout.authentication_dialog, null);
+        @SuppressLint({"InflateParams"}) // OK, as view is passed to AlertDialog.Builder.setView()
+        View form = activity.getLayoutInflater().inflate(R.layout.authentication_dialog, null);
         builder.setView(form);
 
         final EditText userNameEditText = (EditText) form.findViewById(R.id.username);
-        userNameEditText.setText(preferences.getString(Preferences.KEY_USERNAME, null));
+        userNameEditText.setText(preferences.getUserName());
 
         final EditText passwordEditText = (EditText) form.findViewById(R.id.password);
-        passwordEditText.setText(preferences.getString(Preferences.KEY_PASSWORD, null));
+        passwordEditText.setText(preferences.getPassword());
 
         builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
-                SharedPreferences.Editor editor = preferences.edit();
-                editor.putString(Preferences.KEY_USERNAME, userNameEditText.getText().toString());
-                editor.putString(Preferences.KEY_PASSWORD, passwordEditText.getText().toString());
-                editor.commit();
+                preferences.saveUserCredentials(userNameEditText.getText().toString(), passwordEditText.getText().toString());
 
-                ((NowPlayingFragment) getActivity().getSupportFragmentManager()
+                ((NowPlayingFragment) activity.getSupportFragmentManager()
                         .findFragmentById(R.id.now_playing_fragment)).startVisibleConnection();
             }
         });
@@ -46,4 +44,5 @@ public class AuthenticationDialog extends DialogFragment {
 
         return builder.create();
     }
+
 }

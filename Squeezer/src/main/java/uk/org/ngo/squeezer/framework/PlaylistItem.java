@@ -25,7 +25,7 @@ package uk.org.ngo.squeezer.framework;
  *
  * @author nik
  */
-public abstract class PlaylistItem extends Item {
+public abstract class PlaylistItem extends Item implements FilterItem {
 
     /**
      * Fetches the tag that represents this item in a <code>playlistcontrol</code> command.
@@ -33,4 +33,16 @@ public abstract class PlaylistItem extends Item {
      * @return the tag, e.g., "album_id".
      */
     abstract public String getPlaylistTag();
+
+
+    /** @return The parameter to use in the <code>playlistcontrol</code> command for this item.
+     */
+    public String getPlaylistParameter() {
+        return getPlaylistTag() + ":" + getId();
+    }
+
+    @Override
+    public String getFilterParameter() {
+        return getFilterTag() + ":" + getId();
+    }
 }

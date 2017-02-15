@@ -16,29 +16,27 @@
 
 package uk.org.ngo.squeezer.itemlist;
 
-import android.content.Context;
+import android.app.Activity;
 import android.content.Intent;
-import android.os.RemoteException;
 
 import uk.org.ngo.squeezer.framework.ItemView;
 import uk.org.ngo.squeezer.model.Plugin;
+import uk.org.ngo.squeezer.model.PluginItem;
 
-
-public class ApplicationListActivity extends PluginListActivity {
+public class ApplicationListActivity extends PluginItemListActivity {
 
     @Override
-    public ItemView<Plugin> createItemView() {
+    public ItemView<PluginItem> createItemView() {
         return new ApplicationView(this);
     }
 
-    @Override
-    protected void orderPage(int start) throws RemoteException {
-        getService().apps(start);
+    public static void show(Activity activity) {
+        show(activity, Plugin.MY_APPS);
     }
 
-    public static void show(Context context) {
-        final Intent intent = new Intent(context, ApplicationListActivity.class);
-        context.startActivity(intent);
+    public static void show(Activity activity, Plugin plugin) {
+        final Intent intent = new Intent(activity, ApplicationListActivity.class);
+        intent.putExtra(plugin.getClass().getName(), plugin);
+        activity.startActivity(intent);
     }
-
 }

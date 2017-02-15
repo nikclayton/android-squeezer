@@ -2,9 +2,7 @@ package uk.org.ngo.squeezer.itemlist.dialog;
 
 import android.app.Dialog;
 import android.os.Bundle;
-import android.os.RemoteException;
 import android.text.InputType;
-import android.util.Log;
 
 import uk.org.ngo.squeezer.R;
 import uk.org.ngo.squeezer.Util;
@@ -38,18 +36,12 @@ public class PlaylistItemMoveDialog extends BaseEditTextDialog {
     protected boolean commit(String targetString) {
         int targetIndex = Util.parseDecimalInt(targetString, -1);
         if (targetIndex > 0 && targetIndex <= activity.getItemAdapter().getCount()) {
-            try {
-                if (playlist == null) {
-                    activity.getService().playlistMove(fromIndex - 1, targetIndex - 1);
-                } else {
-                    activity.getService().playlistsMove(playlist, fromIndex - 1, targetIndex - 1);
-                }
-                activity.clearAndReOrderItems();
-            } catch (RemoteException e) {
-                Log.e(getTag(),
-                        "Error moving song from '" + fromIndex + "' to '" + targetIndex + "': "
-                                + e);
+            if (playlist == null) {
+                activity.getService().playlistMove(fromIndex - 1, targetIndex - 1);
+            } else {
+                activity.getService().playlistsMove(playlist, fromIndex - 1, targetIndex - 1);
             }
+            activity.clearAndReOrderItems();
             return true;
         }
         return false;

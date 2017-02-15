@@ -30,6 +30,11 @@ public class Year extends PlaylistItem {
         return "year_id";
     }
 
+    @Override
+    public String getFilterTag() {
+        return "year";
+    }
+
     public Year(Map<String, String> record) {
         setId(record.get("year"));
     }

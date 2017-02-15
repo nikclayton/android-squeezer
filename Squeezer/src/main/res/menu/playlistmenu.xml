@@ -16,16 +16,17 @@
  limitations under the License.
 -->
 
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/menu_item_playlists_delete"
         android:title="@string/menu_item_delete"
-        android:showAsAction="ifRoom|withText"
+        app:showAsAction="ifRoom|withText"
         android:orderInCategory="20"/>
 
     <item
         android:id="@+id/menu_item_playlists_rename"
         android:title="@string/menu_item_rename"
-        android:showAsAction="ifRoom|withText"
+        app:showAsAction="ifRoom|withText"
         android:orderInCategory="20"/>
 </menu>

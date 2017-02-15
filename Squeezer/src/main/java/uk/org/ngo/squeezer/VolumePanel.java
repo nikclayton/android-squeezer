@@ -21,11 +21,11 @@
  */
 package uk.org.ngo.squeezer;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
-import android.os.RemoteException;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -50,7 +50,7 @@ public class VolumePanel extends Handler implements SeekBar.OnSeekBarChangeListe
 
     private static final int MSG_TIMEOUT = 2;
 
-    protected BaseActivity mActivity;
+    protected final BaseActivity mActivity;
 
     /**
      * Dialog displaying the volume panel.
@@ -70,6 +70,7 @@ public class VolumePanel extends Handler implements SeekBar.OnSeekBarChangeListe
 
     private final SeekBar mSeekbar;
 
+    @SuppressLint({"InflateParams"}) // OK, as view is passed to Dialog.setView()
     public VolumePanel(BaseActivity activity) {
         mActivity = activity;
 
@@ -136,10 +137,7 @@ public class VolumePanel extends Handler implements SeekBar.OnSeekBarChangeListe
         if (fromUser) {
             ISqueezeService service = mActivity.getService();
             if (service != null) {
-                try {
-                    service.adjustVolumeTo(progress);
-                } catch (RemoteException e) {
-                }
+                service.adjustVolumeTo(progress);
             }
         }
     }

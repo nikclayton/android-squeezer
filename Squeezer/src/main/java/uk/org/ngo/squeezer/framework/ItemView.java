@@ -17,7 +17,6 @@
 package uk.org.ngo.squeezer.framework;
 
 import android.os.Parcelable.Creator;
-import android.os.RemoteException;
 import android.view.ContextMenu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -49,7 +48,7 @@ public interface ItemView<T extends Item> {
     ItemListActivity getActivity();
 
     /**
-     * @return {@link Resources#getQuantityString(int, int)}
+     * @return {@link android.content.res.Resources#getQuantityString(int, int)}
      */
     String getQuantityString(int quantity);
 
@@ -57,7 +56,7 @@ public interface ItemView<T extends Item> {
      * Gets a {@link android.view.View} that displays the data at the specified position in the data
      * set. See {@link ItemAdapter#getView(int, View, android.view.ViewGroup)}
      *
-     * @param convertView the old view to reuse, per {@link Adapter#getView(int, View,
+     * @param convertView the old view to reuse, per {@link android.widget.Adapter#getView(int, View,
      * android.view.ViewGroup)}
      * @param item the item to display.
      * @param imageFetcher an {@link ImageFetcher} configured to load image thumbnails.
@@ -93,10 +92,8 @@ public interface ItemView<T extends Item> {
      *
      * @param index Position in the list of the selected item.
      * @param item The selected item. This may be null if
-     *
-     * @throws RemoteException
      */
-    void onItemSelected(int index, T item) throws RemoteException;
+    void onItemSelected(int index, T item);
 
     /**
      * Creates the context menu, and sets the menu's title to the name of the item that it is the
@@ -107,11 +104,7 @@ public interface ItemView<T extends Item> {
      * Subclasses with a context menu should call this method, then inflate their context menu and
      * perform any adjustments to it before returning.
      *
-     * @param menu
-     * @param v
-     * @param menuInfo
-     *
-     * @see OnCreateContextMenuListener#onCreateContextMenu(ContextMenu, View,
+     * @see android.view.View.OnCreateContextMenuListener#onCreateContextMenu(ContextMenu, View,
      * android.view.ContextMenu.ContextMenuInfo)
      */
     public void onCreateContextMenu(ContextMenu menu, View v,
@@ -120,42 +113,52 @@ public interface ItemView<T extends Item> {
     /**
      * Perform the selected action from the context menu for the selected item.
      *
+     * @param menuItem The selected menu action
+     * @param index Position in the list of the selected item.
      * @param selectedItem The item the context menu was generated for
+     *
+     * @return True if the action was consumed
+     *
+     * @see android.app.Activity#onContextItemSelected(MenuItem)
+     */
+    public boolean doItemContext(MenuItem menuItem, int index, T selectedItem);
+
+    /**
+     * Perform the selected action from the context sub-menu.
+     *
      * @param menuItem The selected menu action
      *
      * @return True if the action was consumed
      *
-     * @throws RemoteException
-     * @see {@link Activity#onContextItemSelected(MenuItem)}
+     * @see android.app.Activity#onContextItemSelected(MenuItem)
      */
-    public boolean doItemContext(MenuItem menuItem, int index, T selectedItems)
-            throws RemoteException;
+    public boolean doItemContext(MenuItem menuItem);
 
     /**
      * Extra menu information provided to the {@link android.view.View.OnCreateContextMenuListener#onCreateContextMenu(ContextMenu,
-     * View, ContextMenuInfo) } callback when a context menu is brought up for this ItemView.
+     * View, ContextMenu.ContextMenuInfo) } callback when a context menu is brought up for this ItemView.
      */
     public static class ContextMenuInfo implements ContextMenu.ContextMenuInfo {
 
         /**
          * The position in the adapter for which the context menu is being displayed.
          */
-        public int position;
+        public final int position;
 
         /**
          * The {@link Item} for which the context menu is being displayed.
          */
-        public Item item;
+        public final Item item;
 
         /**
-         * The {@link ItemAdapter} that is bridging the content to the listview.
+         * The {@link ItemAdapter} that is bridging the content to the list view.
          */
-        public ItemAdapter<?> adapter;
+        public final ItemAdapter<?> adapter;
 
         /**
          * A {@link android.view.MenuInflater} that can be used to inflate a menu resource.
          */
-        public MenuInflater menuInflater;
+        public final MenuInflater menuInflater;
 
         public ContextMenuInfo(int position, Item item, ItemAdapter<?> adapter,
                 MenuInflater menuInflater) {

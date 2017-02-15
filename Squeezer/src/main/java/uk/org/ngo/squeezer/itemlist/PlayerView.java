@@ -16,51 +16,177 @@
 
 package uk.org.ngo.squeezer.itemlist;
 
-import android.os.RemoteException;
+import android.view.ContextMenu;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.SeekBar;
+import android.widget.TextView;
 
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
 import uk.org.ngo.squeezer.R;
+import uk.org.ngo.squeezer.Util;
 import uk.org.ngo.squeezer.framework.BaseItemView;
+import uk.org.ngo.squeezer.itemlist.dialog.PlayerRenameDialog;
 import uk.org.ngo.squeezer.model.Player;
+import uk.org.ngo.squeezer.model.PlayerState;
+import uk.org.ngo.squeezer.model.Song;
+import uk.org.ngo.squeezer.service.ServerString;
 import uk.org.ngo.squeezer.util.ImageFetcher;
 
 public class PlayerView extends BaseItemView<Player> {
-
     private static final Map<String, Integer> modelIcons = initializeModelIcons();
 
-    private final PlayerListActivity mActivity;
+    private final PlayerListActivity activity;
 
     public PlayerView(PlayerListActivity activity) {
         super(activity);
+        this.activity = activity;
 
-        mActivity = activity;
+        setViewParams(EnumSet.of(ViewParams.ICON, ViewParams.TWO_LINE, ViewParams.CONTEXT_BUTTON));
+        setLoadingViewParams(EnumSet.of(ViewParams.ICON, ViewParams.TWO_LINE));
+    }
 
-        setViewParams(EnumSet.of(ViewParams.ICON));
-        setLoadingViewParams(EnumSet.of(ViewParams.ICON));
+    @Override
+    public View getAdapterView(View convertView, ViewGroup parent, EnumSet<ViewParams> viewParams) {
+        return getAdapterView(convertView, parent, viewParams, R.layout.list_item_player);
+    }
+
+    @Override
+    public ViewHolder createViewHolder() {
+        return new PlayerViewHolder();
     }
 
     public void bindView(View view, Player item, ImageFetcher imageFetcher) {
-        ViewHolder viewHolder = (ViewHolder) view.getTag();
+        final PlayerListActivity activity = (PlayerListActivity) getActivity();
+        PlayerState playerState = activity.getPlayerState(item.getId());
+        PlayerViewHolder viewHolder = (PlayerViewHolder) view.getTag();
 
         viewHolder.text1.setText(item.getName());
-        viewHolder.text1.setTextAppearance(mActivity,
-                item.equals(mActivity.getActivePlayer()) ? R.style.SqueezerCurrentTextItem
-                        : R.style.SqueezerTextItem);
-
         viewHolder.icon.setImageResource(getModelIcon(item.getModel()));
 
-        view.setBackgroundResource(
-                item.equals(mActivity.getActivePlayer()) ? R.drawable.list_item_background_current
-                        : R.drawable.list_item_background_normal);
+        if (viewHolder.volumeBar == null) {
+            viewHolder.volumeBar = (SeekBar) view.findViewById(R.id.volume_slider);
+            viewHolder.volumeBar.setOnSeekBarChangeListener(new VolumeSeekBarChangeListener(item, viewHolder.volumeValue));
+        }
+
+        viewHolder.volumeBar.setVisibility(playerState != null ? View.VISIBLE : View.GONE);
+
+        if (playerState != null) {
+            if (playerState.isPoweredOn()) {
+                Util.setAlpha(viewHolder.text1, 1.0f);
+            } else {
+                Util.setAlpha(viewHolder.text1, 0.25f);
+            }
+
+            viewHolder.volumeBar.setProgress(playerState.getCurrentVolume());
+
+            viewHolder.text2.setVisibility(playerState.getSleepDuration() > 0 ? View.VISIBLE : View.INVISIBLE);
+            viewHolder.text2.setText(activity.getServerString(ServerString.SLEEPING_IN)
+                    + " " + Util.formatElapsedTime(playerState.getSleep()));
+        }
     }
 
-    public void onItemSelected(int index, Player item) throws RemoteException {
-        getActivity().getService().setActivePlayer(item);
-        getActivity().finish();
+    public void onItemSelected(int index, Player item) {
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        menuInfo.menuInflater.inflate(R.menu.playercontextmenu, menu);
+
+        menu.findItem(R.id.sleep).setTitle(activity.getServerString(ServerString.SLEEP));
+        String xMinutes = activity.getServerString(ServerString.X_MINUTES);
+        menu.findItem(R.id.in_15_minutes).setTitle(String.format(xMinutes, "15"));
+        menu.findItem(R.id.in_30_minutes).setTitle(String.format(xMinutes, "30"));
+        menu.findItem(R.id.in_45_minutes).setTitle(String.format(xMinutes, "45"));
+        menu.findItem(R.id.in_60_minutes).setTitle(String.format(xMinutes, "60"));
+        menu.findItem(R.id.in_90_minutes).setTitle(String.format(xMinutes, "90"));
+
+        PlayerState playerState = activity.getPlayerState(menuInfo.item.getId());
+        if (playerState != null) {
+            if (playerState.getSleepDuration() != 0) {
+                MenuItem cancelSleepItem = menu.findItem(R.id.cancel_sleep);
+                cancelSleepItem.setTitle(activity.getServerString(ServerString.SLEEP_CANCEL));
+                cancelSleepItem.setVisible(true);
+            }
+
+            Song currentSong = playerState.getCurrentSong();
+            boolean isPlaying = (playerState.isPlaying() && currentSong != null);
+            if (isPlaying && !currentSong.isRemote()) {
+                MenuItem sleepAtEndOfSongItem = menu.findItem(R.id.end_of_song);
+                sleepAtEndOfSongItem.setTitle(activity.getServerString(ServerString.SLEEP_AT_END_OF_SONG));
+                sleepAtEndOfSongItem.setVisible(true);
+            }
+
+            MenuItem togglePowerItem = menu.findItem(R.id.toggle_power);
+            togglePowerItem.setTitle(
+                    activity.getString(playerState.isPoweredOn() ? R.string.menu_item_power_off
+                            : R.string.menu_item_power_on));
+            togglePowerItem.setVisible(true);
+        }
+    }
+
+    @Override
+    public boolean doItemContext(MenuItem menuItem, int index, Player selectedItem) {
+        activity.setCurrentPlayer(selectedItem);
+
+        switch (menuItem.getItemId()) {
+            case R.id.sleep:
+                // This is the start of a context menu.
+                // Just return, as we have set the current player.
+                return true;
+            case R.id.cancel_sleep:
+                activity.getService().sleep(selectedItem, 0);
+                return true;
+            case R.id.rename:
+                new PlayerRenameDialog().show(activity.getSupportFragmentManager(),
+                        PlayerRenameDialog.class.getName());
+                return true;
+            case R.id.toggle_power:
+                getActivity().getService().togglePower(selectedItem);
+                return true;
+        }
+        return super.doItemContext(menuItem, index, selectedItem);
+    }
+
+    @Override
+    public boolean doItemContext(MenuItem menuItem) {
+        Player currentPlayer = activity.getCurrentPlayer();
+        switch (menuItem.getItemId()) {
+            case R.id.end_of_song:
+                PlayerState playerState = activity.getPlayerState(currentPlayer.getId());
+                if (playerState != null) {
+                    Song currentSong = playerState.getCurrentSong();
+                    boolean isPlaying = (playerState.isPlaying() && currentSong != null);
+                    if (isPlaying && !currentSong.isRemote()) {
+                        int sleep = playerState.getCurrentSongDuration() - playerState.getCurrentTimeSecond() + 1;
+                        if (sleep >= 0)
+                            activity.getService().sleep(currentPlayer, sleep);
+                    }
+
+                }
+                return true;
+            case R.id.in_15_minutes:
+                activity.getService().sleep(currentPlayer, 15*60);
+                return true;
+            case R.id.in_30_minutes:
+                activity.getService().sleep(currentPlayer, 30*60);
+                return true;
+            case R.id.in_45_minutes:
+                activity.getService().sleep(currentPlayer, 45*60);
+                return true;
+            case R.id.in_60_minutes:
+                activity.getService().sleep(currentPlayer, 60*60);
+                return true;
+            case R.id.in_90_minutes:
+                activity.getService().sleep(currentPlayer, 90*60);
+                return true;
+        }
+        return super.doItemContext(menuItem);
     }
 
     public String getQuantityString(int quantity) {
@@ -69,22 +195,68 @@ public class PlayerView extends BaseItemView<Player> {
 
     private static Map<String, Integer> initializeModelIcons() {
         Map<String, Integer> modelIcons = new HashMap<String, Integer>();
-        modelIcons.put("baby", R.drawable.icon_baby);
-        modelIcons.put("boom", R.drawable.icon_boom);
-        modelIcons.put("fab4", R.drawable.icon_fab4);
-        modelIcons.put("receiver", R.drawable.icon_receiver);
-        modelIcons.put("controller", R.drawable.icon_controller);
-        modelIcons.put("sb1n2", R.drawable.icon_sb1n2);
-        modelIcons.put("sb3", R.drawable.icon_sb3);
-        modelIcons.put("slimp3", R.drawable.icon_slimp3);
-        modelIcons.put("softsqueeze", R.drawable.icon_softsqueeze);
-        modelIcons.put("squeezeplay", R.drawable.icon_squeezeplay);
-        modelIcons.put("transporter", R.drawable.icon_transporter);
+        modelIcons.put("baby", R.drawable.ic_baby);
+        modelIcons.put("boom", R.drawable.ic_boom);
+        modelIcons.put("fab4", R.drawable.ic_fab4);
+        modelIcons.put("receiver", R.drawable.ic_receiver);
+        modelIcons.put("controller", R.drawable.ic_controller);
+        modelIcons.put("sb1n2", R.drawable.ic_sb1n2);
+        modelIcons.put("sb3", R.drawable.ic_sb3);
+        modelIcons.put("slimp3", R.drawable.ic_slimp3);
+        modelIcons.put("softsqueeze", R.drawable.ic_softsqueeze);
+        modelIcons.put("squeezeplay", R.drawable.ic_squeezeplay);
+        modelIcons.put("transporter", R.drawable.ic_transporter);
+        modelIcons.put("squeezeplayer", R.drawable.ic_squeezeplayer);
         return modelIcons;
     }
 
     private static int getModelIcon(String model) {
         Integer icon = modelIcons.get(model);
-        return (icon != null ? icon : R.drawable.icon_blank);
+        return (icon != null ? icon : R.drawable.ic_blank);
+    }
+
+    private class VolumeSeekBarChangeListener implements SeekBar.OnSeekBarChangeListener {
+        private final Player player;
+        private final TextView valueView;
+
+        public VolumeSeekBarChangeListener(Player player, TextView valueView) {
+            this.player = player;
+            this.valueView = valueView;
+        }
+
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            if (fromUser) {
+                activity.getService().adjustVolumeTo(player, progress);
+            }
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+            activity.setTrackingTouch(true);
+        }
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+            activity.setTrackingTouch(false);
+        }
+    }
+
+    private class PowerButtonClickListener implements View.OnClickListener {
+        private final Player player;
+
+        private PowerButtonClickListener(Player player) {
+            this.player = player;
+        }
+
+        @Override
+        public void onClick(View v) {
+            getActivity().getService().togglePower(player);
+        }
+    }
+
+    private static class PlayerViewHolder extends ViewHolder {
+        SeekBar volumeBar;
+        TextView volumeValue;
     }
 }

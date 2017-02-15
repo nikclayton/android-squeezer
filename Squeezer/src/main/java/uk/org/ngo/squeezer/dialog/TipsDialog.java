@@ -16,6 +16,7 @@
 
 package uk.org.ngo.squeezer.dialog;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.Dialog;
@@ -32,6 +33,7 @@ public class TipsDialog extends DialogFragment implements OnKeyListener {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        @SuppressLint({"InflateParams"}) // OK, as view is passed to AlertDialog.Builder.setView()
         final View view = getActivity().getLayoutInflater().inflate(R.layout.tips_dialog, null);
 
         Builder builder = new AlertDialog.Builder(getActivity());

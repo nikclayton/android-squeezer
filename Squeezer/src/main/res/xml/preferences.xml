@@ -50,6 +50,12 @@
         android:summaryOff="@string/settings_scrobble_off"
         android:persistent="true"/>
 
+    <CheckBoxPreference
+        android:key="squeezer.squeezeplayer.enabled"
+        android:title="@string/settings_squeezeplayer_title"
+        android:summary="@string/settings_squeezeplayer_summary"
+        android:persistent="true"/>
+
     <PreferenceCategory
         android:title="@string/settings_category_ui">
 

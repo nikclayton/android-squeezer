@@ -16,29 +16,15 @@
 
 package uk.org.ngo.squeezer.itemlist;
 
-import android.view.ContextMenu;
-import android.view.View;
-
 import uk.org.ngo.squeezer.R;
-import uk.org.ngo.squeezer.framework.BaseListActivity;
-import uk.org.ngo.squeezer.model.Plugin;
 
-public class ApplicationView extends PluginView {
+public class ApplicationView extends PluginItemView {
 
-    public ApplicationView(BaseListActivity<Plugin> activity) {
+    public ApplicationView(PluginItemListActivity activity) {
         super(activity);
     }
 
     public String getQuantityString(int quantity) {
         return getActivity().getResources().getQuantityString(R.plurals.application, quantity);
-    }
-
-    public void onItemSelected(int index, Plugin item) {
-        //TODO what to do?
-    }
-
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-        // TODO: What to do?
     }
 }

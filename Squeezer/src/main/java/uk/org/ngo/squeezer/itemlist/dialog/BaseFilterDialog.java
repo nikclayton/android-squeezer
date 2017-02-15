@@ -1,5 +1,6 @@
 package uk.org.ngo.squeezer.itemlist.dialog;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -18,10 +19,10 @@ public abstract class BaseFilterDialog extends DialogFragment {
 
     protected abstract void filter();
 
+    @SuppressLint("InflateParams") // OK, as view is passed to AlertDialog.Builder.setView()
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-
         filterForm = getActivity().getLayoutInflater().inflate(R.layout.filter_dialog, null);
         builder.setTitle(R.string.menu_item_filter);
         builder.setView(filterForm);

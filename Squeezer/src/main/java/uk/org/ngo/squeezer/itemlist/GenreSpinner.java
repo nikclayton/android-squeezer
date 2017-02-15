@@ -17,13 +17,12 @@
 package uk.org.ngo.squeezer.itemlist;
 
 import android.os.Handler;
-import android.os.RemoteException;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Spinner;
 
 import java.util.List;
+import java.util.Map;
 
 import uk.org.ngo.squeezer.Util;
 import uk.org.ngo.squeezer.framework.ItemAdapter;
@@ -34,9 +33,7 @@ import uk.org.ngo.squeezer.util.ImageFetcher;
 
 public class GenreSpinner {
 
-    private static final String TAG = GenreSpinner.class.getName();
-
-    GenreSpinnerCallback callback;
+    final GenreSpinnerCallback callback;
 
     private final ItemListActivity activity;
 
@@ -46,46 +43,21 @@ public class GenreSpinner {
         this.callback = callback;
         this.activity = activity;
         this.spinner = spinner;
-        registerCallback();
-        orderItems(0);
+        orderItems();
     }
 
-    private void orderItems(int start) {
+    private void orderItems() {
         if (callback.getService() != null) {
-            try {
-                callback.getService().genres(start, null);
-            } catch (RemoteException e) {
-                Log.e(TAG, "Error ordering items: " + e);
-            }
+            callback.getService().genres(-1, null, genreListCallback);
         }
     }
 
-    public void registerCallback() {
-        if (callback.getService() != null) {
-            try {
-                callback.getService().registerGenreListCallback(genreListCallback);
-            } catch (RemoteException e) {
-                Log.e(TAG, "Error registering callback: " + e);
-            }
-        }
-    }
-
-    public void unregisterCallback() {
-        if (callback.getService() != null) {
-            try {
-                callback.getService().unregisterGenreListCallback(genreListCallback);
-            } catch (RemoteException e) {
-                Log.e(TAG, "Error unregistering callback: " + e);
-            }
-        }
-    }
-
-    private final IServiceGenreListCallback genreListCallback
-            = new IServiceGenreListCallback.Stub() {
+    private final IServiceItemListCallback<Genre> genreListCallback
+            = new IServiceItemListCallback<Genre>() {
         private ItemAdapter<Genre> adapter;
 
-        public void onGenresReceived(final int count, final int start, final List<Genre> list)
-                throws RemoteException {
+        @Override
+        public void onItemsReceived(final int count, final int start, Map<String, String> parameters, final List<Genre> list, Class<Genre> dataType) {
             callback.getUIThreadHandler().post(new Runnable() {
                 public void run() {
                     if (adapter == null) {
@@ -111,16 +83,14 @@ public class GenreSpinner {
                     }
                     adapter.update(count, start, list);
                     spinner.setSelection(adapter.findItem(callback.getGenre()));
-
-                    if (count > start + list.size()) {
-                        if ((start + list.size()) % adapter.getPageSize() == 0) {
-                            orderItems(start + list.size());
-                        }
-                    }
                 }
             });
         }
 
+        @Override
+        public Object getClient() {
+            return activity;
+        }
     };
 
     public interface GenreSpinnerCallback {

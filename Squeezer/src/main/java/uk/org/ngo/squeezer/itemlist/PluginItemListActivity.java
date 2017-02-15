@@ -17,20 +17,23 @@
 package uk.org.ngo.squeezer.itemlist;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
-import android.os.RemoteException;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import java.util.List;
 import java.util.Map;
 
 import uk.org.ngo.squeezer.R;
+import uk.org.ngo.squeezer.dialog.NetworkErrorDialogFragment;
 import uk.org.ngo.squeezer.framework.BaseListActivity;
 import uk.org.ngo.squeezer.framework.ItemView;
 import uk.org.ngo.squeezer.model.Plugin;
@@ -40,7 +43,8 @@ import uk.org.ngo.squeezer.model.PluginItem;
  * The activity's content view scrolls in from the right, and disappear to the left, to provide a
  * spatial component to navigation.
  */
-public class PluginItemListActivity extends BaseListActivity<PluginItem> {
+public class PluginItemListActivity extends BaseListActivity<PluginItem>
+        implements NetworkErrorDialogFragment.NetworkErrorDialogListener {
 
     private Plugin plugin;
 
@@ -88,6 +92,12 @@ public class PluginItemListActivity extends BaseListActivity<PluginItem> {
         }
     }
 
+    private void updateHeader(String headerText) {
+        TextView header = (TextView) findViewById(R.id.header);
+        header.setText(headerText);
+        header.setVisibility(View.VISIBLE);
+    }
+
     public Plugin getPlugin() {
         return plugin;
     }
@@ -106,18 +116,8 @@ public class PluginItemListActivity extends BaseListActivity<PluginItem> {
     }
 
     @Override
-    protected void registerCallback() throws RemoteException {
-        getService().registerPluginItemListCallback(pluginItemListCallback);
-    }
-
-    @Override
-    protected void unregisterCallback() throws RemoteException {
-        getService().unregisterPluginItemListCallback(pluginItemListCallback);
-    }
-
-    @Override
-    protected void orderPage(int start) throws RemoteException {
-        getService().pluginItems(start, plugin, parent, search);
+    protected void orderPage(int start) {
+        getService().pluginItems(start, plugin, parent, search, this);
     }
 
 
@@ -142,55 +142,77 @@ public class PluginItemListActivity extends BaseListActivity<PluginItem> {
         overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
     }
 
-    private final IServicePluginItemListCallback pluginItemListCallback
-            = new IServicePluginItemListCallback.Stub() {
-        public void onPluginItemsReceived(int count, int start,
-                @SuppressWarnings("rawtypes") final Map parameters, List<PluginItem> items)
-                throws RemoteException {
-            if (parameters.containsKey("title")) {
-                getUIThreadHandler().post(new Runnable() {
-                    public void run() {
-                        setTitle((String) parameters.get("title"));
-                    }
-                });
-            }
-
-            // Automatically fetch subitems, if this is the only item.
-            // TODO: Seen an NPE here (before adding size() > 0) check. Find out
-            // why count == 1 might be true, but items.size might be 0.
-            if (count == 1 && items.size() > 0 && items.get(0).isHasitems()) {
-                parent = items.get(0);
-                getUIThreadHandler().post(new Runnable() {
-                    public void run() {
-                        clearAndReOrderItems();
-                    }
-                });
-                return;
-            }
-            onItemsReceived(count, start, items);
+    @Override
+    public void onItemsReceived(int count, int start, final Map<String, String> parameters, List<PluginItem> items, Class<PluginItem> dataType) {
+        if (parameters.containsKey("title")) {
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    updateHeader(parameters.get("title"));
+                }
+            });
         }
-    };
+
+        // The documentation says "Returned with value 1 if there was a network error accessing
+        // the content source.". In practice (with at least the Napster and Pandora plugins) the
+        // value is an error message suitable for displaying to the user.
+        if (parameters.containsKey("networkerror")) {
+            Resources resources = getResources();
+            String playerName = getService().getActivePlayer().getName();
+            String errorMsg = parameters.get("networkerror");
+
+            String errorMessage = String.format(resources.getString(R.string.server_error),
+                    playerName, errorMsg);
+            NetworkErrorDialogFragment networkErrorDialogFragment =
+                    NetworkErrorDialogFragment.newInstance(errorMessage);
+            networkErrorDialogFragment.show(getSupportFragmentManager(), "networkerror");
+        }
+
+        // Automatically fetch subitems, if this is the only item.
+        // TODO: Seen an NPE here (before adding size() > 0) check. Find out
+        // why count == 1 might be true, but items.size might be 0.
+        if (count == 1 && items.size() > 0 && items.get(0).isHasitems()) {
+            parent = items.get(0);
+            getUIThreadHandler().post(new Runnable() {
+                public void run() {
+                    clearAndReOrderItems();
+                }
+            });
+            return;
+        }
+        super.onItemsReceived(count, start, parameters, items, dataType);
+    }
+
+    /**
+     * The user dismissed the network error dialog box. There's nothing more to do, so finish
+     * the activity.
+     */
+    public void onDialogDismissed(DialogInterface dialog) {
+        runOnUiThread(new Runnable() {
+            public void run() {
+                finish();
+            }
+        });
+    }
 
     // Shortcuts for operations for plugin items
 
-    public boolean play(PluginItem item) throws RemoteException {
+    public boolean play(PluginItem item) {
         return pluginPlaylistControl(PluginPlaylistControlCmd.play, item);
     }
 
-    public boolean load(PluginItem item) throws RemoteException {
+    public boolean load(PluginItem item) {
         return pluginPlaylistControl(PluginPlaylistControlCmd.load, item);
     }
 
-    public boolean insert(PluginItem item) throws RemoteException {
+    public boolean insert(PluginItem item) {
         return pluginPlaylistControl(PluginPlaylistControlCmd.insert, item);
     }
 
-    public boolean add(PluginItem item) throws RemoteException {
+    public boolean add(PluginItem item) {
         return pluginPlaylistControl(PluginPlaylistControlCmd.add, item);
     }
 
-    private boolean pluginPlaylistControl(PluginPlaylistControlCmd cmd, PluginItem item)
-            throws RemoteException {
+    private boolean pluginPlaylistControl(PluginPlaylistControlCmd cmd, PluginItem item) {
         if (getService() == null) {
             return false;
         }

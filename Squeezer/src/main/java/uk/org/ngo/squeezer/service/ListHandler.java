@@ -22,17 +22,21 @@ import java.util.Map;
 import uk.org.ngo.squeezer.framework.Item;
 
 /**
- * Implement this and give it to {@link CliClient#parseSqueezerList(List, ListHandler)} for each
+ * Implement this and give it to {@link CliClient#parseSqueezerList(CliClient.ExtendedQueryFormatCmd, List)} for each
  * extended query format command you wish to support. </p>
  *
  * @author Kurt Aaholst
  */
 interface ListHandler<T extends Item> {
-
     /**
      * @return The type of item this handler can handle
      */
     Class<T> getDataType();
+
+    /**
+     * @return The list of items received so far
+     */
+    public List<T> getItems();
 
     /**
      * Prepare for parsing an extended query format response
@@ -42,21 +46,7 @@ interface ListHandler<T extends Item> {
     /**
      * Called for each item received in the current reply. Just store this internally.
      *
-     * @param record
+     * @param record Item data from Squeezebox Server
      */
     void add(Map<String, String> record);
-
-    /**
-     * Called when the current reply is completely parsed. Pass the information on to your activity
-     * now. If there are any more data, it is automatically ordered by {@link
-     * CliClient#parseSqueezerList(List, ListHandler)}
-     *
-     * @param rescan Set if SqueezeServer is currently doing a scan of the music library.
-     * @param count Total number of result for the current query.
-     * @param max The current configured default maximum list size.
-     * @param start Offset for the current list in total results.
-     *
-     * @return
-     */
-    boolean processList(boolean rescan, int count, int start, Map<String, String> parameters);
 }

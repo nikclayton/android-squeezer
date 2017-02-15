@@ -42,8 +42,8 @@ public class Reflection {
      *
      * @see #genericTypeResolver(Class, Class)
      */
-    public static Class<? extends Object> getGenericClass(Class<? extends Object> currentClass,
-            Class<? extends Object> base, int genericArgumentNumber) {
+    public static Class<?> getGenericClass(Class<?> currentClass,
+            Class<?> base, int genericArgumentNumber) {
         Type[] genericTypes = genericTypeResolver(currentClass, base);
         Type type = genericArgumentNumber < genericTypes.length
                 ? genericTypes[genericArgumentNumber] : null;
@@ -72,8 +72,8 @@ public class Reflection {
      *
      * @see #getGenericClass(Class, Class, int)
      */
-    public static Type[] genericTypeResolver(Class<? extends Object> currentClass,
-            Class<? extends Object> base) {
+    public static Type[] genericTypeResolver(Class<?> currentClass,
+            Class<?> base) {
         Type[] actualTypeArguments = null;
 
         while (currentClass != Object.class) {
@@ -112,8 +112,8 @@ public class Reflection {
      *
      * @see #getGenericClass(Class, Class, int)
      */
-    private static Type[] genericInterfaceResolver(Class<? extends Object> currentClass,
-            Class<? extends Object> baseInterface, Type[] pActualTypeArguments) {
+    private static Type[] genericInterfaceResolver(Class<?> currentClass,
+            Class<?> baseInterface, Type[] pActualTypeArguments) {
         Class<?>[] interfaces = currentClass.getInterfaces();
         Type[] genericInterfaces = currentClass.getGenericInterfaces();
         for (int ifno = 0; ifno < genericInterfaces.length; ifno++) {
@@ -147,7 +147,7 @@ public class Reflection {
      *
      * @return The resolved type arguments mapped to the given superclass or direct interface
      */
-    private static Type[] mapTypeArguments(Class<? extends Object> currentClass, Type type,
+    private static Type[] mapTypeArguments(Class<?> currentClass, Type type,
             Type[] actualTypeArguments) {
         if (type instanceof ParameterizedType) {
             ParameterizedType pType = (ParameterizedType) type;

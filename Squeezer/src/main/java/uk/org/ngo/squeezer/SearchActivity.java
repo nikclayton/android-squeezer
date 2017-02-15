@@ -19,8 +19,6 @@ package uk.org.ngo.squeezer;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.RemoteException;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ExpandableListView;
@@ -28,21 +26,12 @@ import android.widget.ExpandableListView.ExpandableListContextMenuInfo;
 import android.widget.ExpandableListView.OnChildClickListener;
 
 import java.util.List;
+import java.util.Map;
 
-import uk.org.ngo.squeezer.framework.Item;
 import uk.org.ngo.squeezer.framework.ItemListActivity;
-import uk.org.ngo.squeezer.itemlist.IServiceAlbumListCallback;
-import uk.org.ngo.squeezer.itemlist.IServiceArtistListCallback;
-import uk.org.ngo.squeezer.itemlist.IServiceGenreListCallback;
-import uk.org.ngo.squeezer.itemlist.IServiceSongListCallback;
-import uk.org.ngo.squeezer.model.Album;
-import uk.org.ngo.squeezer.model.Artist;
-import uk.org.ngo.squeezer.model.Genre;
-import uk.org.ngo.squeezer.model.Song;
+import uk.org.ngo.squeezer.itemlist.IServiceItemListCallback;
 
 public class SearchActivity extends ItemListActivity {
-
-    private static final String TAG = SearchActivity.class.getSimpleName();
 
     private View loadingLabel;
 
@@ -91,21 +80,6 @@ public class SearchActivity extends ItemListActivity {
         }
     }
 
-    @Override
-    protected void registerCallback() throws RemoteException {
-        getService().registerArtistListCallback(artistsCallback);
-        getService().registerAlbumListCallback(albumsCallback);
-        getService().registerGenreListCallback(genresCallback);
-        getService().registerSongListCallback(songsCallback);
-    }
-
-    @Override
-    protected void unregisterCallback() throws RemoteException {
-        getService().unregisterArtistListCallback(artistsCallback);
-        getService().unregisterAlbumListCallback(albumsCallback);
-        getService().unregisterGenreListCallback(genresCallback);
-        getService().unregisterSongListCallback(songsCallback);
-    }
 
     @Override
     public final boolean onContextItemSelected(MenuItem menuItem) {
@@ -134,11 +108,7 @@ public class SearchActivity extends ItemListActivity {
 
     @Override
     protected void orderPage(int start) {
-        try {
-            getService().search(start, searchString);
-        } catch (RemoteException e) {
-            Log.e(getTag(), "Error performing search: " + e);
-        }
+        getService().search(start, searchString, itemListCallback);
     }
 
     /**
@@ -169,49 +139,24 @@ public class SearchActivity extends ItemListActivity {
         doSearch(searchString);
     }
 
-    private <T extends Item> void onItemsReceived(final int count, final int start,
-            final List<T> items, final Class<T> clazz) {
-        super.onItemsReceived(count, start, items.size());
-
-        getUIThreadHandler().post(new Runnable() {
-            @Override
-            public void run() {
-                searchResultsAdapter.updateItems(count, start, items, clazz);
-                loadingLabel.setVisibility(View.GONE);
-                resultsExpandableListView.setVisibility(View.VISIBLE);
-            }
-        });
-    }
-
-    private final IServiceArtistListCallback artistsCallback
-            = new IServiceArtistListCallback.Stub() {
+    private final IServiceItemListCallback itemListCallback = new IServiceItemListCallback() {
         @Override
-        public void onArtistsReceived(int count, int start, List<Artist> items)
-                throws RemoteException {
-            onItemsReceived(count, start, items, Artist.class);
+        public void onItemsReceived(final int count, final int start, Map parameters, final List items, final Class dataType) {
+            SearchActivity.super.onItemsReceived(count, start, items.size());
+
+            getUIThreadHandler().post(new Runnable() {
+                @Override
+                public void run() {
+                    searchResultsAdapter.updateItems(count, start, items, dataType);
+                    loadingLabel.setVisibility(View.GONE);
+                    resultsExpandableListView.setVisibility(View.VISIBLE);
+                }
+            });
         }
-    };
 
-    private final IServiceAlbumListCallback albumsCallback = new IServiceAlbumListCallback.Stub() {
         @Override
-        public void onAlbumsReceived(int count, int start, List<Album> items)
-                throws RemoteException {
-            onItemsReceived(count, start, items, Album.class);
-        }
-    };
-
-    private final IServiceGenreListCallback genresCallback = new IServiceGenreListCallback.Stub() {
-        @Override
-        public void onGenresReceived(int count, int start, List<Genre> items)
-                throws RemoteException {
-            onItemsReceived(count, start, items, Genre.class);
-        }
-    };
-
-    private final IServiceSongListCallback songsCallback = new IServiceSongListCallback.Stub() {
-        @Override
-        public void onSongsReceived(int count, int start, List<Song> items) throws RemoteException {
-            onItemsReceived(count, start, items, Song.class);
+        public Object getClient() {
+            return SearchActivity.this;
         }
     };
 

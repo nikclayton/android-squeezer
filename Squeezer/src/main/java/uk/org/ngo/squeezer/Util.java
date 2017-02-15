@@ -19,6 +19,7 @@ package uk.org.ngo.squeezer;
 import android.app.Activity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
 import android.widget.TextView;
 
 import java.io.UnsupportedEncodingException;
@@ -31,16 +32,6 @@ import java.util.concurrent.atomic.AtomicReference;
 public class Util {
 
     private Util() {
-    }
-
-    public static String nonNullString(AtomicReference<String> ref) {
-        String string = ref.get();
-        return string == null ? "" : string;
-    }
-
-    public static int getAtomicInteger(AtomicReference<Integer> ref, int defaultValue) {
-        Integer integer = ref.get();
-        return integer == null ? 0 : integer;
     }
 
 
@@ -86,9 +77,9 @@ public class Util {
         return parseDecimalInt(value, 0);
     }
 
-    private static StringBuilder sFormatBuilder = new StringBuilder();
+    private static final StringBuilder sFormatBuilder = new StringBuilder();
 
-    private static Formatter sFormatter = new Formatter(sFormatBuilder, Locale.getDefault());
+    private static final Formatter sFormatter = new Formatter(sFormatBuilder, Locale.getDefault());
 
     private static final Object[] sTimeArgs = new Object[5];
 
@@ -155,5 +146,15 @@ public class Util {
             }
         }
         return count;
+    }
+
+    /** Helper to set alpha value for a view, since View.setAlpha is API level 11 */
+    public static View setAlpha(View view, float alpha) {
+        AlphaAnimation alphaAnimation = new AlphaAnimation(alpha, alpha);
+        alphaAnimation.setDuration(0);
+        alphaAnimation.setFillAfter(true);
+        view.startAnimation(alphaAnimation);
+
+        return view;
     }
 }

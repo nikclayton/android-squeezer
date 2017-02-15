@@ -16,7 +16,6 @@
 
 package uk.org.ngo.squeezer.itemlist;
 
-import android.os.RemoteException;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -81,7 +80,7 @@ public class PluginItemView extends BaseItemView<PluginItem> {
     }
 
     @Override
-    public void onItemSelected(int index, PluginItem item) throws RemoteException {
+    public void onItemSelected(int index, PluginItem item) {
         if (item.isHasitems()) {
             mActivity.show(item);
         }
@@ -100,8 +99,7 @@ public class PluginItemView extends BaseItemView<PluginItem> {
     }
 
     @Override
-    public boolean doItemContext(MenuItem menuItem, int index, PluginItem selectedItem)
-            throws RemoteException {
+    public boolean doItemContext(MenuItem menuItem, int index, PluginItem selectedItem) {
         switch (menuItem.getItemId()) {
             case R.id.play_now:
                 if (mActivity.play(selectedItem)) {

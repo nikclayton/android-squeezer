@@ -17,7 +17,6 @@
 package uk.org.ngo.squeezer.service;
 
 import android.net.wifi.WifiManager;
-import android.os.RemoteException;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -29,7 +28,8 @@ import java.net.InetSocketAddress;
 import java.net.PasswordAuthentication;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -53,7 +53,13 @@ class ConnectionState {
 
     private final AtomicBoolean isConnected = new AtomicBoolean(false);
 
+    /** Does the server support "favorites items" queries? */
+    private final AtomicBoolean mCanFavorites = new AtomicBoolean(false);
+
     private final AtomicBoolean mCanMusicfolder = new AtomicBoolean(false);
+
+    /** Does the server support "myapps items" queries? */
+    private final AtomicBoolean mCanMyApps = new AtomicBoolean(false);
 
     private final AtomicBoolean canRandomplay = new AtomicBoolean(false);
 
@@ -64,8 +70,7 @@ class ConnectionState {
     private final AtomicReference<PrintWriter> socketWriter = new AtomicReference<PrintWriter>();
 
     private final AtomicReference<Player> activePlayer = new AtomicReference<Player>();
-
-    private final AtomicReference<Player> defaultPlayer = new AtomicReference<Player>();
+    private final List<Player> players = new CopyOnWriteArrayList<Player>();
 
     // Where we connected (or are connecting) to:
     private final AtomicReference<String> currentHost = new AtomicReference<String>();
@@ -73,6 +78,12 @@ class ConnectionState {
     private final AtomicReference<Integer> httpPort = new AtomicReference<Integer>();
 
     private final AtomicReference<Integer> cliPort = new AtomicReference<Integer>();
+
+    private final AtomicReference<String> userName = new AtomicReference<String>();
+
+    private final AtomicReference<String> password = new AtomicReference<String>();
+
+    private final AtomicReference<String[]> mediaDirs = new AtomicReference<String[]>();
 
     private WifiManager.WifiLock wifiLock;
 
@@ -131,6 +142,7 @@ class ConnectionState {
 
         httpPort.set(null);
         activePlayer.set(null);
+        mediaDirs.set(null);
     }
 
     private void setConnectionState(final SqueezeService service, final boolean currentState,
@@ -143,21 +155,9 @@ class ConnectionState {
         service.executor.execute(new Runnable() {
             @Override
             public void run() {
-                int i = service.mServiceCallbacks.beginBroadcast();
-                while (i > 0) {
-                    i--;
-                    try {
-                        Log.d(TAG, "pre-call setting callback connection state to: " + currentState);
-                        service.mServiceCallbacks.getBroadcastItem(i)
-                                .onConnectionChanged(currentState, postConnect, loginFailed);
-                        Log.d(TAG, "post-call setting callback connection state.");
-
-                    } catch (RemoteException e) {
-                        // The RemoteCallbackList will take care of removing
-                        // the dead object for us.
-                    }
+                for (IServiceConnectionCallback callback : service.mConnectionCallbacks) {
+                    callback.onConnectionChanged(currentState, postConnect, loginFailed);
                 }
-                service.mServiceCallbacks.finishBroadcast();
             }
         });
     }
@@ -170,12 +170,23 @@ class ConnectionState {
         activePlayer.set(player);
     }
 
-    Player getDefaultPlayer() {
-        return defaultPlayer.get();
+    List<Player> getPlayers() {
+        return players;
     }
 
-    void setDefaultPlayer(Player player) {
-        defaultPlayer.set(player);
+    void clearPlayers() {
+        this.players.clear();
+    }
+
+    void addPlayers(List<Player> players) {
+        this.players.addAll(players);
+    }
+
+    Player getPlayer(String playerId) {
+        for (Player player : players)
+            if (playerId.equals(player.getId()))
+                return player;
+        return null;
     }
 
     PrintWriter getSocketWriter() {
@@ -187,12 +198,37 @@ class ConnectionState {
         Log.v(TAG, "HTTP port is now: " + port);
     }
 
+    public String[] getMediaDirs() {
+        String[] dirs = mediaDirs.get();
+        return dirs == null ? new String[0] : dirs;
+    }
+
+    public void setMediaDirs(String dirs) {
+        mediaDirs.set(dirs.split(";"));
+    }
+
+    void setCanFavorites(boolean value) {
+        mCanFavorites.set(value);
+    }
+
+    boolean canFavorites() {
+        return mCanFavorites.get();
+    }
+
     void setCanMusicfolder(boolean value) {
         mCanMusicfolder.set(value);
     }
 
     boolean canMusicfolder() {
         return mCanMusicfolder.get();
+    }
+
+    void setCanMyApps(boolean value) {
+        mCanMyApps.set(value);
+    }
+
+    boolean canMyApps() {
+        return mCanMyApps.get();
     }
 
     void setCanRandomplay(boolean value) {
@@ -282,8 +318,8 @@ class ConnectionState {
         }
     }
 
-    void startConnect(final SqueezeService service, ScheduledThreadPoolExecutor executor,
-            String hostPort, final String userName, final String password) throws RemoteException {
+    void startConnect(final SqueezeService service, String hostPort, final String userName,
+                      final String password) {
         Log.v(TAG, "startConnect");
         // Common mistakes, based on crash reports...
         if (hostPort.startsWith("Http://") || hostPort.startsWith("http://")) {
@@ -302,9 +338,11 @@ class ConnectionState {
         currentHost.set(host);
         cliPort.set(port);
         httpPort.set(null);  // not known until later, after connect.
+        this.userName.set(userName);
+        this.password.set(password);
 
         // Start the off-thread connect.
-        executor.execute(new Runnable() {
+        service.executor.execute(new Runnable() {
             @Override
             public void run() {
                 service.disconnect();
@@ -320,7 +358,6 @@ class ConnectionState {
                     setConnectionState(service, true, true, false);
                     Log.d(TAG, "connection state broadcasted true.");
                     startListeningThread(service);
-                    setDefaultPlayer(null);
                     service.onCliPortConnectionEstablished(userName, password);
                     Authenticator.setDefault(new Authenticator() {
                         @Override
@@ -369,6 +406,14 @@ class ConnectionState {
 
     Integer getHttpPort() {
         return httpPort.get();
+    }
+
+    String getUserName() {
+        return userName.get();
+    }
+
+    String getPassword() {
+        return password.get();
     }
 
     String getCurrentHost() {

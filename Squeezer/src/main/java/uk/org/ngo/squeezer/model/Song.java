@@ -17,8 +17,11 @@
 package uk.org.ngo.squeezer.model;
 
 import android.os.Parcel;
-import android.os.RemoteException;
-import android.util.Log;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
+import com.google.common.base.Objects;
+import com.google.common.base.Strings;
 
 import java.util.Map;
 
@@ -33,140 +36,108 @@ public class Song extends ArtworkItem {
         return "track_id";
     }
 
-    private String name;
+    @Override
+    public String getFilterTag() {
+        return "track_id";
+    }
+
+    /** The "track" or "title" value from the server. */
+    @NonNull private final String mName;
 
     @Override
+    @NonNull
     public String getName() {
-        return name;
+        return mName;
     }
 
-    public Song setName(String name) {
-        this.name = name;
-        return this;
-    }
+    @NonNull private final String mArtist;
 
-    private String artist;
-
+    @NonNull
     public String getArtist() {
-        return artist;
+        return mArtist;
     }
 
-    public void setArtist(String artist) {
-        this.artist = artist;
-    }
+    @NonNull private Album mAlbum;
 
-    private Album album;
-
+    @NonNull
     public Album getAlbum() {
-        return album;
+        return mAlbum;
     }
 
-    public void setAlbum(Album album) {
-        this.album = album;
-    }
+    @NonNull private final String mAlbumName;
 
-    private String albumName;
-
+    @NonNull
     public String getAlbumName() {
-        return albumName;
+        return mAlbumName;
     }
 
-    public void setAlbumName(String albumName) {
-        this.albumName = albumName;
-    }
-
-    private boolean compilation;
+    private final boolean mCompilation;
 
     public boolean getCompilation() {
-        return compilation;
+        return mCompilation;
     }
 
-    public void setCompilation(boolean compilation) {
-        this.compilation = compilation;
-    }
-
-    private int duration;
+    private final int mDuration;
 
     public int getDuration() {
-        return duration;
+        return mDuration;
     }
 
-    public void setDuration(int duration) {
-        this.duration = duration;
-    }
-
-    private int year;
+    private final int mYear;
 
     public int getYear() {
-        return year;
+        return mYear;
     }
 
-    public void setYear(int year) {
-        this.year = year;
+    @NonNull private final String mArtistId;
+
+    @NonNull
+    public String getArtistId() {
+        return mArtistId;
     }
 
-    private String artist_id;
+    @NonNull private final String mAlbumId;
 
-    public String getArtist_id() {
-        return artist_id;
+    @NonNull
+    public String getAlbumId() {
+        return mAlbumId;
     }
 
-    public void setArtist_id(String artist_id) {
-        this.artist_id = artist_id;
-    }
-
-    private String album_id;
-
-    public String getAlbum_id() {
-        return album_id;
-    }
-
-    public void setAlbum_id(String album_id) {
-        this.album_id = album_id;
-    }
-
-    private boolean remote;
+    private boolean mRemote;
 
     public boolean isRemote() {
-        return remote;
+        return mRemote;
     }
 
-    public void setRemote(boolean remote) {
-        this.remote = remote;
+    private final int mTrackNum;
+
+    public int getTrackNum() {
+        return mTrackNum;
     }
 
-    public int tracknum;
+    @NonNull private final String mUrl;
 
-    public int getTracknum() {
-        return tracknum;
+    @NonNull
+    public String getUrl() {
+        return mUrl;
     }
 
-    public void setTracknum(int tracknum) {
-        this.tracknum = tracknum;
+    @NonNull private String mArtworkUrl;
+
+    @NonNull
+    public String getArtworkUrl() {
+        return mArtworkUrl;
     }
 
-    private String artwork_url;
-
-    public String getArtwork_url() {
-        return artwork_url;
-    }
-
-    public void setArtwork_url(String artworkUrl) {
-        artwork_url = artworkUrl;
-    }
-
+    @Nullable
     public String getArtworkUrl(ISqueezeService service) {
         if (getArtwork_track_id() != null) {
-            try {
-                if (service == null) {
-                    return null;
-                }
-                return service.getAlbumArtUrl(getArtwork_track_id());
-            } catch (RemoteException e) {
-                Log.e(getClass().getSimpleName(), "Error requesting album art url: " + e);
+            if (service == null) {
+                return null;
             }
+            return service.getAlbumArtUrl(getArtwork_track_id());
         }
-        return getArtwork_url();
+        return getArtworkUrl();
     }
 
     public Song(Map<String, String> record) {
@@ -176,17 +147,21 @@ public class Song extends ArtworkItem {
         if (getId() == null) {
             setId(record.get("id"));
         }
-        setName(record.containsKey("track") ? record.get("track") : record.get("title"));
-        setArtist(record.get("artist"));
-        setAlbumName(record.get("album"));
-        setCompilation(Util.parseDecimalIntOrZero(record.get("compilation")) == 1);
-        setDuration(Util.parseDecimalIntOrZero(record.get("duration")));
-        setYear(Util.parseDecimalIntOrZero(record.get("year")));
-        setArtist_id(record.get("artist_id"));
-        setAlbum_id(record.get("album_id"));
-        setRemote(Util.parseDecimalIntOrZero(record.get("remote")) != 0);
-        setTracknum(Util.parseDecimalInt(record.get("tracknum"), 1));
-        setArtwork_url(record.get("artwork_url"));
+
+        mName = record.containsKey("track") ? Strings.nullToEmpty(record.get("track"))
+                : Strings.nullToEmpty(record.get("title"));
+
+        mArtist = Strings.nullToEmpty(record.get("artist"));
+        mAlbumName = Strings.nullToEmpty(record.get("album"));
+        mCompilation = Util.parseDecimalIntOrZero(record.get("compilation")) == 1;
+        mDuration = Util.parseDecimalIntOrZero(record.get("duration"));
+        mYear = Util.parseDecimalIntOrZero(record.get("year"));
+        mArtistId = Strings.nullToEmpty(record.get("artist_id"));
+        mAlbumId = Strings.nullToEmpty(record.get("album_id"));
+        mRemote = Util.parseDecimalIntOrZero(record.get("remote")) != 0;
+        mTrackNum = Util.parseDecimalInt(record.get("tracknum"), 1);
+        mArtworkUrl = Strings.nullToEmpty(record.get("artwork_url"));
+        mUrl = Strings.nullToEmpty(record.get("url"));
 
         // Work around a (possible) bug in the Squeezeserver.
         //
@@ -201,16 +176,16 @@ public class Song extends ArtworkItem {
             // "coverart:0" or something useful like that, it just doesn't
             // include a response.  Hence these shenanigans.
             String coverArt = record.get("coverart");
-            if (coverArt != null && coverArt.equals("1")) {
+            if ("1".equals(coverArt)) {
                 setArtwork_track_id(getId());
             }
         }
 
-        Album album = new Album(album_id, albumName);
-        album.setArtist(compilation ? "Various" : artist);
+        Album album = new Album(mAlbumId, mAlbumName);
+        album.setArtist(mCompilation ? "Various" : mArtist);
         album.setArtwork_track_id(artworkTrackId);
-        album.setYear(year);
-        setAlbum(album);
+        album.setYear(mYear);
+        mAlbum = album;
     }
 
     public static final Creator<Song> CREATOR = new Creator<Song>() {
@@ -225,35 +200,78 @@ public class Song extends ArtworkItem {
 
     private Song(Parcel source) {
         setId(source.readString());
-        name = source.readString();
-        artist = source.readString();
-        albumName = source.readString();
-        compilation = source.readInt() == 1;
-        duration = source.readInt();
-        year = source.readInt();
-        artist_id = source.readString();
-        album_id = source.readString();
+        mName = source.readString();
+        mArtist = source.readString();
+        mAlbumName = source.readString();
+        mCompilation = source.readInt() == 1;
+        mDuration = source.readInt();
+        mYear = source.readInt();
+        mArtistId = source.readString();
+        mAlbumId = source.readString();
         setArtwork_track_id(source.readString());
-        tracknum = source.readInt();
+        mTrackNum = source.readInt();
+        mUrl = source.readString();
     }
 
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(getId());
-        dest.writeString(name);
-        dest.writeString(artist);
-        dest.writeString(albumName);
-        dest.writeInt(compilation ? 1 : 0);
-        dest.writeInt(duration);
-        dest.writeInt(year);
-        dest.writeString(artist_id);
-        dest.writeString(album_id);
+        dest.writeString(mName);
+        dest.writeString(mArtist);
+        dest.writeString(mAlbumName);
+        dest.writeInt(mCompilation ? 1 : 0);
+        dest.writeInt(mDuration);
+        dest.writeInt(mYear);
+        dest.writeString(mArtistId);
+        dest.writeString(mAlbumId);
         dest.writeString(getArtwork_track_id());
-        dest.writeInt(tracknum);
+        dest.writeInt(mTrackNum);
+        dest.writeString(mUrl);
     }
 
     @Override
     public String toString() {
-        return "id=" + getId() + ", name=" + name + ", artist=" + artist + ", year=" + year;
+        return "id=" + getId() + ", mName=" + mName + ", mArtist=" + mArtist + ", year=" + mYear;
     }
 
+    /**
+     * Extend the equality test by looking at additional track information.
+     * <p/>
+     * This is to deal with songs from remote streams where the stream might provide a single
+     * song ID for multiple consecutive songs in the stream.
+     *
+     * @param o The object to test.
+     * @return
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (!super.equals(o)) {
+            return false;
+        }
+
+        // super.equals() has already checked that o is not null and is of the same class.
+        Song s = (Song)o;
+
+        if (! s.getName().equals(mName)) {
+            return false;
+        }
+
+        if (! s.getAlbumName().equals(mAlbumName)) {
+            return false;
+        }
+
+        if (! s.getArtist().equals(mArtist)) {
+            return false;
+        }
+
+        if (! s.getArtworkUrl().equals(mArtworkUrl)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(getId(), mName, mAlbumName, mArtist, mArtworkUrl);
+    }
 }

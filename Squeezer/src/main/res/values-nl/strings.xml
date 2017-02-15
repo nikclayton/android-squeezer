@@ -106,6 +106,7 @@
     </string>
 
     <string name="BROWSE_SONGS">Blader liedjes</string>
+    <string name="BROWSE_SONGS_BY_ITEM">Blader liedjes per %s</string>
     <string name="BROWSE_ALBUMS">Blader albums</string>
     <string name="BROWSE_ARTISTS">Blader artiesten</string>
     <string name="BROWSE_ALBUM_SONGS">Blader liedjes op album</string>
@@ -129,6 +130,7 @@
 
     <string name="PLAYLIST_EXISTS_MESSAGE">Playlist %s bestaat al</string>
 
+    <string name="song_display_options">Opties voor nummerweergave</string>
     <string name="songs_sort_order_title">Titel</string>
     <string name="songs_sort_order_tracknum">Liedje</string>
 

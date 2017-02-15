@@ -1,5 +1,6 @@
 package uk.org.ngo.squeezer.itemlist.dialog;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -21,6 +22,8 @@ public abstract class BaseEditTextDialog extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+        @SuppressLint({"InflateParams"}) // OK, as view is passed to AlertDialog.Builder.setView()
         View form = getActivity().getLayoutInflater().inflate(R.layout.edittext_dialog, null);
         builder.setView(form);
         editText = (EditText) form.findViewById(R.id.edittext);

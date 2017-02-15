@@ -16,7 +16,6 @@
 
 package uk.org.ngo.squeezer.itemlist;
 
-import android.os.RemoteException;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -48,7 +47,7 @@ public class PlaylistView extends BaseItemView<Playlist> {
     }
 
     @Override
-    public void onItemSelected(int index, Playlist item) throws RemoteException {
+    public void onItemSelected(int index, Playlist item) {
         activity.setCurrentPlaylist(index, item);
         PlaylistSongsActivity.show(getActivity(), item);
     }
@@ -64,11 +63,11 @@ public class PlaylistView extends BaseItemView<Playlist> {
         menu.add(Menu.NONE, R.id.play_now, 3, R.string.PLAY_NOW);
         menu.add(Menu.NONE, R.id.play_next, 3, R.string.PLAY_NEXT);
         menu.add(Menu.NONE, R.id.add_to_playlist, 4, R.string.ADD_TO_END);
+        menu.add(Menu.NONE, R.id.download, 5, R.string.DOWNLOAD_ITEM);
     }
 
     @Override
-    public boolean doItemContext(MenuItem menuItem, int index, Playlist selectedItem)
-            throws RemoteException {
+    public boolean doItemContext(MenuItem menuItem, int index, Playlist selectedItem) {
         activity.setCurrentPlaylist(index, selectedItem);
         switch (menuItem.getItemId()) {
             case PLAYLISTS_CONTEXTMENU_DELETE_ITEM:

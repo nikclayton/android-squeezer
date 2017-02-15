@@ -16,7 +16,6 @@
 
 package uk.org.ngo.squeezer.itemlist;
 
-import android.os.RemoteException;
 import android.view.ContextMenu;
 import android.view.View;
 
@@ -35,7 +34,7 @@ public class RadioView extends PluginView {
         return getActivity().getResources().getQuantityString(R.plurals.radio, quantity);
     }
 
-    public void onItemSelected(int index, Plugin item) throws RemoteException {
+    public void onItemSelected(int index, Plugin item) {
         PluginItemListActivity.show(getActivity(), item);
     }
 

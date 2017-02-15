@@ -35,16 +35,6 @@ public class NowPlayingActivity extends BaseActivity {
         setContentView(R.layout.now_playing);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see
-     * uk.org.ngo.squeezer.framework.BaseActivity#onServiceConnected()
-     */
-    @Override
-    protected void onServiceConnected() {
-        // Does nothing
-    }
-
     public static void show(Context context) {
         final Intent intent = new Intent(context, NowPlayingActivity.class)
                 .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);

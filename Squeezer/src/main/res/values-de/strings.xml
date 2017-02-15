@@ -133,6 +133,7 @@
     </string>
 
     <string name="BROWSE_SONGS">Lieder anzeigen</string>
+    <string name="BROWSE_SONGS_BY_ITEM">Titel des %s anzeigen</string>
     <string name="BROWSE_ALBUMS">Alben anzeigen</string>
     <string name="BROWSE_ARTISTS">Künstler anzeigen</string>
     <string name="BROWSE_ALBUM_SONGS">Albumtitel anzeigen</string>
@@ -154,7 +155,8 @@
 
     <string name="PLAYLIST_EXISTS_MESSAGE">Die Wiedergabeliste %s existiert bereits</string>
 
-    <!-- Song sort orders -->
+    <!-- Song display options -->
+    <string name="song_display_options">Liederansicht - Optionen</string>
     <string name="songs_sort_order_title">Titel</string>
     <string name="songs_sort_order_tracknum">Nummer</string>
 

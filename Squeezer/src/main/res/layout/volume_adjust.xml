@@ -15,7 +15,9 @@
      limitations under the License.
 -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/volume_adjust_root"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
@@ -23,37 +25,28 @@
     android:orientation="vertical"
     android:gravity="center_horizontal">
 
-    <LinearLayout
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="14dp"
-        android:gravity="center_vertical">
-
-        <ImageView
-            android:id="@+id/other_stream_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="6dp" android:visibility="gone"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/message"
-            android:textAppearance="@style/SqueezerTextItem"/>
-    </LinearLayout>
+        android:id="@+id/message"
+        android:textAppearance="@style/SqueezerTextItem"
+        tools:text="Squeezer volume"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/additional_message"
-        android:textAppearance="@style/SqueezerTextItemSmall"/>
+        android:textAppearance="@style/SqueezerTextItemSmall"
+        tools:text="Lounge Squeezebox"/>
 
     <ImageView
         android:id="@+id/ringer_stream_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="14dp"
-        android:visibility="visible"/>
+        android:visibility="visible"
+        tools:src="@drawable/ic_volume"/>
 
     <SeekBar
         style="?android:attr/progressBarStyleHorizontal"

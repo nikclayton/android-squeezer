@@ -18,20 +18,85 @@ package uk.org.ngo.squeezer.itemlist;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.RemoteException;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 
+import java.lang.ref.WeakReference;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import uk.org.ngo.squeezer.NowPlayingFragment;
+import uk.org.ngo.squeezer.R;
 import uk.org.ngo.squeezer.framework.BaseListActivity;
+import uk.org.ngo.squeezer.framework.ItemAdapter;
 import uk.org.ngo.squeezer.framework.ItemView;
 import uk.org.ngo.squeezer.model.Player;
+import uk.org.ngo.squeezer.model.PlayerState;
+import uk.org.ngo.squeezer.service.IServicePlayerStateCallback;
+import uk.org.ngo.squeezer.service.IServicePlayersCallback;
+import uk.org.ngo.squeezer.service.IServiceVolumeCallback;
 
 public class PlayerListActivity extends BaseListActivity<Player> {
+    public static final String CURRENT_PLAYER = "currentPlayer";
 
-    private Player activePlayer;
+    private final Map<String, PlayerState> playerStates = new HashMap<String, PlayerState>();
+    private Player currentPlayer;
+    private boolean trackingTouch;
 
-    public Player getActivePlayer() {
-        return activePlayer;
+    private final Handler uiThreadHandler = new UiThreadHandler(this);
+
+    private final static class UiThreadHandler extends Handler {
+        private static final int VOLUME_CHANGE = 1;
+        private static final int PLAYER_STATE = 2;
+
+        final WeakReference<PlayerListActivity> activity;
+
+        public UiThreadHandler(PlayerListActivity activity) {
+            this.activity = new WeakReference<PlayerListActivity>(activity);
+        }
+
+        @Override
+        public void handleMessage(Message message) {
+            switch (message.what) {
+                case VOLUME_CHANGE:
+                    activity.get().onVolumeChanged(message.arg1, (Player)message.obj);
+                    break;
+                case PLAYER_STATE:
+                    activity.get().onPlayerStateReceived((PlayerState) message.obj);
+                    break;
+            }
+        }
+    }
+
+    private void onVolumeChanged(int newVolume, Player player) {
+        PlayerState playerState = playerStates.get(player.getId());
+        if (playerState != null) {
+            playerState.setCurrentVolume(newVolume);
+            if (!trackingTouch)
+                getItemAdapter().notifyDataSetChanged();
+        }
+    }
+
+    private void onPlayerStateReceived(PlayerState playerState) {
+        playerStates.put(playerState.getPlayerId(), playerState);
+        if (!trackingTouch)
+            getItemAdapter().notifyDataSetChanged();
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (savedInstanceState != null)
+            currentPlayer = savedInstanceState.getParcelable(CURRENT_PLAYER);
+        ((NowPlayingFragment) getSupportFragmentManager().findFragmentById(R.id.now_playing_fragment)).setIgnoreVolumeChange(true);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putParcelable(CURRENT_PLAYER, currentPlayer);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -40,18 +105,84 @@ public class PlayerListActivity extends BaseListActivity<Player> {
     }
 
     @Override
-    protected void registerCallback() throws RemoteException {
-        getService().registerPlayerListCallback(playerListCallback);
+    protected void orderPage(int start) {
+        getService().players(start, this);
     }
 
     @Override
-    protected void unregisterCallback() throws RemoteException {
-        getService().unregisterPlayerListCallback(playerListCallback);
+    protected void registerCallback() {
+        super.registerCallback();
+        getService().registerVolumeCallback(volumeCallback);
+        getService().registerPlayersCallback(playersCallback);
+        getService().registerPlayerStateCallback(playerStateCallback);
+    }
+
+    private final IServicePlayerStateCallback playerStateCallback
+            = new IServicePlayerStateCallback() {
+        @Override
+        public void onPlayerStateReceived(final PlayerState playerState) {
+            uiThreadHandler.obtainMessage(UiThreadHandler.PLAYER_STATE, 0, 0, playerState).sendToTarget();
+        }
+
+        @Override
+        public Object getClient() {
+            return PlayerListActivity.this;
+        }
+    };
+
+    private final IServiceVolumeCallback volumeCallback = new IServiceVolumeCallback() {
+        @Override
+        public void onVolumeChanged(final int newVolume, final Player player) {
+            uiThreadHandler.obtainMessage(UiThreadHandler.VOLUME_CHANGE, newVolume, 0, player).sendToTarget();
+        }
+
+        @Override
+        public Object getClient() {
+            return PlayerListActivity.this;
+        }
+
+        @Override
+        public boolean wantAllPlayers() {
+            return true;
+        }
+    };
+
+    private final IServicePlayersCallback playersCallback = new IServicePlayersCallback() {
+        @Override
+        public void onPlayersChanged(List<Player> players, Player activePlayer) {
+            onItemsReceived(players.size(), 0, players);
+        }
+
+        @Override
+        public Object getClient() {
+            return PlayerListActivity.this;
+        }
+    };
+
+    public PlayerState getPlayerState(String id) {
+        return playerStates.get(id);
+    }
+
+    public Player getCurrentPlayer() {
+        return currentPlayer;
+    }
+    public void setCurrentPlayer(Player currentPlayer) {
+        this.currentPlayer = currentPlayer;
+    }
+
+    public void setTrackingTouch(boolean trackingTouch) {
+        this.trackingTouch = trackingTouch;
+    }
+
+    public void playerRename(String newName) {
+        getService().playerRename(currentPlayer, newName);
+        this.currentPlayer.setName(newName);
+        getItemAdapter().notifyDataSetChanged();
     }
 
     @Override
-    protected void orderPage(int start) throws RemoteException {
-        getService().players(start);
+    protected ItemAdapter<Player> createItemListAdapter(ItemView<Player> itemView) {
+        return new PlayerListAdapter(itemView, getImageFetcher());
     }
 
     public static void show(Context context) {
@@ -59,14 +190,4 @@ public class PlayerListActivity extends BaseListActivity<Player> {
                 .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         context.startActivity(intent);
     }
-
-    private final IServicePlayerListCallback playerListCallback
-            = new IServicePlayerListCallback.Stub() {
-        public void onPlayersReceived(int count, int start, List<Player> items)
-                throws RemoteException {
-            activePlayer = getService().getActivePlayer();
-            onItemsReceived(count, start, items);
-        }
-    };
-
 }

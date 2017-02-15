@@ -4,9 +4,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.os.RemoteException;
 import android.support.v4.app.DialogFragment;
-import android.util.Log;
 
 import uk.org.ngo.squeezer.R;
 import uk.org.ngo.squeezer.itemlist.PlaylistsActivity;
@@ -24,12 +22,8 @@ public class PlaylistsDeleteDialog extends DialogFragment {
         builder.setMessage(R.string.delete__message);
         builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
-                try {
-                    activity.getService().playlistsDelete(activity.getCurrentPlaylist());
-                    activity.clearAndReOrderItems();
-                } catch (RemoteException e) {
-                    Log.e(getTag(), "Error deleting playlist");
-                }
+                activity.getService().playlistsDelete(activity.getCurrentPlaylist());
+                activity.clearAndReOrderItems();
             }
         });
         builder.setNegativeButton(android.R.string.cancel, null);

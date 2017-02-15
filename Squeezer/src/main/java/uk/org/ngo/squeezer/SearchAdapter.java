@@ -93,21 +93,11 @@ public class SearchAdapter extends BaseExpandableListAdapter implements
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public <T extends Item> void updateItems(int count, int start, List<T> items, Class<T> clazz) {
-        ItemAdapter<T> adapter = (ItemAdapter<T>) childAdapterMap.get(clazz);
+    public <T extends Item> void updateItems(int count, int start, List<T> items, Class<T> dataType) {
+        @SuppressWarnings("unchecked")
+        ItemAdapter<T> adapter = (ItemAdapter<T>) childAdapterMap.get(dataType);
         adapter.update(count, start, items);
         notifyDataSetChanged();
-    }
-
-    public int getMaxCount() {
-        int count = 0;
-        for (ItemAdapter<? extends Item> itemAdapter : childAdapters) {
-            if (itemAdapter.getCount() > count) {
-                count = itemAdapter.getCount();
-            }
-        }
-        return count;
     }
 
     @Override

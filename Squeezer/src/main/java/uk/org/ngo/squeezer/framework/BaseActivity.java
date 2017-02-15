@@ -16,29 +16,27 @@
 
 package uk.org.ngo.squeezer.framework;
 
-import org.acra.ErrorReporter;
-
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.RemoteException;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.Toast;
 
+
 import uk.org.ngo.squeezer.R;
 import uk.org.ngo.squeezer.menu.BaseMenuFragment;
 import uk.org.ngo.squeezer.menu.MenuFragment;
-import uk.org.ngo.squeezer.model.Song;
 import uk.org.ngo.squeezer.service.ISqueezeService;
 import uk.org.ngo.squeezer.service.ServerString;
 import uk.org.ngo.squeezer.service.SqueezeService;
+import uk.org.ngo.squeezer.util.SqueezePlayer;
 
 /**
  * Common base class for all activities in the squeezer
@@ -49,10 +47,15 @@ public abstract class BaseActivity extends ActionBarActivity implements HasUiThr
 
     private ISqueezeService service = null;
 
+    /**
+     * Keep track of whether callbacks have been registered
+     */
+    private boolean mRegisteredCallbacks;
+
     private final Handler uiThreadHandler = new Handler() {
     };
 
-    protected abstract void onServiceConnected();
+    private SqueezePlayer squeezePlayer;
 
     protected String getTag() {
         return getClass().getSimpleName();
@@ -76,7 +79,7 @@ public abstract class BaseActivity extends ActionBarActivity implements HasUiThr
     private final ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder binder) {
-            service = ISqueezeService.Stub.asInterface(binder);
+            service = (ISqueezeService) binder;
             BaseActivity.this.onServiceConnected();
         }
 
@@ -103,8 +106,71 @@ public abstract class BaseActivity extends ActionBarActivity implements HasUiThr
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (serviceConnection != null) {
-            unbindService(serviceConnection);
+        unbindService(serviceConnection);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (getService() != null) {
+            maybeRegisterCallbacks();
+        }
+
+        // If SqueezePlayer is installed, start it
+        if (SqueezePlayer.hasSqueezePlayer(this)) {
+            squeezePlayer = new SqueezePlayer(this);
+        }
+    }
+
+    @Override
+    public void onPause() {
+        if (squeezePlayer != null) {
+            squeezePlayer.stopControllingSqueezePlayer();
+            squeezePlayer = null;
+        }
+        if (mRegisteredCallbacks) {
+            // If we are not bound to the service, it's process is no longer
+            // running, so the callbacks are already cleaned up.
+            if (getService() != null) {
+                unregisterCallback();
+            }
+            mRegisteredCallbacks = false;
+        }
+
+        super.onPause();
+    }
+
+    protected void onServiceConnected() {
+        maybeRegisterCallbacks();
+    }
+
+    /**
+     * This is called when the service is connected.
+     * <p/>
+     * Override this to if your activity wish to subscribe to any notifications
+     * from the service.
+     */
+    protected void registerCallback() {
+    }
+
+    /**
+     * This is called when the service is disconnected.
+     * <p/>
+     * Normally you do not need to override this.
+     */
+    protected void unregisterCallback() {
+        getService().cancelItemListRequests(this);
+        getService().cancelSubscriptions(this);
+    }
+
+    /**
+     * This is called when the service is first connected, and whenever the activity is resumed.
+     */
+    private void maybeRegisterCallbacks() {
+        if (!mRegisteredCallbacks) {
+            registerCallback();
+            mRegisteredCallbacks = true;
         }
     }
 
@@ -157,39 +223,28 @@ public abstract class BaseActivity extends ActionBarActivity implements HasUiThr
             return false;
         }
         Log.v(getTag(), "Adjust volume by: " + delta);
-        try {
-            getService().adjustVolumeBy(delta);
-            return true;
-        } catch (RemoteException e) {
-            Log.e(getTag(), "Error from service.adjustVolumeBy: " + e);
-        }
-        return false;
+        getService().adjustVolumeBy(delta);
+        return true;
     }
 
     // Safe accessors
+
+    public boolean canDownload() {
+        return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD);
+    }
 
     public boolean isConnected() {
         if (service == null) {
             return false;
         }
-        try {
-            return service.isConnected();
-        } catch (RemoteException e) {
-            Log.e(getTag(), "Service exception in isConnected(): " + e);
-        }
-        return false;
+        return service.isConnected();
     }
 
     public String getIconUrl(String icon) {
         if (service == null || icon == null) {
             return null;
         }
-        try {
-            return service.getIconUrl(icon);
-        } catch (RemoteException e) {
-            Log.e(getClass().getSimpleName(), "Error requesting icon url '" + icon + "': " + e);
-            return null;
-        }
+        return service.getIconUrl(icon);
     }
 
     public String getServerString(ServerString stringToken) {
@@ -198,66 +253,39 @@ public abstract class BaseActivity extends ActionBarActivity implements HasUiThr
 
     // This section is just an easier way to call squeeze service
 
-    public void play(PlaylistItem item) throws RemoteException {
+    public void play(PlaylistItem item) {
         playlistControl(PlaylistControlCmd.load, item, R.string.ITEM_PLAYING);
     }
 
-    public void add(PlaylistItem item) throws RemoteException {
+    public void add(PlaylistItem item) {
         playlistControl(PlaylistControlCmd.add, item, R.string.ITEM_ADDED);
     }
 
-    public void insert(PlaylistItem item) throws RemoteException {
+    public void insert(PlaylistItem item) {
         playlistControl(PlaylistControlCmd.insert, item, R.string.ITEM_INSERTED);
     }
 
     private void playlistControl(PlaylistControlCmd cmd, PlaylistItem item, int resId)
-            throws RemoteException {
+            {
         if (service == null) {
             return;
         }
 
-        service.playlistControl(cmd.name(), item.getPlaylistTag(), item.getId());
+        service.playlistControl(cmd.name(), item);
         Toast.makeText(this, getString(resId, item.getName()), Toast.LENGTH_SHORT).show();
     }
 
     /**
-     * Attempts to download the supplied song. <p>This method will silently refuse to download if
-     * song is null or is remote.
+     * Initiate download of songs for the supplied item.
      *
-     * @param song song to download
+     * @param item Song or item with songs to download
+     * @see ISqueezeService#downloadItem(FilterItem)
      */
-    public void downloadSong(Song song) {
-        if (song != null && !song.isRemote()) {
-            downloadSong(song.getId());
-        }
-    }
-
-    /**
-     * Attempts to download the song given by songId.
-     *
-     * @param songId ID of the song to download
-     */
-    public void downloadSong(String songId) {
-        if (songId == null) {
-            return;
-        }
-
-        /*
-         * Quick-and-dirty version. Use ACTION_VIEW to have something try and
-         * download the song (probably the browser).
-         *
-         * TODO: If running on Gingerbread or greater use the Download Manager
-         * APIs to have more control over the download.
-         */
-        try {
-            String url = getService().getSongDownloadUrl(songId);
-
-            Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-            startActivity(i);
-        } catch (RemoteException e) {
-            ErrorReporter.getInstance().handleException(e);
-            e.printStackTrace();
-        }
+    public void downloadItem(FilterItem item) {
+        if (canDownload())
+            service.downloadItem(item);
+        else
+            Toast.makeText(this, R.string.DOWNLOAD_MANAGER_NEEDED, Toast.LENGTH_LONG).show();
     }
 
     private enum PlaylistControlCmd {

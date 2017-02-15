@@ -27,7 +27,8 @@ import uk.org.ngo.squeezer.framework.Item;
 
 public class Plugin extends Item {
 
-    public static Plugin FAVORITE = new Plugin("favorites", R.drawable.icon_favorites);
+    public static final Plugin FAVORITE = new Plugin("favorites", R.drawable.ic_favorites);
+    public static final Plugin MY_APPS = new Plugin("myapps", R.drawable.ic_my_apps);
 
     private String name;
 

@@ -17,13 +17,12 @@
 package uk.org.ngo.squeezer.itemlist;
 
 import android.os.Handler;
-import android.os.RemoteException;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Spinner;
 
 import java.util.List;
+import java.util.Map;
 
 import uk.org.ngo.squeezer.Util;
 import uk.org.ngo.squeezer.framework.ItemAdapter;
@@ -34,9 +33,7 @@ import uk.org.ngo.squeezer.util.ImageFetcher;
 
 public class YearSpinner {
 
-    private static final String TAG = YearSpinner.class.getName();
-
-    YearSpinnerCallback callback;
+    final YearSpinnerCallback callback;
 
     private final ItemListActivity activity;
 
@@ -46,45 +43,19 @@ public class YearSpinner {
         this.callback = callback;
         this.activity = activity;
         this.spinner = spinner;
-        registerCallback();
-        orderItems(0);
+        orderItems();
     }
 
-    private void orderItems(int start) {
+    private void orderItems() {
         if (callback.getService() != null) {
-            try {
-                callback.getService().years(start);
-            } catch (RemoteException e) {
-                Log.e(TAG, "Error ordering items: " + e);
-            }
+            callback.getService().years(-1, yearListCallback);
         }
     }
 
-    public void registerCallback() {
-        if (callback.getService() != null) {
-            try {
-                callback.getService().registerYearListCallback(yearListCallback);
-            } catch (RemoteException e) {
-                Log.e(TAG, "Error registering callback: " + e);
-            }
-        }
-    }
-
-    public void unregisterCallback() {
-        if (callback.getService() != null) {
-            try {
-                callback.getService().unregisterYearListCallback(yearListCallback);
-            } catch (RemoteException e) {
-                Log.e(TAG, "Error unregistering callback: " + e);
-            }
-        }
-    }
-
-    private final IServiceYearListCallback yearListCallback = new IServiceYearListCallback.Stub() {
+    private final IServiceItemListCallback<Year> yearListCallback = new IServiceItemListCallback<Year>() {
         private ItemAdapter<Year> adapter;
 
-        public void onYearsReceived(final int count, final int start, final List<Year> list)
-                throws RemoteException {
+        public void onItemsReceived(final int count, final int start, Map<String, String> parameters, final List<Year> list, Class<Year> dataType) {
             callback.getUIThreadHandler().post(new Runnable() {
                 public void run() {
                     if (adapter == null) {
@@ -109,16 +80,14 @@ public class YearSpinner {
                     }
                     adapter.update(count, start, list);
                     spinner.setSelection(adapter.findItem(callback.getYear()));
-
-                    if (count > start + list.size()) {
-                        if ((start + list.size()) % adapter.getPageSize() == 0) {
-                            orderItems(start + list.size());
-                        }
-                    }
                 }
             });
         }
 
+        @Override
+        public Object getClient() {
+            return activity;
+        }
     };
 
     public interface YearSpinnerCallback {

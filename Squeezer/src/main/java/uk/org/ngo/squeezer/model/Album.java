@@ -31,6 +31,11 @@ public class Album extends ArtworkItem {
         return "album_id";
     }
 
+    @Override
+    public String getFilterTag() {
+        return "album_id";
+    }
+
     private String name;
 
     @Override

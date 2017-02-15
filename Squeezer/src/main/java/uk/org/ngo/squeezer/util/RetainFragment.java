@@ -35,7 +35,7 @@ public class RetainFragment extends Fragment {
 
     private static final String TAG = RetainFragment.class.getName();
 
-    private Map<String, Object> mHash = new Hashtable<String, Object>();
+    private final Map<String, Object> mHash = new Hashtable<String, Object>();
 
     /**
      * Empty constructor as per the Fragment documentation

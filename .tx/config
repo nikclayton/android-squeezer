@@ -1,0 +1,9 @@
+[main]
+host = https://www.transifex.com
+
+[squeezer.stringsxml]
+file_filter = translations/squeezer.stringsxml/<lang>.xml
+source_file = Squeezer/src/main/res/values/strings.xml
+source_lang = en
+type = ANDROID
+

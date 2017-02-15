@@ -20,8 +20,6 @@ package uk.org.ngo.squeezer;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.RemoteException;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -43,10 +41,6 @@ public class RandomplayActivity extends BaseActivity {
         setRandomplayMenu();
     }
 
-    @Override
-    protected void onServiceConnected() {
-    }
-
 
     private void setRandomplayMenu() {
         String[] values = getResources().getStringArray(R.array.randomplay_items);
@@ -64,11 +58,7 @@ public class RandomplayActivity extends BaseActivity {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             if (position < RandomPlayType.values().length) {
-                try {
-                    getService().randomPlay(RandomPlayType.values()[position].toString());
-                } catch (RemoteException e) {
-                    Log.e(getTag(), "Error registering list callback: " + e);
-                }
+                getService().randomPlay(RandomPlayType.values()[position].toString());
                 NowPlayingActivity.show(RandomplayActivity.this);
             }
         }

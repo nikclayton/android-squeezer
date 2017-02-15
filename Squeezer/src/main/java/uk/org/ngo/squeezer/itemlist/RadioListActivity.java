@@ -19,9 +19,9 @@ package uk.org.ngo.squeezer.itemlist;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.os.RemoteException;
 
 import uk.org.ngo.squeezer.R;
+import uk.org.ngo.squeezer.framework.BaseListActivity;
 import uk.org.ngo.squeezer.framework.ItemView;
 import uk.org.ngo.squeezer.model.Plugin;
 
@@ -31,7 +31,7 @@ import uk.org.ngo.squeezer.model.Plugin;
  * The activity's content view scrolls in from the right, and disappear to the left, to provide a
  * spatial component to navigation.
  */
-public class RadioListActivity extends PluginListActivity {
+public class RadioListActivity extends BaseListActivity<Plugin> {
 
     @Override
     public ItemView<Plugin> createItemView() {
@@ -39,8 +39,8 @@ public class RadioListActivity extends PluginListActivity {
     }
 
     @Override
-    protected void orderPage(int start) throws RemoteException {
-        getService().radios(start);
+    protected void orderPage(int start) {
+        getService().radios(start, this);
     }
 
     public static void show(Activity activity) {

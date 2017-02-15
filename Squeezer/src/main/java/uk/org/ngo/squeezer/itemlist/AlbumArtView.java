@@ -17,8 +17,6 @@
 package uk.org.ngo.squeezer.itemlist;
 
 
-import android.os.RemoteException;
-import android.util.Log;
 import android.view.View;
 
 import java.util.EnumSet;
@@ -79,11 +77,6 @@ public abstract class AlbumArtView<T extends ArtworkItem> extends
             return null;
         }
 
-        try {
-            return service.getAlbumArtUrl(artwork_track_id);
-        } catch (RemoteException e) {
-            Log.e(getClass().getSimpleName(), "Error requesting album art url: " + e);
-            return null;
-        }
+        return service.getAlbumArtUrl(artwork_track_id);
     }
 }

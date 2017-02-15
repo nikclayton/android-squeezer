@@ -82,6 +82,8 @@
             android:label="@string/app_name"/>
         <activity android:name=".itemlist.FavoriteListActivity" android:label="@string/app_name"/>
 
+        <activity android:name=".service.CancelDownloadsActivity" android:theme="@android:style/Theme.Dialog" />
+
         <activity android:name="org.acra.CrashReportDialog"
             android:theme="@android:style/Theme.Dialog"
             android:launchMode="singleInstance"
@@ -91,6 +93,15 @@
         <service android:exported="false" android:label="Squeezer Service"
             android:name=".service.SqueezeService">
         </service>
+
+        <receiver
+            android:name=".service.DownloadStatusReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.DOWNLOAD_COMPLETE" />
+                <action android:name="android.intent.action.DOWNLOAD_NOTIFICATION_CLICKED" />
+            </intent-filter>
+        </receiver>
 
         <!-- Used for install referrer tracking -->
         <receiver android:name="com.google.android.apps.analytics.AnalyticsReceiver"

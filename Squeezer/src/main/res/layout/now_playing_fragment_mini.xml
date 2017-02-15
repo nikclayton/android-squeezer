@@ -17,6 +17,7 @@
 -->
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
 
@@ -75,5 +76,6 @@
         android:layout_below="@id/progressbar"
         android:background="@null"
         android:maxWidth="48dp"
-        android:minWidth="48dp"/>
+        android:minWidth="48dp"
+        tools:src="@drawable/ic_action_pause"/>
 </RelativeLayout>

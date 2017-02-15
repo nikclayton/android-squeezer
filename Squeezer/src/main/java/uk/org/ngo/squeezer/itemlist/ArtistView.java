@@ -16,7 +16,6 @@
 
 package uk.org.ngo.squeezer.itemlist;
 
-import android.os.RemoteException;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.View;
@@ -34,7 +33,7 @@ public class ArtistView extends BaseItemView<Artist> {
     }
 
     // XXX: Consider making this extend PlaylistItemView and make the action user definable.
-    public void onItemSelected(int index, Artist item) throws RemoteException {
+    public void onItemSelected(int index, Artist item) {
         AlbumListActivity.show(getActivity(), item);
     }
 
@@ -47,6 +46,7 @@ public class ArtistView extends BaseItemView<Artist> {
         menu.add(Menu.NONE, R.id.browse_songs, 1, R.string.BROWSE_SONGS);
         menu.add(Menu.NONE, R.id.play_now, 2, R.string.PLAY_NOW);
         menu.add(Menu.NONE, R.id.add_to_playlist, 3, R.string.ADD_TO_END);
+        menu.add(Menu.NONE, R.id.download, 4, R.string.DOWNLOAD_ITEM);
     }
 
     public String getQuantityString(int quantity) {

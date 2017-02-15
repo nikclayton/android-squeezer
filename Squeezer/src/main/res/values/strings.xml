@@ -65,6 +65,9 @@
     <string name="settings_scrobble_noapp">No apps that can scrobble are installed</string>
     <string name="settings_market_not_found">Could not start Google Play, is it installed?</string>
 
+    <string name="settings_squeezeplayer_title">Start SqueezePlayer</string>
+    <string name="settings_squeezeplayer_summary">Check this option to make sure SqueezePlayer is running, when using Squeezer</string>
+
     <string name="settings_category_ui">Squeezer interface</string>
 
     <string name="menu_item_disconnect">Disconnect</string>
@@ -139,6 +142,12 @@
     <string name="tip_volume">Use your device\'s hardware volume controls to change the playing
         volume.\n\nTry it now.
     </string>
+
+    <!-- Reporting errors that from the server. -->
+    <string name="server_error">%1$s reported an error: \"%2$s\".</string>
+
+    <string name="menu_item_power_off">Turn off</string>
+    <string name="menu_item_power_on">Turn on</string>
 
     <!-- Dialog buttons -->
     <string name="dialog_license">License</string>
@@ -324,6 +333,7 @@ of your accepting any such warranty or additional liability.&lt;/p&gt;</string>
 
     <string name="NO_ACTION">None</string>
     <string name="BROWSE_SONGS">Browse songs</string>
+    <string name="BROWSE_SONGS_BY_ITEM">Browse songs by %s</string>
     <string name="BROWSE_ALBUMS">Browse albums</string>
     <string name="BROWSE_ARTISTS">Browse artists</string>
     <string name="BROWSE_ALBUM_SONGS">Browse songs on album</string>
@@ -333,6 +343,7 @@ of your accepting any such warranty or additional liability.&lt;/p&gt;</string>
     <string name="ADD_TO_END">Add to playlist</string>
     <string name="PLAY_NEXT">Play after the currently playing song</string>
     <string name="DOWNLOAD_ITEM">Download</string>
+    <string name="DOWNLOAD_MANAGER_NEEDED">Download requires Android 2.3 or later</string>
 
     <string name="PLAYLIST_REMOVE_ITEM">Remove from playlist</string>
     <string name="PLAYLIST_MOVE_UP">Move up</string>
@@ -347,7 +358,8 @@ of your accepting any such warranty or additional liability.&lt;/p&gt;</string>
 
     <string name="PLAYLIST_EXISTS_MESSAGE">Playlist %s already exists</string>
 
-    <!-- Song sort orders -->
+    <!-- Song display options -->
+    <string name="song_display_options">Songview options</string>
     <string name="songs_sort_order_title">Title</string>
     <string name="songs_sort_order_tracknum">Track</string>
 
@@ -467,4 +479,5 @@ of your accepting any such warranty or additional liability.&lt;/p&gt;</string>
 
     <string name="settings_album_selectaction">Album select action</string>
     <string name="settings_song_selectaction">Song select action</string>
+    <string name="confirm_cancel_downloads">Cancel pending downloads?</string>
 </resources>

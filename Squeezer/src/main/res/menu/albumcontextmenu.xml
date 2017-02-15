@@ -22,6 +22,10 @@
     <item android:id="@+id/browse_songs"
         android:title="@string/BROWSE_SONGS"/>
 
+    <item android:id="@+id/browse_songs_by_artist"
+        android:title="@string/BROWSE_SONGS_BY_ITEM"
+        android:visible="false"/>
+
     <item android:id="@+id/play_now"
         android:title="@string/PLAY_NOW"/>
 
@@ -30,4 +34,7 @@
 
     <item android:id="@+id/browse_artists"
         android:title="@string/BROWSE_ARTISTS"/>
+
+    <item android:id="@+id/download"
+        android:title="@string/DOWNLOAD_ITEM"/>
 </menu>

@@ -16,12 +16,9 @@
 
 package uk.org.ngo.squeezer.dialog;
 
-import org.acra.ErrorReporter;
-
 import android.annotation.TargetApi;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
@@ -41,6 +38,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+
+import org.acra.ErrorReporter;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -93,14 +92,16 @@ public class ServerAddressPreference extends DialogPreference {
     protected void onBindDialogView(View view) {
         super.onBindDialogView(view);
 
+        Preferences preferences = new Preferences(getContext());
+
         mServerAddressEditText = (EditText) view.findViewById(R.id.server_address);
         Button scanBtn = (Button) view.findViewById(R.id.scan_btn);
         mServersSpinner = (Spinner) view.findViewById(R.id.found_servers);
 
         userNameEditText = (EditText) view.findViewById(R.id.username);
-        userNameEditText.setText(getSharedPreferences().getString(Preferences.KEY_USERNAME, null));
+        userNameEditText.setText(preferences.getUserName());
         passwordEditText = (EditText) view.findViewById(R.id.password);
-        passwordEditText.setText(getSharedPreferences().getString(Preferences.KEY_PASSWORD, null));
+        passwordEditText.setText(preferences.getPassword());
 
         // If there's no server address configured then set the default text
         // in the edit box to our IP address, trimmed of the last octet.
@@ -235,13 +236,24 @@ public class ServerAddressPreference extends DialogPreference {
 
             persistString(ipPort.toString());
 
-            SharedPreferences.Editor editor = getEditor();
-            editor.putString(Preferences.KEY_USERNAME, userNameEditText.getText().toString());
-            editor.putString(Preferences.KEY_PASSWORD, passwordEditText.getText().toString());
-            editor.commit();
+            Preferences preferences = new Preferences(getContext());
+            String serverName = getServerName(ipPort.toString());
+            if (serverName != null) {
+                preferences.saveServerName(serverName);
+            }
+            preferences.saveUserCredentials(userNameEditText.getText().toString(),
+                    passwordEditText.getText().toString());
 
             callChangeListener(ipPort.toString());
         }
+    }
+
+    private String getServerName(String ipPort) {
+        if (mDiscoveredServers != null)
+            for (Entry<String, String> entry : mDiscoveredServers.entrySet())
+                if (ipPort.equals(entry.getValue()))
+                    return entry.getKey();
+        return null;
     }
 
     @Override
@@ -325,7 +337,7 @@ public class ServerAddressPreference extends DialogPreference {
          */
         @Override
         protected Void doInBackground(Void... unused) {
-            WifiManager.WifiLock wifiLock = null;
+            WifiManager.WifiLock wifiLock;
             DatagramSocket socket = null;
 
             // UDP broadcast data that causes Squeezeservers to reply. The
@@ -432,9 +444,7 @@ public class ServerAddressPreference extends DialogPreference {
             }
 
             Log.v(TAG, "Scanning complete, unlocking WiFi");
-            if (wifiLock != null) {
-                wifiLock.release();
-            }
+            wifiLock.release();
 
             // For testing that multiple servers are handled correctly.
             // mServerMap.put("Dummy", "127.0.0.1");
@@ -448,7 +458,7 @@ public class ServerAddressPreference extends DialogPreference {
          */
         @Override
         protected void onProgressUpdate(Integer... values) {
-            mPref.updateProgress(Math.min(mServerMap.size(), 5), values[0].intValue());
+            mPref.updateProgress(Math.min(mServerMap.size(), 5), values[0]);
         }
 
         @Override

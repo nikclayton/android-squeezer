@@ -58,7 +58,7 @@ public abstract class ImageWorker {
 
     private final Object mPauseWorkLock = new Object();
 
-    protected Resources mResources;
+    protected final Resources mResources;
 
     private static final int MESSAGE_CLEAR = 0;
 

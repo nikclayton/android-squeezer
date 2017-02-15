@@ -18,16 +18,13 @@ package uk.org.ngo.squeezer;
 
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.RemoteException;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
 import uk.org.ngo.squeezer.framework.BaseActivity;
-import uk.org.ngo.squeezer.model.Player;
+import uk.org.ngo.squeezer.service.IServiceConnectionCallback;
 
 /**
  * An activity for when the user is not connected to a Squeezeserver.
@@ -37,43 +34,14 @@ import uk.org.ngo.squeezer.model.Player;
  */
 public class DisconnectedActivity extends BaseActivity {
 
-    private final String TAG = "DisconnectedActivity";
-
-    /**
-     * Keep track of whether callbacks have been registered
-     */
-    private boolean mRegisteredCallbacks;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.disconnected);
 
         Button btnConnect = (Button) findViewById(R.id.btn_connect);
-        String ipPort = getSharedPreferences(Preferences.NAME, Context.MODE_PRIVATE).getString(
-                Preferences.KEY_SERVERADDR, null);
-        btnConnect.setText(getString(R.string.connect_to_text, ipPort));
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (getService() != null) {
-            maybeRegisterCallbacks();
-        }
-    }
-
-    @Override
-    public void onPause() {
-        if (mRegisteredCallbacks) {
-            try {
-                getService().unregisterCallback(serviceCallback);
-            } catch (RemoteException e) {
-                Log.e(TAG, "Service exception in onPause(): " + e);
-            }
-            mRegisteredCallbacks = false;
-        }
-        super.onPause();
+        String serverName = new Preferences(this).getServerName();
+        btnConnect.setText(getString(R.string.connect_to_text, serverName));
     }
 
     /**
@@ -108,33 +76,17 @@ public class DisconnectedActivity extends BaseActivity {
     }
 
     @Override
-    protected void onServiceConnected() {
-        maybeRegisterCallbacks();
+    protected void registerCallback() {
+        super.registerCallback();
+        getService().registerConnectionCallback(connectionCallback);
     }
 
-    /**
-     * Register callbacks with the server, if not already registered.
-     * <p/>
-     * This is called when the service is first connected, and whenever the activity is resumed.
-     */
-    private void maybeRegisterCallbacks() {
-        if (!mRegisteredCallbacks) {
-            try {
-                getService().registerCallback(serviceCallback);
-            } catch (RemoteException e) {
-                Log.e(getTag(), "Error registering callback: " + e);
-            }
-            mRegisteredCallbacks = true;
-        }
-    }
-
-    private final IServiceCallback serviceCallback = new IServiceCallback.Stub() {
+    private final IServiceConnectionCallback connectionCallback = new IServiceConnectionCallback() {
         // TODO: Maybe move onConnectionChanged to its own callback.
 
         @Override
         public void onConnectionChanged(final boolean isConnected, final boolean postConnect,
-                final boolean loginFailed)
-                throws RemoteException {
+                final boolean loginFailed) {
             if (isConnected) {
                 // The user requested a connection to the server, which succeeded.  There's
                 // no prior activity to go to, so launch HomeActivity, with flags to
@@ -155,29 +107,8 @@ public class DisconnectedActivity extends BaseActivity {
         }
 
         @Override
-        public void onPlayerChanged(Player player) throws RemoteException {
-        }
-
-        @Override
-        public void onPlayStatusChanged(final String playStatus) {
-        }
-
-        @Override
-        public void onShuffleStatusChanged(final boolean initial, final int shuffleStatus) {
-        }
-
-        @Override
-        public void onRepeatStatusChanged(final boolean initial, final int repeatStatus) {
-        }
-
-        @Override
-        public void onTimeInSongChange(final int secondsIn, final int secondsTotal)
-                throws RemoteException {
-        }
-
-        @Override
-        public void onPowerStatusChanged(final boolean canPowerOn, final boolean canPowerOff)
-                throws RemoteException {
+        public Object getClient() {
+            return DisconnectedActivity.this;
         }
     };
 }

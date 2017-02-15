@@ -8,6 +8,7 @@ import android.widget.Spinner;
 
 import uk.org.ngo.squeezer.R;
 import uk.org.ngo.squeezer.itemlist.ArtistListActivity;
+import uk.org.ngo.squeezer.itemlist.GenreSpinner;
 import uk.org.ngo.squeezer.model.Genre;
 
 public class ArtistFilterDialog extends BaseFilterDialog {
@@ -30,7 +31,7 @@ public class ArtistFilterDialog extends BaseFilterDialog {
 
         filterForm.findViewById(R.id.year_view).setVisibility(View.GONE);
         genreSpinnerView = (Spinner) filterForm.findViewById(R.id.genre_spinner);
-        activity.setGenreSpinner(genreSpinnerView);
+        new GenreSpinner(activity, activity, genreSpinnerView);
 
         if (activity.getAlbum() != null) {
             ((EditText) filterForm.findViewById(R.id.album)).setText(activity.getAlbum().getName());

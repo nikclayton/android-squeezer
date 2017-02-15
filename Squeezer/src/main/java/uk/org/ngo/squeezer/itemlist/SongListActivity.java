@@ -18,8 +18,9 @@ package uk.org.ngo.squeezer.itemlist;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.os.Bundle;
-import android.os.RemoteException;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -29,38 +30,39 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.util.EnumSet;
 
+import uk.org.ngo.squeezer.Preferences;
 import uk.org.ngo.squeezer.R;
 import uk.org.ngo.squeezer.Util;
+import uk.org.ngo.squeezer.framework.BaseListActivity;
 import uk.org.ngo.squeezer.framework.Item;
 import uk.org.ngo.squeezer.framework.ItemView;
 import uk.org.ngo.squeezer.framework.PlaylistItem;
 import uk.org.ngo.squeezer.itemlist.GenreSpinner.GenreSpinnerCallback;
 import uk.org.ngo.squeezer.itemlist.YearSpinner.YearSpinnerCallback;
 import uk.org.ngo.squeezer.itemlist.dialog.SongFilterDialog;
-import uk.org.ngo.squeezer.itemlist.dialog.SongOrderDialog;
-import uk.org.ngo.squeezer.itemlist.dialog.SongOrderDialog.SongsSortOrder;
+import uk.org.ngo.squeezer.itemlist.dialog.SongViewDialog;
 import uk.org.ngo.squeezer.menu.BaseMenuFragment;
 import uk.org.ngo.squeezer.menu.FilterMenuFragment;
-import uk.org.ngo.squeezer.menu.OrderMenuItemFragment;
+import uk.org.ngo.squeezer.menu.ViewMenuItemFragment;
 import uk.org.ngo.squeezer.model.Album;
 import uk.org.ngo.squeezer.model.Artist;
 import uk.org.ngo.squeezer.model.Genre;
 import uk.org.ngo.squeezer.model.Song;
 import uk.org.ngo.squeezer.model.Year;
+import uk.org.ngo.squeezer.util.ImageFetcher;
 
-public class SongListActivity extends AbstractSongListActivity
+public class SongListActivity extends BaseListActivity<Song>
         implements GenreSpinnerCallback, YearSpinnerCallback,
         FilterMenuFragment.FilterableListActivity,
-        OrderMenuItemFragment.OrderableListActivity {
+        ViewMenuItemFragment.ListActivityWithViewMenu<Song, SongViewDialog.SongListLayout, SongViewDialog.SongsSortOrder> {
 
-    private static final String TAG = SongListActivity.class.getSimpleName();
+    private SongViewDialog.SongsSortOrder sortOrder = SongViewDialog.SongsSortOrder.title;
 
-    private SongsSortOrder sortOrder = SongsSortOrder.title;
+    private SongViewDialog.SongListLayout listLayout = SongViewDialog.SongListLayout.list;
 
     private String searchString;
 
@@ -116,17 +118,6 @@ public class SongListActivity extends AbstractSongListActivity
         this.genre = genre;
     }
 
-    private GenreSpinner genreSpinner;
-
-    public void setGenreSpinner(Spinner spinner) {
-        genreSpinner = new GenreSpinner(this, this, spinner);
-    }
-
-    private YearSpinner yearSpinner;
-
-    public void setYearSpinner(Spinner spinner) {
-        yearSpinner = new YearSpinner(this, this, spinner);
-    }
 
     private SongView songViewLogic;
 
@@ -136,6 +127,7 @@ public class SongListActivity extends AbstractSongListActivity
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        setListLayout();
         super.onCreate(savedInstanceState);
 
         // Set the album header.
@@ -159,8 +151,7 @@ public class SongListActivity extends AbstractSongListActivity
                     v.showContextMenu();
                 }
             });
-        }
-
+        } else
         if (artist != null) {
             TextView header = (TextView) findViewById(R.id.header);
             header.setVisibility(View.VISIBLE);
@@ -172,7 +163,7 @@ public class SongListActivity extends AbstractSongListActivity
         songViewLogic = (SongView) getItemAdapter().getItemView();
 
         BaseMenuFragment.add(this, FilterMenuFragment.class);
-        BaseMenuFragment.add(this, OrderMenuItemFragment.class);
+        BaseMenuFragment.add(this, ViewMenuItemFragment.class);
 
         songViewLogic.setBrowseByAlbum(album != null);
         songViewLogic.setBrowseByArtist(artist != null);
@@ -185,7 +176,7 @@ public class SongListActivity extends AbstractSongListActivity
             for (String key : extras.keySet()) {
                 if (Album.class.getName().equals(key)) {
                     album = extras.getParcelable(key);
-                    sortOrder = SongsSortOrder.tracknum;
+                    sortOrder = SongViewDialog.SongsSortOrder.tracknum;
                 } else if (Artist.class.getName().equals(key)) {
                     artist = extras.getParcelable(key);
                 } else if (Year.class.getName().equals(key)) {
@@ -203,7 +194,8 @@ public class SongListActivity extends AbstractSongListActivity
             return R.layout.item_list_album;
         }
 
-        return super.getContentView();
+        return (listLayout == SongViewDialog.SongListLayout.grid) ? R.layout.item_grid
+                : super.getContentView();
     }
 
     @Override
@@ -243,14 +235,14 @@ public class SongListActivity extends AbstractSongListActivity
                     SongView.Details.DURATION,
                     SongView.Details.ARTIST_IF_COMPILATION));
         } else if (artist != null) {
-            songViewLogic = new SongViewWithArt(this);
+            songViewLogic = songViewLogicFromListLayout();
             songViewLogic.setDetails(EnumSet.of(
                     SongView.Details.DURATION,
                     SongView.Details.ALBUM,
                     SongView.Details.YEAR
             ));
         } else {
-            songViewLogic = new SongViewWithArt(this);
+            songViewLogic = songViewLogicFromListLayout();
             songViewLogic.setDetails(EnumSet.of(
                     SongView.Details.ARTIST,
                     SongView.Details.ALBUM,
@@ -260,31 +252,28 @@ public class SongListActivity extends AbstractSongListActivity
         return songViewLogic;
     }
 
-    @Override
-    protected void registerCallback() throws RemoteException {
-        super.registerCallback();
-        if (genreSpinner != null) {
-            genreSpinner.registerCallback();
-        }
-        if (yearSpinner != null) {
-            yearSpinner.registerCallback();
-        }
+    private SongViewWithArt songViewLogicFromListLayout() {
+        return (listLayout == SongViewDialog.SongListLayout.grid) ? new SongGridView(this) : new SongViewWithArt(this);
     }
 
     @Override
-    protected void unregisterCallback() throws RemoteException {
-        super.unregisterCallback();
-        if (genreSpinner != null) {
-            genreSpinner.unregisterCallback();
+    protected ImageFetcher createImageFetcher() {
+        // Get an ImageFetcher to scale artwork to the size of the icon view.
+        Resources resources = getResources();
+        int height, width;
+        if (listLayout == SongViewDialog.SongListLayout.grid) {
+            height = resources.getDimensionPixelSize(R.dimen.album_art_icon_grid_height);
+            width = resources.getDimensionPixelSize(R.dimen.album_art_icon_grid_width);
+        } else {
+            height = resources.getDimensionPixelSize(R.dimen.album_art_icon_height);
+            width = resources.getDimensionPixelSize(R.dimen.album_art_icon_width);
         }
-        if (yearSpinner != null) {
-            yearSpinner.unregisterCallback();
-        }
+        return super.createImageFetcher(height, width);
     }
 
     @Override
-    protected void orderPage(int start) throws RemoteException {
-        getService().songs(start, sortOrder.name(), searchString, album, artist, year, genre);
+    protected void orderPage(int start) {
+        getService().songs(this, start, sortOrder.name(), searchString, album, artist, year, genre);
 
         boolean canPlay = (getCurrentPlaylistItem() != null);
         if (playButton != null) {
@@ -296,13 +285,42 @@ public class SongListActivity extends AbstractSongListActivity
         }
     }
 
-    public SongsSortOrder getSortOrder() {
+    @Override
+    public SongViewDialog.SongsSortOrder getSortOrder() {
         return sortOrder;
     }
 
-    public void setSortOrder(SongsSortOrder sortOrder) {
+    @Override
+    public void setSortOrder(SongViewDialog.SongsSortOrder sortOrder) {
         this.sortOrder = sortOrder;
         clearAndReOrderItems();
+    }
+
+    @Override
+    public SongViewDialog.SongListLayout getListLayout() {
+        return listLayout;
+    }
+
+    /**
+     * Set the preferred album list layout.
+     */
+    private void setListLayout() {
+        SharedPreferences preferences = getSharedPreferences(Preferences.NAME, 0);
+        String listLayoutString = preferences.getString(Preferences.KEY_SONG_LIST_LAYOUT, null);
+        if (listLayoutString != null) {
+            listLayout = SongViewDialog.SongListLayout.valueOf(listLayoutString);
+        }
+    }
+
+    @Override
+    public void setListLayout(SongViewDialog.SongListLayout listLayout) {
+        SharedPreferences preferences = getSharedPreferences(Preferences.NAME, 0);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(Preferences.KEY_SONG_LIST_LAYOUT, listLayout.name());
+        editor.commit();
+
+        startActivity(getIntent());
+        finish();
     }
 
     @Override
@@ -311,8 +329,8 @@ public class SongListActivity extends AbstractSongListActivity
     }
 
     @Override
-    public void showOrderDialog() {
-        new SongOrderDialog().show(this.getSupportFragmentManager(), "OrderDialog");
+    public void showViewDialog() {
+        new SongViewDialog().show(this.getSupportFragmentManager(), "OrderDialog");
     }
 
     @Override
@@ -339,25 +357,25 @@ public class SongListActivity extends AbstractSongListActivity
 
         // If info is null then this the context menu from the header, not a list item.
         if (info == null) {
-            try {
-                switch (item.getItemId()) {
-                    case R.id.play_now:
-                        play(album);
-                        return true;
+            switch (item.getItemId()) {
+                case R.id.play_now:
+                    play(album);
+                    return true;
 
-                    case R.id.add_to_playlist:
-                        add(album);
-                        return true;
+                case R.id.add_to_playlist:
+                    add(album);
+                    return true;
 
-                    case R.id.browse_artists:
-                        ArtistListActivity.show(this, album);
-                        return true;
+                case R.id.browse_artists:
+                    ArtistListActivity.show(this, album);
+                    return true;
 
-                    default:
-                        throw new IllegalStateException("Unknown menu ID.");
-                }
-            } catch (RemoteException e) {
-                Log.e(getTag(), "Error executing menu action '" + item.getTitle() + "': " + e);
+                case R.id.download:
+                    downloadItem(album);
+                    return true;
+
+                default:
+                    throw new IllegalStateException("Unknown menu ID.");
             }
 
         }
@@ -378,22 +396,18 @@ public class SongListActivity extends AbstractSongListActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        try {
-            PlaylistItem playlistItem = getCurrentPlaylistItem();
-            switch (item.getItemId()) {
-                case R.id.play_now:
-                    if (playlistItem != null) {
-                        play(playlistItem);
-                    }
-                    return true;
-                case R.id.add_to_playlist:
-                    if (playlistItem != null) {
-                        add(playlistItem);
-                    }
-                    return true;
-            }
-        } catch (RemoteException e) {
-            Log.e(getTag(), "Error executing menu action '" + item.getMenuInfo() + "': " + e);
+        PlaylistItem playlistItem = getCurrentPlaylistItem();
+        switch (item.getItemId()) {
+            case R.id.play_now:
+                if (playlistItem != null) {
+                    play(playlistItem);
+                }
+                return true;
+            case R.id.add_to_playlist:
+                if (playlistItem != null) {
+                    add(playlistItem);
+                }
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }

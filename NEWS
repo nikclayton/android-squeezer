@@ -1,3 +1,48 @@
+In-progress
+===========
+
+*   Support for "My Apps" installed via mysqueezebox.com.  Fixes
+    https://code.google.com/p/android-squeezer/issues/detail?id=26,
+    https://code.google.com/p/android-squeezer/issues/detail?id=46
+
+*   Show the current player name in the Action Bar at the top of the screen,
+    with a drop-down menu allowing you to easily switch between players.
+    Fixes https://code.google.com/p/android-squeezer/issues/detail?id=53.
+
+*   Enhance the display of available players.  You can now rename a player,
+    adjust the volume, set a sleep duration, and power on/off players
+    directly from the list. Fixes
+    https://code.google.com/p/android-squeezer/issues/detail?id=47,
+    https://code.google.com/p/android-squeezer/issues/detail?id=63,
+    https://code.google.com/p/android-squeezer/issues/detail?id=64.
+
+*   Support downloading all songs by album, artist, genre, year, or music
+    folder.  This uses features only available in Android 2.3 (Gingerbread)
+    and above. Fixes
+    https://code.google.com/p/android-squeezer/issues/detail?id=55.
+
+*   Integration with SqueezePlayer (http://www.squeezeplayer.com/).
+    Squeezer can automatically start SqueezePlayer when Squeezer is
+    started. Fixes
+    https://code.google.com/p/android-squeezer/issues/detail?id=48.
+
+*   A grid layout when viewing the song list on larger devices
+
+*   When viewing albums containing songs by a searched-for artist, filter
+    the list of displayed songs to show those by that artist.  Fixes
+    https://code.google.com/p/android-squeezer/issues/detail?id=51.
+
+*   Internal restructuring to make Squeezer faster and use less memory.
+
+*   Fixed a bug where Squeezer was forgetting the active player.
+
+*   Fixed a bug where Squeezer was not updating the power status of a
+    powered-off player.
+
+*   Fixed a bug where song information for songs being remotely
+    streamed would not update when the song changes.
+
+
 1.0.2
 =====
 

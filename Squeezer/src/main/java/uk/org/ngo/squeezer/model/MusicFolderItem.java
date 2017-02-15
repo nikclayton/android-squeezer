@@ -49,8 +49,12 @@ public class MusicFolderItem extends PlaylistItem {
         return "Unknown_type_in_getTag()";
     }
 
-    private String name;
+    @Override
+    public String getFilterTag() {
+        return "folder_id";
+    }
 
+    private String name;
 
     @Override
     public String getName() {
@@ -77,15 +81,23 @@ public class MusicFolderItem extends PlaylistItem {
         return this;
     }
 
-    public MusicFolderItem(String musicFolderId, String musicFolder) {
-        setId(musicFolderId);
-        setName(musicFolder);
+
+    private String url;
+
+    public String getUrl() {
+        return url;
     }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
 
     public MusicFolderItem(Map<String, String> record) {
         setId(record.get("id"));
         name = record.get("filename");
         type = record.get("type");
+        url = record.get("url");
     }
 
     public static final Creator<MusicFolderItem> CREATOR = new Creator<MusicFolderItem>() {
@@ -102,12 +114,14 @@ public class MusicFolderItem extends PlaylistItem {
         setId(source.readString());
         name = source.readString();
         type = source.readString();
+        url = source.readString();
     }
 
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(getId());
         dest.writeString(name);
         dest.writeString(type);
+        dest.writeString(url);
     }
 
     @Override

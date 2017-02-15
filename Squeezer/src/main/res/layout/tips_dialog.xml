@@ -27,26 +27,15 @@ limitations under the License.
         android:orientation="vertical"
         android:padding="8dp">
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/tips_title"
+            style="?android:attr/textAppearanceLarge"
             android:layout_height="wrap_content"
             android:layout_width="fill_parent"
-            android:orientation="horizontal">
-
-            <ImageView
-                android:layout_gravity="center_vertical"
-                android:layout_height="48dp"
-                android:layout_width="48dp"
-                android:src="@drawable/ic_launcher"/>
-
-            <TextView
-                android:id="@+id/tips_title"
-                style="?android:attr/textAppearanceLarge"
-                android:layout_height="wrap_content"
-                android:layout_width="fill_parent"
-                android:text="@string/tips_title"
-                android:textSize="32sp"
-                android:paddingLeft="8dp"/>
-        </LinearLayout>
+            android:text="@string/tips_title"
+            android:textSize="32sp"
+            android:drawableLeft="@drawable/ic_launcher"
+            android:drawablePadding="8dp"/>
 
         <TextView
             style="?android:attr/textAppearanceMedium"

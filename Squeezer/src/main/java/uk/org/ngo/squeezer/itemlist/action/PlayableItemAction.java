@@ -1,7 +1,5 @@
 package uk.org.ngo.squeezer.itemlist.action;
 
-import android.os.RemoteException;
-
 import uk.org.ngo.squeezer.R;
 import uk.org.ngo.squeezer.framework.ItemListActivity;
 import uk.org.ngo.squeezer.framework.PlaylistItem;
@@ -48,8 +46,7 @@ public abstract class PlayableItemAction {
         return getClass().getSimpleName();
     }
 
-    public abstract void execute(PlaylistItem item)
-            throws RemoteException;
+    public abstract void execute(PlaylistItem item);
 
     public static PlayableItemAction createAction(
             ItemListActivity activity, String actionType) {

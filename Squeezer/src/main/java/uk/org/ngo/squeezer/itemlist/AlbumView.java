@@ -17,6 +17,7 @@
 package uk.org.ngo.squeezer.itemlist;
 
 import android.view.ContextMenu;
+import android.view.MenuItem;
 import android.view.View;
 
 import java.util.EnumSet;
@@ -26,6 +27,7 @@ import uk.org.ngo.squeezer.R;
 import uk.org.ngo.squeezer.framework.ItemListActivity;
 import uk.org.ngo.squeezer.itemlist.action.PlayableItemAction;
 import uk.org.ngo.squeezer.model.Album;
+import uk.org.ngo.squeezer.model.Artist;
 import uk.org.ngo.squeezer.util.ImageFetcher;
 
 /**
@@ -61,6 +63,12 @@ public class AlbumView extends AlbumArtView<Album> {
 
     public void setDetails(EnumSet<Details> details) {
         mDetails = details;
+    }
+
+    Artist mArtist;
+
+    public void setArtist(Artist artist) {
+        mArtist = artist;
     }
 
     @Override
@@ -101,6 +109,21 @@ public class AlbumView extends AlbumArtView<Album> {
         super.onCreateContextMenu(menu, v, menuInfo);
 
         menuInfo.menuInflater.inflate(R.menu.albumcontextmenu, menu);
+        if (mArtist != null) {
+            MenuItem item = menu.findItem(R.id.browse_songs_by_artist);
+            item.setVisible(true);
+            item.setTitle(getActivity().getString(R.string.BROWSE_SONGS_BY_ITEM, mArtist.getName()));
+        }
+    }
+
+    @Override
+    public boolean doItemContext(MenuItem menuItem, int index, Album selectedItem) {
+        switch (menuItem.getItemId()) {
+            case R.id.browse_songs_by_artist:
+                SongListActivity.show(getActivity(), selectedItem, mArtist);
+                return true;
+        }
+        return super.doItemContext(menuItem, index, selectedItem);
     }
 
     @Override

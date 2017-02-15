@@ -19,11 +19,7 @@ package uk.org.ngo.squeezer.itemlist;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.RemoteException;
 import android.util.Log;
-import android.widget.Spinner;
-
-import java.util.List;
 
 import uk.org.ngo.squeezer.framework.BaseListActivity;
 import uk.org.ngo.squeezer.framework.Item;
@@ -70,12 +66,6 @@ public class ArtistListActivity extends BaseListActivity<Artist> implements
         this.genre = genre;
     }
 
-    private GenreSpinner genreSpinner;
-
-    public void setGenreSpinner(Spinner spinner) {
-        genreSpinner = new GenreSpinner(this, this, spinner);
-    }
-
     @Override
     public ItemView<Artist> createItemView() {
         return new ArtistView(this);
@@ -103,24 +93,8 @@ public class ArtistListActivity extends BaseListActivity<Artist> implements
     }
 
     @Override
-    protected void registerCallback() throws RemoteException {
-        getService().registerArtistListCallback(artistsListCallback);
-        if (genreSpinner != null) {
-            genreSpinner.registerCallback();
-        }
-    }
-
-    @Override
-    protected void unregisterCallback() throws RemoteException {
-        getService().unregisterArtistListCallback(artistsListCallback);
-        if (genreSpinner != null) {
-            genreSpinner.unregisterCallback();
-        }
-    }
-
-    @Override
-    protected void orderPage(int start) throws RemoteException {
-        getService().artists(start, getSearchString(), album, genre);
+    protected void orderPage(int start) {
+        getService().artists(this, start, getSearchString(), album, genre);
     }
 
     @Override
@@ -140,13 +114,5 @@ public class ArtistListActivity extends BaseListActivity<Artist> implements
         }
         context.startActivity(intent);
     }
-
-    private final IServiceArtistListCallback artistsListCallback
-            = new IServiceArtistListCallback.Stub() {
-        public void onArtistsReceived(int count, int start, List<Artist> items)
-                throws RemoteException {
-            onItemsReceived(count, start, items);
-        }
-    };
 
 }

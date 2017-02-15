@@ -30,6 +30,11 @@ public class Playlist extends PlaylistItem {
         return "playlist_id";
     }
 
+    @Override
+    public String getFilterTag() {
+        return "playlist_id";
+    }
+
     private String name;
 
     @Override

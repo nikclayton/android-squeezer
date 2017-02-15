@@ -16,6 +16,9 @@
 
 package uk.org.ngo.squeezer.util;
 
+import com.google.common.hash.HashFunction;
+import com.google.common.hash.Hashing;
+
 import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.content.Context;
@@ -32,8 +35,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 import uk.org.ngo.squeezer.BuildConfig;
 
@@ -75,6 +76,8 @@ public class ImageCache {
     private final Object mDiskCacheLock = new Object();
 
     private boolean mDiskCacheStarting = true;
+
+    private static final HashFunction mHashFunction = Hashing.md5();
 
     /**
      * Creating a new ImageCache object using the specified parameters.
@@ -412,21 +415,21 @@ public class ImageCache {
 
         public int memCacheSize = DEFAULT_MEM_CACHE_SIZE;
 
-        public int diskCacheSize = DEFAULT_DISK_CACHE_SIZE;
+        public final int diskCacheSize = DEFAULT_DISK_CACHE_SIZE;
 
         public File diskCacheDir;
 
-        public CompressFormat compressFormat = DEFAULT_COMPRESS_FORMAT;
+        public final CompressFormat compressFormat = DEFAULT_COMPRESS_FORMAT;
 
-        public int compressQuality = DEFAULT_COMPRESS_QUALITY;
+        public final int compressQuality = DEFAULT_COMPRESS_QUALITY;
 
-        public boolean memoryCacheEnabled = DEFAULT_MEM_CACHE_ENABLED;
+        public final boolean memoryCacheEnabled = DEFAULT_MEM_CACHE_ENABLED;
 
-        public boolean diskCacheEnabled = DEFAULT_DISK_CACHE_ENABLED;
+        public final boolean diskCacheEnabled = DEFAULT_DISK_CACHE_ENABLED;
 
         public boolean clearDiskCacheOnStart = DEFAULT_CLEAR_DISK_CACHE_ON_START;
 
-        public boolean initDiskCacheOnCreate = DEFAULT_INIT_DISK_CACHE_ON_CREATE;
+        public final boolean initDiskCacheOnCreate = DEFAULT_INIT_DISK_CACHE_ON_CREATE;
 
         public ImageCacheParams(Context context, String uniqueName) {
             diskCacheDir = getDiskCacheDir(context, uniqueName);
@@ -484,31 +487,10 @@ public class ImageCache {
 
     /**
      * A hashing method that changes a string (like a URL) into a hash suitable for using as a disk
-     * filename.
+     * filename.  The hashing method is MD5.
      */
     public static String hashKeyForDisk(String key) {
-        String cacheKey;
-        try {
-            final MessageDigest mDigest = MessageDigest.getInstance("MD5");
-            mDigest.update(key.getBytes());
-            cacheKey = bytesToHexString(mDigest.digest());
-        } catch (NoSuchAlgorithmException e) {
-            cacheKey = String.valueOf(key.hashCode());
-        }
-        return cacheKey;
-    }
-
-    private static String bytesToHexString(byte[] bytes) {
-        // http://stackoverflow.com/questions/332079
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < bytes.length; i++) {
-            String hex = Integer.toHexString(0xFF & bytes[i]);
-            if (hex.length() == 1) {
-                sb.append('0');
-            }
-            sb.append(hex);
-        }
-        return sb.toString();
+        return mHashFunction.hashBytes(key.getBytes()).toString();
     }
 
     /**

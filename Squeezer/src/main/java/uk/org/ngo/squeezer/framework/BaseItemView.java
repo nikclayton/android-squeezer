@@ -19,7 +19,6 @@ package uk.org.ngo.squeezer.framework;
 import com.google.common.base.Joiner;
 
 import android.os.Parcelable.Creator;
-import android.os.RemoteException;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -76,8 +75,6 @@ public abstract class BaseItemView<T extends Item> implements ItemView<T> {
     private final ItemListActivity mActivity;
 
     private final LayoutInflater mLayoutInflater;
-
-    private ItemAdapter<T> mAdapter;
 
     private Class<T> mItemClass;
 
@@ -142,14 +139,6 @@ public abstract class BaseItemView<T extends Item> implements ItemView<T> {
     @Override
     public ItemListActivity getActivity() {
         return mActivity;
-    }
-
-    public ItemAdapter<T> getAdapter() {
-        return mAdapter;
-    }
-
-    public void setAdapter(ItemAdapter<T> adapter) {
-        mAdapter = adapter;
     }
 
     public LayoutInflater getLayoutInflater() {
@@ -291,13 +280,13 @@ public abstract class BaseItemView<T extends Item> implements ItemView<T> {
     public View getAdapterView(View convertView, ViewGroup parent, EnumSet<ViewParams> viewParams,
             int layoutResource) {
         ViewHolder viewHolder =
-                (convertView != null && convertView.getTag().getClass() == ViewHolder.class)
+                (convertView != null && convertView.getTag() instanceof ViewHolder)
                         ? (ViewHolder) convertView.getTag()
                         : null;
 
         if (viewHolder == null) {
             convertView = getLayoutInflater().inflate(layoutResource, parent, false);
-            viewHolder = new ViewHolder();
+            viewHolder = createViewHolder();
             viewHolder.text1 = (TextView) convertView.findViewById(R.id.text1);
             viewHolder.text2 = (TextView) convertView.findViewById(R.id.text2);
             viewHolder.icon = (ImageView) convertView.findViewById(R.id.icon);
@@ -331,6 +320,10 @@ public abstract class BaseItemView<T extends Item> implements ItemView<T> {
         return convertView;
     }
 
+    public ViewHolder createViewHolder() {
+        return new ViewHolder();
+    }
+
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v,
             ItemView.ContextMenuInfo menuInfo) {
@@ -338,12 +331,10 @@ public abstract class BaseItemView<T extends Item> implements ItemView<T> {
     }
 
     /**
-     * The default context menu handler handles some common actions. Each action must be set up in
-     * {@link #setupContextMenu(android.view.ContextMenu, int, Item)}
+     * The default context menu handler handles some common actions.
      */
     @Override
-    public boolean doItemContext(MenuItem menuItem, int index, T selectedItem)
-            throws RemoteException {
+    public boolean doItemContext(MenuItem menuItem, int index, T selectedItem) {
         switch (menuItem.getItemId()) {
             case R.id.browse_songs:
                 SongListActivity.show(mActivity, selectedItem);
@@ -368,7 +359,18 @@ public abstract class BaseItemView<T extends Item> implements ItemView<T> {
             case R.id.play_next:
                 mActivity.insert((PlaylistItem) selectedItem);
                 return true;
+
+            case R.id.download:
+                if (selectedItem instanceof FilterItem)
+                    mActivity.downloadItem((FilterItem) selectedItem);
+                return true;
         }
+        return false;
+    }
+
+    /** Empty default context-sub-menu implementation, as most context menus doesn't have subs */
+    @Override
+    public boolean doItemContext(MenuItem menuItem) {
         return false;
     }
 }

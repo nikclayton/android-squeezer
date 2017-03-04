@@ -99,6 +99,8 @@ public class NowPlayingFragment extends Fragment implements View.OnCreateContext
 
     private TextView albumText;
 
+    private TextView artistAlbumText;
+
     private TextView artistText;
 
     private TextView trackText;
@@ -254,6 +256,7 @@ public class NowPlayingFragment extends Fragment implements View.OnCreateContext
             v = inflater.inflate(R.layout.now_playing_fragment_full, container, false);
 
             artistText = (TextView) v.findViewById(R.id.artistname);
+            albumText = (TextView) v.findViewById(R.id.albumname);
             shuffleButton = (ImageButton) v.findViewById(R.id.shuffle);
             repeatButton = (ImageButton) v.findViewById(R.id.repeat);
             currentTime = (TextView) v.findViewById(R.id.currenttime);
@@ -272,11 +275,11 @@ public class NowPlayingFragment extends Fragment implements View.OnCreateContext
             v = inflater.inflate(R.layout.now_playing_fragment_mini, container, false);
 
             mProgressBar = (ProgressBar) v.findViewById(R.id.progressbar);
+            artistAlbumText = (TextView) v.findViewById(R.id.artistalbumname);
         }
 
         albumArt = (ImageView) v.findViewById(R.id.album);
         trackText = (TextView) v.findViewById(R.id.trackname);
-        albumText = (TextView) v.findViewById(R.id.albumname);
         playPauseButton = (ImageButton) v.findViewById(R.id.pause);
 
         // May or may not be present in the layout, depending on orientation,
@@ -634,7 +637,6 @@ public class NowPlayingFragment extends Fragment implements View.OnCreateContext
         Song song = playerState.getCurrentSong();
 
         if (song != null) {
-            albumText.setText(song.getAlbumName());
             trackText.setText(song.getName());
 
             // If remote and number of tracks in playlist is not 1, it's spotify
@@ -658,14 +660,21 @@ public class NowPlayingFragment extends Fragment implements View.OnCreateContext
 
             if (mFullHeightLayout) {
                 artistText.setText(song.getArtist());
+                albumText.setText(song.getAlbumName());
                 totalTime.setText(Util.formatElapsedTime(song.getDuration()));
             }
+            else {
+                artistAlbumText.setText(song.getArtist() + " - " + song.getAlbumName());
+            }
         } else {
-            albumText.setText("");
             trackText.setText("");
             if (mFullHeightLayout) {
                 artistText.setText("");
+                albumText.setText("");
                 btnContextMenu.setVisibility(View.GONE);
+            }
+            else {
+                artistAlbumText.setText("");
             }
         }
 

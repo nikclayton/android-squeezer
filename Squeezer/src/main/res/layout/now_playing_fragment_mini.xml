@@ -49,12 +49,12 @@
         style="@style/SqueezerWidget.NowPlayingMini.SongName"/>
 
     <TextView
-        android:id="@+id/albumname"
+        android:id="@+id/artistalbumname"
         android:layout_below="@id/trackname"
         android:layout_toLeftOf="@id/pause"
         android:layout_toRightOf="@id/album"
         android:paddingLeft="4dp"
-        style="@style/SqueezerWidget.NowPlayingMini.AlbumName"/>
+        style="@style/SqueezerWidget.NowPlayingMini.ArtistAlbumName"/>
 
     <ImageButton
         android:id="@+id/pause"

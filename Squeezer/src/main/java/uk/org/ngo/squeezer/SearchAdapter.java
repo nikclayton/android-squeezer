@@ -155,7 +155,7 @@ public class SearchAdapter extends BaseExpandableListAdapter implements
     }
 
     private View getChildView(int groupPosition, int childPosition, View convertView, ViewGroup parent) {
-        if (convertView != null && convertView.getTag(R.id.group_position_tag) != groupPosition)
+        if (convertView != null && (int)convertView.getTag(R.id.group_position_tag) != groupPosition)
             convertView = null;
         final View view = groups[groupPosition].adapter.getView(childPosition, convertView, parent);
         prepareItemView(view, groupPosition, childPosition);
@@ -167,7 +167,7 @@ public class SearchAdapter extends BaseExpandableListAdapter implements
         final Group group = groups[groupPosition];
         ViewGroup row;
 
-        if (convertView != null && convertView instanceof ViewGroup && convertView.getTag(R.id.group_position_tag) == groupPosition) {
+        if (convertView != null && convertView instanceof ViewGroup && (int)convertView.getTag(R.id.group_position_tag) == groupPosition) {
             row = (ViewGroup) convertView;
         } else {
             Context context = parent.getContext();

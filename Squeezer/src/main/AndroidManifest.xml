@@ -19,7 +19,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="uk.org.ngo.squeezer"
-    android:versionCode="13" android:versionName="0.9.1">
+    android:versionCode="13" android:versionName="0.9.1"
+    android:installLocation="auto">
 
     <!-- Crashlytics is for API 8+. Override that here, as Squeezer checks for
          the API level before invoking it. -->

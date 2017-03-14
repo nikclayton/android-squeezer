@@ -31,6 +31,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -42,8 +43,43 @@ import uk.org.ngo.squeezer.model.Song;
 class PlayerListAdapter extends BaseExpandableListAdapter implements View.OnCreateContextMenuListener {
     private final PlayerListActivity mActivity;
 
-    private final List<ItemAdapter<Player>> mChildAdapters = new ArrayList<ItemAdapter<Player>>();
+    private final List<SyncGroup> mChildAdapters = new ArrayList();
 
+    /**
+     * A list adapter for a synchronization group, containing players.
+     * This class is comparable and it has a name for the synchronization group.
+     */
+    private class SyncGroup extends ItemAdapter<Player> implements Comparable {
+
+        public String syncGroupName; // the name of the synchronization group as displayed in the players screen
+
+        public SyncGroup(PlayerView playerView) {
+            super(playerView);
+        }
+
+        @Override
+        public int compareTo(Object otherSyncGroup) {
+            // compare this syncgroup name with the other one, alphabetically
+            return this.syncGroupName.compareToIgnoreCase(((SyncGroup)otherSyncGroup).syncGroupName);
+        }
+
+        @Override
+        public void update(int count, int start, List<Player> syncedPlayersList) {
+            Collections.sort(syncedPlayersList); // first order players in syncgroup alphabetically
+
+            // add the list
+            super.update(count, start, syncedPlayersList);
+
+            // determine and set synchronization group name (player names divided by commas)
+            List<String> playerNames = new ArrayList<String>();
+            for (int i = 0; i < this.getCount(); i++) {
+                Player p = this.getItem(i);
+                playerNames.add(p.getName());
+            }
+            syncGroupName = Joiner.on(", ").join(playerNames);
+        }
+
+    }
     /** The last set of player sync groups that were provided. */
     private Multimap<String, Player> prevPlayerSyncGroups;
 
@@ -93,19 +129,17 @@ class PlayerListAdapter extends BaseExpandableListAdapter implements View.OnCrea
         prevPlayerSyncGroups = HashMultimap.create(playerSyncGroups);
         clear();
 
-        List<String> masters = new ArrayList<String>(playerSyncGroups.keySet());
-        Collections.sort(masters);
-
-        for (String masterId : masters) {
-            ItemAdapter<Player> childAdapter = new ItemAdapter<Player>(new PlayerView(mActivity));
-
-            List<Player> slaves = new ArrayList<Player>(playerSyncGroups.get(masterId));
+        // Get a list of slaves for every synchronization group
+        for (Collection<Player> slaves: playerSyncGroups.asMap().values()) {
+            // create a new synchronization group
+            SyncGroup syncGroup = new SyncGroup(new PlayerView(mActivity));
             mPlayerCount += slaves.size();
-            Collections.sort(slaves, Player.compareById);
-            childAdapter.update(slaves.size(), 0, slaves);
-            mChildAdapters.add(childAdapter);
+            // add the slaves (the players) to the synchronization group
+            syncGroup.update(slaves.size(), 0, new ArrayList<>(slaves));
+            // add synchronization group to the child adapters
+            mChildAdapters.add(syncGroup);
         }
-
+        Collections.sort(mChildAdapters); // sort syncgroup list alphabetically by syncgroup name
         notifyDataSetChanged();
     }
 
@@ -218,16 +252,11 @@ class PlayerListAdapter extends BaseExpandableListAdapter implements View.OnCrea
         TextView text1 = (TextView) row.findViewById(R.id.text1);
         TextView text2 = (TextView) row.findViewById(R.id.text2);
 
-        ItemAdapter<Player> adapter = mChildAdapters.get(groupPosition);
-        List<String> playerNames = new ArrayList<String>();
-        for (int i = 0; i < adapter.getCount(); i++) {
-            Player p = adapter.getItem(i);
-            playerNames.add(p.getName());
-        }
-        String header = Joiner.on(", ").join(playerNames);
+        SyncGroup syncGroup = mChildAdapters.get(groupPosition);
+        String header = syncGroup.syncGroupName;
         text1.setText(mActivity.getString(R.string.player_group_header, header));
 
-        Song groupSong = adapter.getItem(0).getPlayerState().getCurrentSong();
+        Song groupSong = syncGroup.getItem(0).getPlayerState().getCurrentSong();
 
         if (groupSong != null) {
             text2.setText(mJoiner.join(groupSong.getName(), groupSong.getArtist(),

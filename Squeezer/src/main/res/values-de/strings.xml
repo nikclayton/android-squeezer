@@ -112,6 +112,7 @@
     <string name="unknown_track">Unbekanntes Lied</string>
     <string name="unknown_album">Unbekanntes Album</string>
     <string name="unknown_artist">Unbekannter Künstler</string>
+    <string name="unknown_artistalbum">Unbekannter Künstler/Album</string>
 
     <string name="tips_title">Tipps</string>
     <string name="tip_volume">Sie können die Musiklautstärke mit den Lautstärketasten des Geräts

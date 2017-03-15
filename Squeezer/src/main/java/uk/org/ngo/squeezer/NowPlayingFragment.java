@@ -55,6 +55,9 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -624,6 +627,11 @@ public class NowPlayingFragment extends Fragment implements View.OnCreateContext
     }
 
     /**
+     * Joins elements together with ' - ', skipping nulls.
+     */
+    protected static final Joiner mJoiner = Joiner.on(" - ").skipNulls();
+
+    /**
      * Update the UI when the song changes, either because the track has changed, or the
      * active player has changed.
      *
@@ -662,9 +670,10 @@ public class NowPlayingFragment extends Fragment implements View.OnCreateContext
                 artistText.setText(song.getArtist());
                 albumText.setText(song.getAlbumName());
                 totalTime.setText(Util.formatElapsedTime(song.getDuration()));
-            }
-            else {
-                artistAlbumText.setText(song.getArtist() + " - " + song.getAlbumName());
+            } else {
+                artistAlbumText.setText(mJoiner.join(
+                        Strings.emptyToNull(song.getArtist()),
+                        Strings.emptyToNull(song.getAlbumName())));
             }
         } else {
             trackText.setText("");
@@ -672,8 +681,7 @@ public class NowPlayingFragment extends Fragment implements View.OnCreateContext
                 artistText.setText("");
                 albumText.setText("");
                 btnContextMenu.setVisibility(View.GONE);
-            }
-            else {
+            } else {
                 artistAlbumText.setText("");
             }
         }

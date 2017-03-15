@@ -63,6 +63,7 @@
   <string name="unknown_track">Bilinmeyen parça</string>
   <string name="unknown_album">Bilinmeyen albüm</string>
   <string name="unknown_artist">Bilinmeyen sanatçı</string>
+  <string name="unknown_artistalbum">Bilinmeyen sanatçı/albüm</string>
   <string name="unknown_year">Bilinmeyen yıl</string>
   <!--Reporting errors that from the server.-->
   <string name="server_error">%1$s bir hata bildirdi: \"%2$s\".</string>

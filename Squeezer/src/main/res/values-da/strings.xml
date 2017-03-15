@@ -157,6 +157,7 @@
     <string name="unknown_track">Ukendt sang</string>
     <string name="unknown_album">Ukendt album</string>
     <string name="unknown_artist">Ukendt kunster</string>
+    <string name="unknown_artistalbum">Ukendt kunster/album</string>
     <string name="unknown_year">Ukendt år</string>
 
     <string name="tips_title">Tips</string>

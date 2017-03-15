@@ -195,6 +195,7 @@
     <style name="SqueezerWidget.NowPlayingMini.ArtistAlbumName">
         <item name="android:layout_width">fill_parent</item>
         <item name="android:layout_height">wrap_content</item>
+        <item name="android:hint">@string/unknown_artistalbum</item>
         <item name="android:singleLine">true</item>
         <item name="android:textAppearance">@style/SqueezerTextAppearance.NowPlayingMini.ArtistAlbumName</item>
     </style>

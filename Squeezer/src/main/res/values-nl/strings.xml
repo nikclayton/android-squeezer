@@ -115,6 +115,7 @@
     <string name="unknown_track">Onbekend nummer</string>
     <string name="unknown_album">Onbekend album</string>
     <string name="unknown_artist">Onbekende artiest</string>
+    <string name="unknown_artistalbum">Onbekende artiest/album</string>
     <string name="unknown_year">Onbekend jaar</string>
     <string name="tips_title">Tips</string>
     <string name="tip_volume">Gebruik de volume knoppen van uw apparaat om het afspeel volume te

@@ -656,7 +656,7 @@ public class NowPlayingFragment extends Fragment implements View.OnCreateContext
                 // TODO: figure out how to parse the buttons HASH;
                 // for now just assume the next button is enabled if there was a
                 // "buttons" response.
-                setButtonState(nextButton, song.getButtons().length() == 0);
+                setButtonState(nextButton, song.getButtons().length() != 0);
                 disableButton(prevButton);
                 if (btnContextMenu != null) {
                     btnContextMenu.setVisibility(View.GONE);

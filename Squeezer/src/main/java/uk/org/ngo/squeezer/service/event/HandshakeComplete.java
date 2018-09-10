@@ -16,6 +16,8 @@
 
 package uk.org.ngo.squeezer.service.event;
 
+import uk.org.ngo.squeezer.service.ServerVersion;
+
 /**
  * Event sent after handshaking with the server is complete.
  */
@@ -33,10 +35,10 @@ public class HandshakeComplete {
     public final boolean canRandomPlay;
 
     /** Server version */
-    public final String version;
+    public final ServerVersion version;
 
     public HandshakeComplete(boolean canFavourites, boolean canMusicFolders,
-                             boolean canMyApps, boolean canRandomPlay, String version) {
+            boolean canMyApps, boolean canRandomPlay, ServerVersion version) {
         this.canFavourites = canFavourites;
         this.canMusicFolders = canMusicFolders;
         this.canMyApps = canMyApps;

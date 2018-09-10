@@ -1019,9 +1019,10 @@ class CliClient implements IClient {
             public void handle(List<String> tokens) {
                 Log.i(TAG, "Version received: " + tokens);
                 mUrlPrefix = "http://" + getCurrentHost() + ":" + getHttpPort();
-                String version = tokens.get(1);
+                final String versionString = tokens.get(1);
+                final ServerVersion version = new ServerVersion(versionString);
                 connectionState.setServerVersion(version);
-                Util.crashlyticsSetString("server_version", version);
+                Util.crashlyticsSetString("server_version", versionString);
 
                 mEventBus.postSticky(new HandshakeComplete(
                         connectionState.canFavorites(), connectionState.canMusicfolder(),
@@ -1524,7 +1525,7 @@ class CliClient implements IClient {
         return connectionState.getMediaDirs();
     }
 
-    public String getServerVersion() {
+    public ServerVersion getServerVersion() {
         return connectionState.getServerVersion();
     }
 

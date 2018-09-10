@@ -16,10 +16,13 @@
 
 package uk.org.ngo.squeezer.framework;
 
+import uk.org.ngo.squeezer.service.ServerVersion;
+
 /**
  * Helper interface suitable for testing whether the current server version supports a specific
  * enum value
  */
 public interface VersionedEnumWithText extends EnumWithText {
-    boolean can(String serverVersion);
+
+    boolean can(ServerVersion serverVersion);
 }

@@ -22,6 +22,7 @@ import uk.org.ngo.squeezer.framework.EnumWithTextAndIcon;
 import uk.org.ngo.squeezer.framework.VersionedEnumWithText;
 import uk.org.ngo.squeezer.model.Album;
 import uk.org.ngo.squeezer.service.ServerString;
+import uk.org.ngo.squeezer.service.ServerVersion;
 
 public class AlbumViewDialog extends BaseViewDialog<Album, AlbumViewDialog.AlbumListLayout, AlbumViewDialog.AlbumsSortOrder> {
 
@@ -80,7 +81,7 @@ public class AlbumViewDialog extends BaseViewDialog<Album, AlbumViewDialog.Album
         private final ServerString serverString;
 
         @Override
-        public boolean can(String version) {
+        public boolean can(ServerVersion version) {
             return true;
         }
 

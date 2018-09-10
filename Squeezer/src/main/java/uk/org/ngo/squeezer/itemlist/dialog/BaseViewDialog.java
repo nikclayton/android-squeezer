@@ -21,6 +21,7 @@ import uk.org.ngo.squeezer.framework.EnumWithTextAndIcon;
 import uk.org.ngo.squeezer.framework.Item;
 import uk.org.ngo.squeezer.framework.VersionedEnumWithText;
 import uk.org.ngo.squeezer.menu.ViewMenuItemFragment;
+import uk.org.ngo.squeezer.service.ServerVersion;
 import uk.org.ngo.squeezer.util.Reflection;
 
 public abstract class BaseViewDialog<
@@ -37,7 +38,8 @@ public abstract class BaseViewDialog<
         final int positionSortLabel = listLayoutClass.getEnumConstants().length;
         final int positionSortStart = positionSortLabel + 1;
         Bundle args = getArguments();
-        final String serverVersion = (args != null ? args.getString("version") : "");
+        final ServerVersion serverVersion = new ServerVersion(
+                args != null ? args.getString("version") : "1");
         final List<SortOrder> sortOrders = getAvailableSortOrders(sortOrderClass.getEnumConstants(), serverVersion);
 
 
@@ -119,7 +121,7 @@ public abstract class BaseViewDialog<
         return builder.create();
     }
 
-    private List<SortOrder> getAvailableSortOrders(SortOrder[] sortOrders, String version) {
+    private List<SortOrder> getAvailableSortOrders(SortOrder[] sortOrders, ServerVersion version) {
         List<SortOrder> availableSortOrders = new ArrayList<SortOrder>();
         for (SortOrder sortOrder : sortOrders)
             if (sortOrder.can(version)) availableSortOrders.add(sortOrder);

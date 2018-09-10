@@ -87,7 +87,8 @@ public class ConnectionState {
 
     private final AtomicBoolean canRandomplay = new AtomicBoolean(false);
 
-    private final AtomicReference<String> serverVersion = new AtomicReference<String>();
+    private final AtomicReference<ServerVersion> serverVersion
+            = new AtomicReference<ServerVersion>();
 
     private final AtomicReference<String> preferredAlbumSort = new AtomicReference<String>("album");
 
@@ -194,11 +195,11 @@ public class ConnectionState {
         return canRandomplay.get();
     }
 
-    public void setServerVersion(String version) {
+    public void setServerVersion(ServerVersion version) {
         serverVersion.set(version);
     }
 
-    public String getServerVersion() {
+    public ServerVersion getServerVersion() {
         return serverVersion.get();
     }
 

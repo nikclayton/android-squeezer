@@ -9,6 +9,7 @@ import uk.org.ngo.squeezer.framework.EnumWithTextAndIcon;
 import uk.org.ngo.squeezer.framework.VersionedEnumWithText;
 import uk.org.ngo.squeezer.model.Song;
 import uk.org.ngo.squeezer.service.ServerString;
+import uk.org.ngo.squeezer.service.ServerVersion;
 
 public class SongViewDialog extends BaseViewDialog<Song, SongViewDialog.SongListLayout, SongViewDialog.SongsSortOrder> {
     private static final String TAG = SongViewDialog.class.getSimpleName();
@@ -59,17 +60,17 @@ public class SongViewDialog extends BaseViewDialog<Song, SongViewDialog.SongList
      * be removed.
      */
     public enum SongsSortOrder implements VersionedEnumWithText {
-        title(R.string.songs_sort_order_title, ""),
-        tracknum(R.string.songs_sort_order_tracknum, ""),
-        albumtrack(R.string.songs_sort_order_albumtrack, "7.6");
+        title(R.string.songs_sort_order_title, new ServerVersion("1")),
+        tracknum(R.string.songs_sort_order_tracknum, new ServerVersion("1")),
+        albumtrack(R.string.songs_sort_order_albumtrack, new ServerVersion("7.6"));
 
         /** The text to use for this ordering */
         private final int stringResource;
 
         /** Supported since (server version) */
-        private final String since;
+        private final ServerVersion since;
 
-        public boolean can(String version) {
+        public boolean can(ServerVersion version) {
             return (version.compareTo(since) >= 0);
         }
 
@@ -78,16 +79,17 @@ public class SongViewDialog extends BaseViewDialog<Song, SongViewDialog.SongList
             return context.getText(stringResource).toString();
         }
 
-        SongsSortOrder(int stringResource, String since) {
+        SongsSortOrder(int stringResource, ServerVersion since) {
             this.stringResource = stringResource;
             this.since = since;
         }
     }
 
-    public static SongViewDialog showDialog(FragmentManager fragmentManager, String serverVersion) {
+    public static SongViewDialog showDialog(FragmentManager fragmentManager,
+            ServerVersion serverVersion) {
         SongViewDialog dialog = new SongViewDialog();
         Bundle args = new Bundle();
-        args.putString("version", serverVersion);
+        args.putString("version", serverVersion.toString());
         dialog.setArguments(args);
         dialog.show(fragmentManager, TAG);
         return dialog;

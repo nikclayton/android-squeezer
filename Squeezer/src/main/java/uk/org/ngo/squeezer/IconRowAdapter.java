@@ -56,8 +56,8 @@ public class IconRowAdapter extends BaseAdapter {
     }
 
     @Override
-    public CharSequence getItem(int position) {
-        return mRows.get(position).getText();
+    public IconRow getItem(int position) {
+        return mRows.get(position);
     }
 
     @Override
@@ -73,7 +73,7 @@ public class IconRowAdapter extends BaseAdapter {
      *
      * @param context
      * @param items Item text.
-     * @param images Image resources.
+     * @param icons Image resources.
      */
     public IconRowAdapter(Activity context, CharSequence[] items, int[] icons) {
         this.activity = context;
@@ -112,7 +112,8 @@ public class IconRowAdapter extends BaseAdapter {
     }
 
     /**
-     * Helper class to represent a row. Each row has an identifier, a string, and an icon.
+     * Helper class to represent a row. Each row has an identifier, a string, an icon,
+     * and arbitrary data.
      * <p>
      * The identifier should be unique across all rows in a given {@link IconRowAdapter}, and will
      * be used as the <code>id</code> parameter to the <code>OnItemClickListener</code>.
@@ -125,10 +126,19 @@ public class IconRowAdapter extends BaseAdapter {
 
         private int mIcon;
 
+        private Object mData;
+
         IconRow(long id, CharSequence text, int icon) {
             mId = id;
             mText = text;
             mIcon = icon;
+        }
+
+        IconRow(long id, CharSequence text, int icon, Object data) {
+            mId = id;
+            mText = text;
+            mIcon = icon;
+            mData = data;
         }
 
         public long getId() {
@@ -153,6 +163,14 @@ public class IconRowAdapter extends BaseAdapter {
 
         public void setIcon(int icon) {
             mIcon = icon;
+        }
+
+        public Object getData() {
+            return mData;
+        }
+
+        public void setData(Object data) {
+            mData = data;
         }
     }
 }

@@ -165,6 +165,7 @@
     </string>
 
     <string name="home_item_artists">Künstler</string>
+    <string name="home_item_album_artists">Album-Interpreten</string>
     <string name="home_item_albums">Alben</string>
     <string name="home_item_songs">Lieder</string>
     <string name="home_item_genres">Genres</string>

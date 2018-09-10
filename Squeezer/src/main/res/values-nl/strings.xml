@@ -232,4 +232,5 @@
     <string name="settings_album_selectaction">Selecteer album actie</string>
     <string name="settings_song_selectaction">Selecteer nummer actie</string>
     <string name="confirm_cancel_downloads">Downloaden afbreken?</string>
+    <string name="home_item_album_artists">Albumartiesten</string>
 </resources>

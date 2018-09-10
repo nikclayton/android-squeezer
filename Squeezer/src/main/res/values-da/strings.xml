@@ -220,6 +220,7 @@
     <string name="pref_analytics_enable_disabled">Ingen brugsstatistikker indsamles.</string>
 
     <string name="home_item_artists">Kunstnere</string>
+    <string name="home_item_album_artists">Albumkunstnere</string>
     <string name="home_item_albums">Album</string>
     <string name="home_item_songs">Alle Sange</string>
     <string name="home_item_genres">Genrer</string>

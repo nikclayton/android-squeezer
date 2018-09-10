@@ -262,6 +262,7 @@ of your accepting any such warranty or additional liability.&lt;/p&gt;</string>
   <string name="pref_cat_error_reports">Hata raporları ve istatistikler</string>
   <string name="pref_analytics_enable">Kullanım istatistiklerini gönder</string>
   <string name="home_item_artists">Sanatçılar</string>
+  <string name="home_item_album_artists">Albüm Sanatçısı</string>
   <string name="home_item_albums">Albümler</string>
   <string name="home_item_songs">Şarkılar</string>
   <string name="home_item_genres">Türler</string>

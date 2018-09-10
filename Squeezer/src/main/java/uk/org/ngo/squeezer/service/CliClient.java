@@ -672,6 +672,8 @@ class CliClient implements IClient {
             } else if ("correlationid".equals(key)) {
                 correlationId = Util.parseDecimalIntOrZero(value);
                 taggedParameters.put(key, token);
+            } else if ("role_id".equals(key)) {
+                taggedParameters.put(key, token);
             } else if ("actions".equals(key)) {
                 // Apparently squeezer returns some commands which are
                 // included in the count of the current request

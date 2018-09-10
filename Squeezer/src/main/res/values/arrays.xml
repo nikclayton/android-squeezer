@@ -18,21 +18,6 @@
 
 <resources>
 
-    <string-array name="home_items">
-        <item>@string/home_item_artists</item>
-        <item>@string/home_item_albums</item>
-        <item>@string/home_item_songs</item>
-        <item>@string/home_item_genres</item>
-        <item>@string/home_item_years</item>
-        <item>@string/home_item_new_music</item>
-        <item>@string/home_item_music_folder</item>
-        <item>@string/home_item_random_mix</item>
-        <item>@string/home_item_playlists</item>
-        <item>@string/home_item_radios</item>
-        <item>@string/home_item_favorites</item>
-        <item>@string/home_item_my_apps</item>
-    </string-array>
-
     <string-array name="randomplay_items">
         <item>@string/randomplay_item_song_mix</item>
         <item>@string/randomplay_item_album_mix</item>

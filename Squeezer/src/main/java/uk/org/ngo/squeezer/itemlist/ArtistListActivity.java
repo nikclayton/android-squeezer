@@ -19,11 +19,11 @@ package uk.org.ngo.squeezer.itemlist;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
 import uk.org.ngo.squeezer.framework.BaseListActivity;
-import uk.org.ngo.squeezer.framework.Item;
 import uk.org.ngo.squeezer.framework.ItemView;
 import uk.org.ngo.squeezer.itemlist.GenreSpinner.GenreSpinnerCallback;
 import uk.org.ngo.squeezer.itemlist.dialog.ArtistFilterDialog;
@@ -33,6 +33,7 @@ import uk.org.ngo.squeezer.menu.FilterMenuFragment.FilterableListActivity;
 import uk.org.ngo.squeezer.model.Album;
 import uk.org.ngo.squeezer.model.Artist;
 import uk.org.ngo.squeezer.model.Genre;
+import uk.org.ngo.squeezer.model.ContributorRoles;
 import uk.org.ngo.squeezer.service.ISqueezeService;
 
 public class ArtistListActivity extends BaseListActivity<Artist> implements
@@ -47,6 +48,8 @@ public class ArtistListActivity extends BaseListActivity<Artist> implements
     public void setSearchString(String searchString) {
         this.searchString = searchString;
     }
+
+    private ContributorRoles roleIds;
 
     private Album album;
 
@@ -88,6 +91,8 @@ public class ArtistListActivity extends BaseListActivity<Artist> implements
                     album = extras.getParcelable(key);
                 } else if (Genre.class.getName().equals(key)) {
                     genre = extras.getParcelable(key);
+                } else if (ContributorRoles.class.getName().equals(key)) {
+                    roleIds = extras.getParcelable(key);
                 } else {
                     Log.e(getTag(), "Unexpected extra value: " + key + "("
                             + extras.get(key).getClass().getName() + ")");
@@ -98,7 +103,7 @@ public class ArtistListActivity extends BaseListActivity<Artist> implements
 
     @Override
     protected void orderPage(@NonNull ISqueezeService service, int start) {
-        service.artists(this, start, getSearchString(), album, genre);
+        service.artists(this, start, getSearchString(), album, genre, roleIds);
     }
 
     @Override
@@ -112,9 +117,9 @@ public class ArtistListActivity extends BaseListActivity<Artist> implements
         new ArtistFilterDialog().show(getSupportFragmentManager(), "ArtistFilterDialog");
     }
 
-    public static void show(Context context, Item... items) {
+    public static void show(Context context, Parcelable... extras) {
         final Intent intent = new Intent(context, ArtistListActivity.class);
-        for (Item item : items) {
+        for (Parcelable item : extras) {
             intent.putExtra(item.getClass().getName(), item);
         }
         context.startActivity(intent);

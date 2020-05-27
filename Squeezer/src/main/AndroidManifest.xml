@@ -37,6 +37,22 @@
         android:usesCleartextTraffic="true"
         android:allowBackup="true">
 
+        <receiver android:name=".homescreenwidgets.SqueezerRemoteControl">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/squeezer_remote_control_info" />
+        </receiver>
+
+        <activity android:name=".homescreenwidgets.SqueezerRemoteControlConfigureActivity">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
+
         <!-- Newer Android versions no longer include the Apache HTTP library -->
         <uses-library android:name="org.apache.http.legacy" android:required="false" />
 

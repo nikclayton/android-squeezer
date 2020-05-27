@@ -94,6 +94,13 @@ public interface ItemView<T extends Item> {
      * @param item The selected item. This may be null if
      */
     void onItemSelected(View view, int index, T item);
+    
+    /**
+     * Implement the action to be taken when an item is selected.
+     *
+     * @param view The view currently showing the item.
+     */
+    void onGroupSelected(View view, T[] items);
 
     /**
      * Creates the context menu.

@@ -35,8 +35,8 @@ import uk.org.ngo.squeezer.framework.ItemAdapter;
 import uk.org.ngo.squeezer.model.CurrentPlaylistItem;
 import uk.org.ngo.squeezer.model.Player;
 
-class PlayerListAdapter extends BaseExpandableListAdapter {
-    private final PlayerListActivity mActivity;
+public class PlayerListAdapter extends BaseExpandableListAdapter {
+    private final PlayerListBaseActivity mActivity;
 
     private final List<SyncGroup> mChildAdapters = new ArrayList<>();
 
@@ -48,7 +48,7 @@ class PlayerListAdapter extends BaseExpandableListAdapter {
 
         public String syncGroupName; // the name of the synchronization group as displayed in the players screen
 
-        public SyncGroup(PlayerView playerView) {
+        public SyncGroup(PlayerBaseView playerView) {
             super(playerView);
         }
 
@@ -87,10 +87,14 @@ class PlayerListAdapter extends BaseExpandableListAdapter {
     /** Count of how many players are in the adapter. */
     int mPlayerCount;
 
-    public PlayerListAdapter(PlayerListActivity activity) {
+    public PlayerListAdapter(PlayerListBaseActivity activity) {
         mActivity = activity;
     }
 
+    
+    public void onGroupClick(View view, int groupPosition) {
+        mChildAdapters.get(groupPosition).onSelected(view);
+    }
     public void onChildClick(View view, int groupPosition, int childPosition) {
         mChildAdapters.get(groupPosition).onItemSelected(view, childPosition);
     }
@@ -124,7 +128,7 @@ class PlayerListAdapter extends BaseExpandableListAdapter {
         // Get a list of slaves for every synchronization group
         for (Collection<Player> slaves: playerSyncGroups.asMap().values()) {
             // create a new synchronization group
-            SyncGroup syncGroup = new SyncGroup(new PlayerView(mActivity));
+            SyncGroup syncGroup = new SyncGroup(mActivity.createPlayerView());
             mPlayerCount += slaves.size();
             // add the slaves (the players) to the synchronization group
             syncGroup.update(slaves.size(), 0, new ArrayList<>(slaves));

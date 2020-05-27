@@ -105,6 +105,7 @@ public interface ISqueezeService {
     void powerOff();
     String getServerVersion() throws SqueezeService.HandshakeNotCompleteException;
     boolean togglePausePlay();
+    boolean togglePausePlay(Player player);
     boolean play();
     boolean pause();
     boolean stop();

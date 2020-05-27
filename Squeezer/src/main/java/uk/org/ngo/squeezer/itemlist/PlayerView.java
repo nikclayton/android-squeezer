@@ -40,22 +40,14 @@ import uk.org.ngo.squeezer.model.PlayerState;
 import uk.org.ngo.squeezer.service.ISqueezeService;
 import uk.org.ngo.squeezer.service.event.SongTimeChanged;
 
-public class PlayerView extends BaseItemView<Player> {
+public class PlayerView extends PlayerBaseView<PlayerListActivity> {
     private static final Map<String, Integer> modelIcons = initializeModelIcons();
 
-    private final PlayerListActivity activity;
-
     public PlayerView(PlayerListActivity activity) {
-        super(activity);
-        this.activity = activity;
+        super(activity, R.layout.list_item_player);
 
         setViewParams(VIEW_PARAM_ICON | VIEW_PARAM_TWO_LINE | VIEW_PARAM_CONTEXT_BUTTON);
         setLoadingViewParams(VIEW_PARAM_ICON | VIEW_PARAM_TWO_LINE);
-    }
-
-    @Override
-    public View getAdapterView(View convertView, ViewGroup parent, @ViewParam int viewParams) {
-        return getAdapterView(convertView, parent, viewParams, R.layout.list_item_player);
     }
 
     @Override
@@ -91,10 +83,6 @@ public class PlayerView extends BaseItemView<Player> {
             viewHolder.text2.setText(activity.getString(R.string.SLEEPING_IN)
                     + " " + Util.formatElapsedTime(item.getSleepingIn()));
         }
-    }
-
-    @Override
-    public void onItemSelected(View view, int index, Player item) {
     }
 
     @Override

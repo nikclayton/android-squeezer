@@ -209,7 +209,9 @@ public class PluginView extends BaseItemView<Plugin> {
             }
         }
    }
-
+    public void onGroupSelected(View view, Plugin[] items) {
+    
+    }
     @Override
     public void showContextMenu(ViewHolder viewHolder, Plugin item) {
         logicDelegate.showContextMenu(viewHolder, item);

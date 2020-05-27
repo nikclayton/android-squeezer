@@ -654,22 +654,19 @@ public class SqueezeService extends Service {
 
             ongoingNotification = notificationState();
             NotificationData notificationData = new NotificationData(ongoingNotification);
-            Notification notification;
+            Notification notification = notificationData.builder.build();
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                final MediaMetadataCompat.Builder metaBuilder = new MediaMetadataCompat.Builder();
-                metaBuilder.putString(MediaMetadata.METADATA_KEY_ARTIST, ongoingNotification.artistName);
-                metaBuilder.putString(MediaMetadata.METADATA_KEY_ALBUM, ongoingNotification.albumName);
-                metaBuilder.putString(MediaMetadata.METADATA_KEY_TITLE, ongoingNotification.songName);
-                mMediaSession.setMetadata(metaBuilder.build());
-                notification = notificationData.builder.build();
-            } else {
-                notification = notificationData.builder.build();
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            if (ongoingNotification != null) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    final MediaMetadataCompat.Builder metaBuilder = new MediaMetadataCompat.Builder();
+                    metaBuilder.putString(MediaMetadata.METADATA_KEY_ARTIST, ongoingNotification.artistName);
+                    metaBuilder.putString(MediaMetadata.METADATA_KEY_ALBUM, ongoingNotification.albumName);
+                    metaBuilder.putString(MediaMetadata.METADATA_KEY_TITLE, ongoingNotification.songName);
+                    mMediaSession.setMetadata(metaBuilder.build());
+                } else {
                     notification.bigContentView = notificationData.expandedView;
                 }
             }
-
 
             // Start it and have it run forever (until it shuts itself down).
             // This is required so swapping out the activity (and unbinding the
@@ -999,19 +996,23 @@ public class SqueezeService extends Service {
 
         @Override
         public boolean togglePausePlay() {
+            return togglePausePlay(getActivePlayer());
+        }
+        @Override
+        public boolean togglePausePlay(Player player) {
             if (!isConnected()) {
                 return false;
             }
 
-            Player activePlayer = getActivePlayer();
+            
 
             // May be null (e.g., connected to a server with no connected
             // players. TODO: Handle this better, since it's not obvious in the
             // UI.
-            if (activePlayer == null)
+            if (player == null)
                 return false;
 
-            PlayerState activePlayerState = activePlayer.getPlayerState();
+            PlayerState activePlayerState = player.getPlayerState();
             @PlayerState.PlayState String playStatus = activePlayerState.getPlayStatus();
 
             // May be null -- race condition when connecting to a server that
@@ -1025,17 +1026,17 @@ public class SqueezeService extends Service {
                 // because then we'd get confused when they came back in to us, not being
                 // able to differentiate ours coming back on the listen channel vs. those
                 // of those idiots at the dinner party messing around.
-                mDelegate.command(activePlayer).cmd("pause", "1").exec();
+                mDelegate.command(player).cmd("pause", "1").exec();
                 return true;
             }
 
             if (playStatus.equals(PlayerState.PLAY_STATE_STOP)) {
-                mDelegate.command(activePlayer).cmd("play", fadeInSecs()).exec();
+                mDelegate.command(player).cmd("play", fadeInSecs()).exec();
                 return true;
             }
 
             if (playStatus.equals(PlayerState.PLAY_STATE_PAUSE)) {
-                mDelegate.command(activePlayer).cmd("pause", "0", fadeInSecs()).exec();
+                mDelegate.command(player).cmd("pause", "0", fadeInSecs()).exec();
                 return true;
             }
 

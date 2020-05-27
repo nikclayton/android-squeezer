@@ -129,10 +129,12 @@ public abstract class BaseItemView<T extends Item> implements ItemView<T> {
 
         public void setContextMenu(View view) {
             contextMenuButtonHolder = view.findViewById(R.id.context_menu);
-            contextMenuButton = contextMenuButtonHolder.findViewById(R.id.context_menu_button);
-            contextMenuLoading = contextMenuButtonHolder.findViewById(R.id.loading_progress);
-            contextMenuCheckbox = contextMenuButtonHolder.findViewById(R.id.checkbox);
-            contextMenuRadio = contextMenuButtonHolder.findViewById(R.id.radio);
+            if (contextMenuButtonHolder!= null) {
+                contextMenuButton = contextMenuButtonHolder.findViewById(R.id.context_menu_button);
+                contextMenuLoading = contextMenuButtonHolder.findViewById(R.id.loading_progress);
+                contextMenuCheckbox = contextMenuButtonHolder.findViewById(R.id.checkbox);
+                contextMenuRadio = contextMenuButtonHolder.findViewById(R.id.radio);
+            }
         }
     }
 
@@ -171,7 +173,12 @@ public abstract class BaseItemView<T extends Item> implements ItemView<T> {
             mItemClass = (Class<T>) Reflection.getGenericClass(getClass(), ItemView.class,
                     0);
             if (mItemClass == null) {
-                throw new RuntimeException("Could not read generic argument for: " + getClass());
+                mItemClass = (Class<T>) Reflection.getGenericClass(getClass().getSuperclass(), ItemView.class,
+                    0);
+                if (mItemClass == null) {
+                    
+                    throw new RuntimeException("Could not read generic argument for: " + getClass());
+                }
             }
         }
         return mItemClass;
@@ -222,12 +229,15 @@ public abstract class BaseItemView<T extends Item> implements ItemView<T> {
         final ViewHolder viewHolder = (ViewHolder) view.getTag();
 
         viewHolder.text1.setText(item.getName());
-        viewHolder.contextMenuButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showContextMenu(viewHolder, item);
-            }
-        });
+        
+        if (viewHolder.contextMenuButton!= null) {
+            viewHolder.contextMenuButton.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showContextMenu(viewHolder, item);
+                }
+            });
+        }
     }
 
     /**
@@ -310,9 +320,11 @@ public abstract class BaseItemView<T extends Item> implements ItemView<T> {
                 (viewParams & VIEW_PARAM_ICON) != 0 ? View.VISIBLE : View.GONE);
         viewHolder.text2.setVisibility(
                 (viewParams & VIEW_PARAM_TWO_LINE) != 0 ? View.VISIBLE : View.GONE);
-        viewHolder.contextMenuButtonHolder.setVisibility(
-                (viewParams & VIEW_PARAM_CONTEXT_BUTTON) != 0 ? View.VISIBLE : View.GONE);
-
+        
+        if (viewHolder.contextMenuButtonHolder != null) {
+            viewHolder.contextMenuButtonHolder.setVisibility(
+                    (viewParams & VIEW_PARAM_CONTEXT_BUTTON) != 0 ? View.VISIBLE : View.GONE);
+        }
         viewHolder.viewParams = viewParams;
     }
 

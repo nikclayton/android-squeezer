@@ -269,7 +269,9 @@ public class AlarmView extends BaseItemView<Alarm> {
     @Override
     public void onItemSelected(View view, int index, Alarm item) {
     }
-
+    public void onGroupSelected(View view, Alarm[] items) {
+    
+    }
     // Require an immutable list so that caller's can't modify it when this method iterates
     // over it.
     public void setAlarmPlaylists(ImmutableList<AlarmPlaylist> alarmPlaylists) {

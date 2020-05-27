@@ -29,6 +29,9 @@ import android.graphics.Path;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import androidx.annotation.IdRes;
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
@@ -341,7 +344,17 @@ public abstract class ImageWorker {
      */
     public void addImageCache(ImageCache.ImageCacheParams imageCacheParams) {
         setImageCache(new ImageCache(imageCacheParams));
-        new CacheAsyncTask().execute(MESSAGE_INIT_DISK_CACHE);
+        
+        // AsyncTask instantiates an InternalHandler (which extends Handler but doesn't pass a
+        // Looper so it grabs the current one, sometimes it's not the main thread and an exception
+        // is thrown. This makes the Looper explicit.
+        
+        Handler handler = new Handler(Looper.getMainLooper()) {
+            public void handleMessage(@NonNull Message msg) {
+                    new CacheAsyncTask().execute(msg.what);
+            }
+        };
+        handler.obtainMessage(MESSAGE_INIT_DISK_CACHE).sendToTarget();
     }
 
     /**

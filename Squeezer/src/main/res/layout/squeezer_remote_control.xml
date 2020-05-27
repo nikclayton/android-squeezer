@@ -1,0 +1,45 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="?android:attr/buttonBarStyle"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#70000000"
+    android:orientation="vertical"
+
+    >
+
+    <TextView
+        android:id="@+id/squeezerRemote_playerName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:padding="5dp"
+        android:textColor="@color/white"
+
+        />
+
+    <LinearLayout
+        style="?android:attr/buttonBarStyle"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+
+        <ImageButton
+            android:id="@+id/squeezerRemote_power"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/remote_powerDescription"
+            android:src="@drawable/power" />
+
+        <ImageButton
+            android:id="@+id/squeezerRemote_pausePlay"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/remote_pausePlayDescription"
+            android:src="@android:drawable/ic_media_play" />
+
+    </LinearLayout>
+</LinearLayout>

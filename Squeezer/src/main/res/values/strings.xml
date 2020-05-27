@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--
+<?xml version="1.0" encoding="UTF-8"?><!--
  Copyright (c) 2009 Google Inc.  All Rights Reserved.
 
  Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +12,8 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.
---><resources xmlns:tools="http://schemas.android.com/tools">
+-->
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name" translatable="false">Squeezer</string>
     <string name="undo">Undo</string>
     <string name="disabled">Disabled</string>
@@ -341,4 +341,7 @@ of your accepting any such warranty or additional liability.&lt;/p&gt;</string>
     <string name="about_support" translatable="false">Support</string>
     <string name="about_support_text" translatable="false">https://nikclayton.github.io/android-squeezer/</string>
     <string name="mysqueezebox_com" translatable="false">mysqueezebox.com</string>
+    <string name="configure_select_player">Select player to control</string>
+    <string name="remote_powerDescription">Power</string>
+    <string name="remote_pausePlayDescription">Pause/Play</string>
 </resources>

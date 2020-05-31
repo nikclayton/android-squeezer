@@ -113,6 +113,8 @@ public class SqueezerRemoteControl extends AppWidgetProvider {
         switch (columns) {
             case 1:
                 return new RemoteViews(context.getPackageName(), R.layout.squeezer_remote_control_1column);
+            case 2:
+                return new RemoteViews(context.getPackageName(), R.layout.squeezer_remote_control_2column);
             case 3:
             case 4:
             case 5:

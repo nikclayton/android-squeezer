@@ -14,6 +14,7 @@ import uk.org.ngo.squeezer.R;
 import uk.org.ngo.squeezer.itemlist.PlayerBaseView;
 import uk.org.ngo.squeezer.itemlist.PlayerListBaseActivity;
 import uk.org.ngo.squeezer.model.Player;
+import uk.org.ngo.squeezer.model.PlayerState;
 
 /**
  * The configuration screen for the {@link SqueezerRemoteControl SqueezerRemoteControl} AppWidget.
@@ -85,35 +86,7 @@ public class SqueezerRemoteControlConfigureActivity extends PlayerListBaseActivi
     }
 
     public PlayerBaseView createPlayerView() {
-        return new PlayerBaseView<SqueezerRemoteControlConfigureActivity>(this, R.layout.list_item_player_simple) {
-            public void onItemSelected(View view, int index, Player item) {
-                super.onItemSelected(view, index, item);
-            }
-
-            public void onGroupSelected(View view, Player[] items) {
-
-                final Context context = SqueezerRemoteControlConfigureActivity.this;
-
-                // Write the prefix to the SharedPreferences object for this widget
-
-                SharedPreferences.Editor prefs = context.getSharedPreferences(PREFS_NAME, 0).edit();
-                Player player = items[0];
-                prefs.putString(PREF_PREFIX_KEY + mAppWidgetId + PREF_SUFFIX_PLAYER_ID, player.getId());
-                prefs.putString(PREF_PREFIX_KEY + mAppWidgetId + PREF_SUFFIX_PLAYER_NAME, player.getName());
-                prefs.apply();
-
-
-                // It is the responsibility of the configuration activity to update the app widget
-                AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-                SqueezerRemoteControl.updateAppWidget(context, appWidgetManager, mAppWidgetId);
-
-                // Make sure we pass back the original appWidgetId
-                Intent resultValue = new Intent();
-                resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
-                setResult(RESULT_OK, resultValue);
-                finish();
-            }
-        };
+        return new SqueezerRemoteControlConfigureActivityPlayerBaseView();
     }
 
     /*
@@ -138,6 +111,57 @@ public class SqueezerRemoteControlConfigureActivity extends PlayerListBaseActivi
     @Override
     protected boolean needPlayer() {
         return false;
+    }
+
+    private class SqueezerRemoteControlConfigureActivityPlayerBaseView extends PlayerBaseView<SqueezerRemoteControlConfigureActivity> {
+
+        public SqueezerRemoteControlConfigureActivityPlayerBaseView() {
+            super(SqueezerRemoteControlConfigureActivity.this, R.layout.list_item_player_simple);
+            setViewParams(VIEW_PARAM_ICON);
+        }
+
+        @Override
+        public void bindView(View view, Player player) {
+            super.bindView(view, player);
+            ViewHolder viewHolder = (ViewHolder) view.getTag();
+            viewHolder.icon.setImageResource(getModelIcon(player.getModel()));
+
+            PlayerState playerState = player.getPlayerState();
+
+            if (playerState.isPoweredOn()) {
+                viewHolder.text1.setAlpha(1.0f);
+            } else {
+                viewHolder.text1.setAlpha(0.25f);
+            }
+        }
+
+        public void onItemSelected(View view, int index, Player item) {
+            super.onItemSelected(view, index, item);
+        }
+
+        public void onGroupSelected(View view, Player[] items) {
+
+            final Context context = SqueezerRemoteControlConfigureActivity.this;
+
+            // Write the prefix to the SharedPreferences object for this widget
+
+            SharedPreferences.Editor prefs = context.getSharedPreferences(PREFS_NAME, 0).edit();
+            Player player = items[0];
+            prefs.putString(PREF_PREFIX_KEY + mAppWidgetId + PREF_SUFFIX_PLAYER_ID, player.getId());
+            prefs.putString(PREF_PREFIX_KEY + mAppWidgetId + PREF_SUFFIX_PLAYER_NAME, player.getName());
+            prefs.apply();
+
+
+            // It is the responsibility of the configuration activity to update the app widget
+            AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+            SqueezerRemoteControl.updateAppWidget(context, appWidgetManager, mAppWidgetId);
+
+            // Make sure we pass back the original appWidgetId
+            Intent resultValue = new Intent();
+            resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
+            setResult(RESULT_OK, resultValue);
+            finish();
+        }
     }
 }
 

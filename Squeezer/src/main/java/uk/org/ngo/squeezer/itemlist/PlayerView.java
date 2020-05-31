@@ -19,18 +19,13 @@ package uk.org.ngo.squeezer.itemlist;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.PopupMenu;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import uk.org.ngo.squeezer.R;
 import uk.org.ngo.squeezer.Util;
-import uk.org.ngo.squeezer.framework.BaseItemView;
 import uk.org.ngo.squeezer.itemlist.dialog.DefeatDestructiveTouchToPlayDialog;
 import uk.org.ngo.squeezer.itemlist.dialog.PlayTrackAlbumDialog;
 import uk.org.ngo.squeezer.itemlist.dialog.PlayerRenameDialog;
@@ -41,7 +36,6 @@ import uk.org.ngo.squeezer.service.ISqueezeService;
 import uk.org.ngo.squeezer.service.event.SongTimeChanged;
 
 public class PlayerView extends PlayerBaseView<PlayerListActivity> {
-    private static final Map<String, Integer> modelIcons = initializeModelIcons();
 
     public PlayerView(PlayerListActivity activity) {
         super(activity, R.layout.list_item_player);
@@ -193,28 +187,6 @@ public class PlayerView extends PlayerBaseView<PlayerListActivity> {
 
 
         return false;
-    }
-
-    private static Map<String, Integer> initializeModelIcons() {
-        Map<String, Integer> modelIcons = new HashMap<>();
-        modelIcons.put("baby", R.drawable.ic_baby);
-        modelIcons.put("boom", R.drawable.ic_boom);
-        modelIcons.put("fab4", R.drawable.ic_fab4);
-        modelIcons.put("receiver", R.drawable.ic_receiver);
-        modelIcons.put("controller", R.drawable.ic_controller);
-        modelIcons.put("sb1n2", R.drawable.ic_sb1n2);
-        modelIcons.put("sb3", R.drawable.ic_sb3);
-        modelIcons.put("slimp3", R.drawable.ic_slimp3);
-        modelIcons.put("softsqueeze", R.drawable.ic_softsqueeze);
-        modelIcons.put("squeezeplay", R.drawable.ic_squeezeplay);
-        modelIcons.put("transporter", R.drawable.ic_transporter);
-        modelIcons.put("squeezeplayer", R.drawable.ic_squeezeplayer);
-        return modelIcons;
-    }
-
-    private static int getModelIcon(String model) {
-        Integer icon = modelIcons.get(model);
-        return (icon != null ? icon : R.drawable.ic_blank);
     }
 
     private class VolumeSeekBarChangeListener implements SeekBar.OnSeekBarChangeListener {

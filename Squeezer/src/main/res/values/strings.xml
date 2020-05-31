@@ -344,4 +344,6 @@ of your accepting any such warranty or additional liability.&lt;/p&gt;</string>
     <string name="configure_select_player">Select player to control</string>
     <string name="remote_powerDescription">Power</string>
     <string name="remote_pausePlayDescription">Pause/Play</string>
+    <string name="remote_nextDescription">Next song</string>
+    <string name="remote_previousDescription">Previous song</string>
 </resources>

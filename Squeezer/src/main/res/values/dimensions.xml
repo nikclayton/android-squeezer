@@ -24,5 +24,4 @@
     <!-- Volume panel -->
     <dimen name="volume_panel_top_margin">8dp</dimen>
 
-    <dimen name="squeezerremote_button_size">55dp</dimen>
 </resources>

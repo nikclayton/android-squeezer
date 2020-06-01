@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
     android:configure="uk.org.ngo.squeezer.homescreenwidgets.SqueezerRemoteControlConfigureActivity"
-    android:initialKeyguardLayout="@layout/squeezer_remote_control"
-    android:initialLayout="@layout/squeezer_remote_control"
+    android:initialKeyguardLayout="@layout/squeezer_remote_control_4column"
+    android:initialLayout="@layout/squeezer_remote_control_4column"
     android:minWidth="40dp"
     android:minHeight="40dp"
     android:previewImage="@drawable/squeezerremote_preview"

@@ -17,6 +17,7 @@
         style="?android:attr/buttonBarStyle"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:gravity="center_horizontal|center_vertical"
         android:background="#80000000"
         android:orientation="horizontal">
 

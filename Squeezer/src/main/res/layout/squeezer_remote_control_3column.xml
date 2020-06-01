@@ -17,11 +17,11 @@
         style="?android:attr/buttonBarStyle"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:gravity="start|center_vertical"
         android:background="#80000000"
         android:orientation="horizontal">
 
         <include layout="@layout/squeezer_remote_control_power_button" />
-        <include layout="@layout/squeezer_remote_control_previous_button" />
         <include layout="@layout/squeezer_remote_control_playpause_button" />
         <include layout="@layout/squeezer_remote_control_next_button" />
     </LinearLayout>

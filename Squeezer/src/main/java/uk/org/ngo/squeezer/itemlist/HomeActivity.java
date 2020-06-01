@@ -17,6 +17,7 @@
 package uk.org.ngo.squeezer.itemlist;
 
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -90,9 +91,12 @@ public class HomeActivity extends HomeMenuActivity {
     }
 
     public static void show(Context context) {
-        final Intent intent = new Intent(context, HomeActivity.class)
+        Intent intent = new Intent(context, HomeActivity.class)
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                 .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        if (!(context instanceof Activity))
+            intent = intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
         context.startActivity(intent);
     }
 

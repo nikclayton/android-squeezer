@@ -65,6 +65,9 @@ import uk.org.ngo.squeezer.util.ThemeManager;
  */
 public abstract class BaseActivity extends AppCompatActivity {
 
+
+    private static final String TAG = BaseActivity.class.getName();
+
     @Nullable
     private ISqueezeService mService = null;
 
@@ -139,7 +142,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
         boundService = bindService(new Intent(this, SqueezeService.class), serviceConnection,
                 Context.BIND_AUTO_CREATE);
-        Log.d(getTag(), "did bindService; serviceStub = " + getService());
+        Log.d(TAG, "did bindService; serviceStub = " + getService());
     }
 
     @Override
@@ -256,6 +259,7 @@ public abstract class BaseActivity extends AppCompatActivity {
      */
     @CallSuper
     protected void onServiceConnected(@NonNull ISqueezeService service) {
+        Log.d(TAG, "onServiceConnected");
         supportInvalidateOptionsMenu();
         maybeRegisterOnEventBus(service);
     }

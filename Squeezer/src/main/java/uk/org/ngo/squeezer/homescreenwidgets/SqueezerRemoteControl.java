@@ -17,6 +17,8 @@ import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+
 import uk.org.ngo.squeezer.R;
 import uk.org.ngo.squeezer.itemlist.HomeActivity;
 import uk.org.ngo.squeezer.model.Player;
@@ -145,31 +147,37 @@ public class SqueezerRemoteControl extends AppWidgetProvider {
 
         if (service != null) {
             Log.i(TAG, "servicePeek found ISqueezeService");
-            handler.run((ISqueezeService) service);
+            showToastExceptionIfExists(context, runHandlerAndCatchException(handler, (ISqueezeService) service));
         } else {
 
             boolean bound = context.getApplicationContext().bindService(new Intent(context, SqueezeService.class), new ServiceConnection() {
                 public void onServiceConnected(ComponentName name, IBinder service1) {
+                    final ServiceConnection serviceConnection = this;
+
                     if (name != null && service1 instanceof ISqueezeService) {
                         Log.i(TAG, "onServiceConnected connected to ISqueezeService");
                         final ISqueezeService squeezeService = (ISqueezeService) service1;
 
                         // Might already be connected, try first
-                        if (!runHandlerAndCatchException(handler, squeezeService)) {
+                        if (runHandlerAndCatchException(handler, squeezeService) == null) {
+                            // Handler was called successfully; service no longer needed
+                            context.unbindService(serviceConnection);
+                        } else {
                             Log.i(TAG, "ISqueezeService probably wasn't connected, connecting...");
                             // Probably wasn't connected. Connect and try again
                             squeezeService.getEventBus().register(new Object() {
                                 public void onEvent(Object event) {
                                     if (event instanceof PlayerStateChanged) {
                                         Log.i(TAG, "Reconnected, trying again");
-                                        runHandlerAndCatchException(handler, squeezeService);
+                                        showToastExceptionIfExists(context, runHandlerAndCatchException(handler, squeezeService));
                                         squeezeService.getEventBus().unregister(this);
+                                        // Handler was called successfully; service no longer needed
+                                        context.unbindService(serviceConnection);
                                     }
                                 }
                             });
                             squeezeService.startConnect();
                         }
-                        context.unbindService(this);
                     }
                 }
 
@@ -183,34 +191,35 @@ public class SqueezerRemoteControl extends AppWidgetProvider {
         }
     }
 
-    private boolean runHandlerAndCatchException(ServiceHandler handler, ISqueezeService squeezeService) {
+    private void showToastExceptionIfExists(Context context, @Nullable Exception possibleException) {
+        Toast.makeText(context, possibleException.getMessage(), Toast.LENGTH_LONG).show();
+    }
+
+    private @Nullable
+    Exception runHandlerAndCatchException(ServiceHandler handler, ISqueezeService squeezeService) {
         try {
-            return handler.run(squeezeService);
+            handler.run(squeezeService);
+            return null;
         } catch (Exception ex) {
             Log.e(TAG, "Exception while handling serviceHandler", ex);
+            return ex;
         }
-        return false;
     }
 
     public void runOnPlayer(final Context context, final String playerId, final ServicePlayerHandler handler) {
         runOnService(context, new ServiceHandler() {
-            public boolean run(ISqueezeService service) {
-                try {
-                    handler.run(service, service.getPlayer(playerId));
-                    return true;
-                } catch (PlayerNotFoundException ex) {
-                    return false;
-                }
+            public void run(ISqueezeService service) throws Exception {
+                handler.run(service, service.getPlayer(playerId));
             }
         });
     }
 
     private interface ServiceHandler {
-        boolean run(ISqueezeService service);
+        void run(ISqueezeService service) throws Exception;
     }
 
     private interface ServicePlayerHandler {
-        void run(ISqueezeService service, Player player);
+        void run(ISqueezeService service, Player player) throws Exception;
     }
 
     public void onReceive(final Context context, Intent intent) {
@@ -224,25 +233,19 @@ public class SqueezerRemoteControl extends AppWidgetProvider {
         if (SQUEEZER_REMOTE_OPEN.equals(action)) {
             runOnService(context, new ServiceHandler() {
                 @Override
-                public boolean run(ISqueezeService service) {
-                    try {
-                        Log.d(TAG, "setting active player: " + playerId);
-                        service.setActivePlayer(service.getPlayer(playerId));
-                        Handler handler = new Handler();
-                        float animationDelay = Settings.Global.getFloat(context.getContentResolver(),
-                                Settings.Global.ANIMATOR_DURATION_SCALE, 1.0f);
-                        handler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                HomeActivity.show(context);
+                public void run(ISqueezeService service) throws Exception {
+                    Log.d(TAG, "setting active player: " + playerId);
+                    service.setActivePlayer(service.getPlayer(playerId));
+                    Handler handler = new Handler();
+                    float animationDelay = Settings.Global.getFloat(context.getContentResolver(),
+                            Settings.Global.ANIMATOR_DURATION_SCALE, 1.0f);
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            HomeActivity.show(context);
 
-                            }
-                        }, (long) (300 * animationDelay));
-                        return true;
-                    } catch (PlayerNotFoundException e) {
-                        Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
-                        return false;
-                    }
+                        }
+                    }, (long) (300 * animationDelay));
                 }
             });
 
@@ -283,20 +286,5 @@ public class SqueezerRemoteControl extends AppWidgetProvider {
         }
     }
 
-    @Override
-    public void onEnabled(Context context) {
-
-
-//		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-//		ComponentName thisAppWidget = new ComponentName(context.getPackageName(), SqueezerRemoteControl.class.getName());
-//		int[] appWidgetIds = appWidgetManager.getAppWidgetIds(thisAppWidget);
-//		onUpdate(context, appWidgetManager, appWidgetIds);
-
-    }
-
-    @Override
-    public void onDisabled(Context context) {
-        // Enter relevant functionality for when the last widget is disabled
-    }
 }
 

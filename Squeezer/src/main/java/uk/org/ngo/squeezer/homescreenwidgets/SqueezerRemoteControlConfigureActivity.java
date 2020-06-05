@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AbsListView;
 
@@ -62,8 +63,11 @@ public class SqueezerRemoteControlConfigureActivity extends PlayerListBaseActivi
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
 
+        Log.d(TAG, "onCreate");
+
         // Set the result to CANCELED.  This will cause the widget host to cancel
         // out of the widget placement if the user presses the back button.
+        // Actual result, when successful is below in the onGroupSelected handler
         setResult(RESULT_CANCELED);
 
         setContentView(R.layout.squeezer_remote_control_configure);

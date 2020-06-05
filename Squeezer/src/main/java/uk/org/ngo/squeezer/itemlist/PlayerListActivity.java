@@ -49,13 +49,7 @@ public class PlayerListActivity extends PlayerListBaseActivity implements
         return false;
     }
 
-    public void onEventMainThread(PlayerStateChanged event) {
-        if (!mTrackingTouch) {
-            updateAndExpandPlayerList();
-        } else {
-            mUpdateWhileTracking = true;
-        }
-    }
+
 
     public void onEventMainThread(PlayerVolume event) {
         if (!mTrackingTouch) {

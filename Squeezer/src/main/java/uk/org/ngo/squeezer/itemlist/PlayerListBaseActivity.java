@@ -3,6 +3,7 @@ package uk.org.ngo.squeezer.itemlist;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.ExpandableListView;
@@ -18,6 +19,7 @@ import uk.org.ngo.squeezer.model.Player;
 import uk.org.ngo.squeezer.model.PlayerState;
 import uk.org.ngo.squeezer.service.ISqueezeService;
 import uk.org.ngo.squeezer.service.event.HandshakeComplete;
+import uk.org.ngo.squeezer.service.event.PlayerStateChanged;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -26,6 +28,8 @@ import java.util.Map;
 
 
 public abstract class PlayerListBaseActivity extends ItemListActivity {
+    private static final String TAG = PlayerListBaseActivity.class.getName();
+
     /**
      * Map from player IDs to Players synced to that player ID.
      */
@@ -59,6 +63,16 @@ public abstract class PlayerListBaseActivity extends ItemListActivity {
 
         for (int i = 0; i < mResultsAdapter.getGroupCount(); i++) {
             mResultsExpandableListView.expandGroup(i);
+        }
+    }
+
+    @Override
+    protected void onServiceConnected(@NonNull ISqueezeService service) {
+        super.onServiceConnected(service);
+        Log.d(TAG, "onServiceConnected: service.isConnected=" + service.isConnected());
+
+        if (!service.isConnected()) {
+            service.startConnect();
         }
     }
 
@@ -106,9 +120,19 @@ public abstract class PlayerListBaseActivity extends ItemListActivity {
     }
 
     public void onEventMainThread(HandshakeComplete event) {
+        super.onEventMainThread(event);
         if (mResultsExpandableListView.getExpandableListAdapter() == null)
             mResultsExpandableListView.setAdapter(mResultsAdapter);
         updateAndExpandPlayerList();
+    }
+
+
+    public void onEventMainThread(PlayerStateChanged event) {
+        if (!mTrackingTouch) {
+            updateAndExpandPlayerList();
+        } else {
+            mUpdateWhileTracking = true;
+        }
     }
 
     public void setTrackingTouch(boolean trackingTouch) {
@@ -142,9 +166,11 @@ public abstract class PlayerListBaseActivity extends ItemListActivity {
         // Iterate over all the connected players to build the list of master players.
         for (Player player : connectedPlayers.values()) {
             String playerId = player.getId();
+            String name = player.getName();
             PlayerState playerState = player.getPlayerState();
             String syncMaster = playerState.getSyncMaster();
 
+            Log.d(TAG, "player discovered: id=" + playerId + ", syncMaster=" + syncMaster + ", name=" + name);
             // If a player doesn't have a sync master then it's in a group of its own.
             if (syncMaster == null) {
                 mPlayerSyncGroups.put(playerId, player);

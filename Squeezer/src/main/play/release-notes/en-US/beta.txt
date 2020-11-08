@@ -1,9 +1,11 @@
-&bull; Download of local music
+&bull; Current playlist control; Possibility to undo a clear current playlist. Remove a track by swiping left or right. Touch and hold to move a track
 
-&bull; Automatic connection on app startup
+&bull; Download confirmation and option to disable downloads
 
-&bull; Home Screen Widget, contributed by Charlie Hayes
+&bull; Fix an issue with where Android 10 would falsely adds .mp3 to filenames
 
-&bull; Material Design
+&bull; Work around an issue with recent spotty versions, where only one search result is displayed
 
-&bull; Support RTL interface
+&bull; Switch radio buttons properly
+
+&bull; Bug and stability fixes

@@ -1,3 +1,21 @@
+2.2.1
+=====
+
+*   Current playlist control; Possibility to undo a clear current playlist.
+    Remove a track by swiping left or right. Touch and hold to move a track
+
+*   Download confirmation and option to disable downloads
+
+*   Fix an issue with where Android 10 would falsely adds .mp3 to filenames
+
+*   Work around an issue with recent Spotty versions, where only one search
+    result is displayed
+
+*   Switch radio buttons properly
+
+*   Bug and stability fixes
+
+
 2.2.0
 =====
 

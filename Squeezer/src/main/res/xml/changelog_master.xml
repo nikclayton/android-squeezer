@@ -2,8 +2,29 @@
 
 <changelog>
     <release
+        version="2.2.1"
+        versioncode="89">
+        <change>Current playlist control;
+            Possibility to undo a clear current playlist.
+            Remove a track by swiping left or right.
+            Touch and hold to move a track
+        </change>
+
+        <change>Download confirmation and option to disable downloads</change>
+
+        <change>Fix an issue with where Android 10 would falsely adds .mp3 to filenames</change>
+
+        <change>Work around an issue with recent Spotty versions, where only one search result is
+            displayed</change>
+
+        <change>Switch radio buttons properly</change>
+
+        <change>Bug and stability fixes</change>
+    </release>
+
+    <release
         version="2.2.0"
-        versioncode="87">
+        versioncode="84">
         <change>Download of local music</change>
 
         <change>Automatic connection on app startup</change>

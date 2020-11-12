@@ -36,7 +36,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import uk.org.ngo.squeezer.R;
 import uk.org.ngo.squeezer.Squeezer;
@@ -189,7 +188,7 @@ public class JiveItem extends Item {
         return iconResource == null ? defaultIcon : iconResource;
     }
 
-    private static Map<String, Integer> slimIcons = initializeSlimIcons();
+    private static final Map<String, Integer> slimIcons = initializeSlimIcons();
 
     private static Map<String, Integer> initializeSlimIcons() {
         Map<String, Integer> result = new HashMap<>();
@@ -214,7 +213,7 @@ public class JiveItem extends Item {
         return iconResource == null ? 0 : iconResource;
     }
 
-    private static Map<String, Integer> itemIcons = initializeItemIcons();
+    private static final Map<String, Integer> itemIcons = initializeItemIcons();
 
     private static Map<String, Integer> initializeItemIcons() {
         Map<String, Integer> result = new HashMap<>();
@@ -530,7 +529,7 @@ public class JiveItem extends Item {
      * <p>
      * make an educated guess at window style when one is not sent but a menu style is
      */
-    private static Map<String, Window.WindowStyle> menu2window = initializeMenu2Window();
+    private static final Map<String, Window.WindowStyle> menu2window = initializeMenu2Window();
 
     private static Map<String, Window.WindowStyle> initializeMenu2Window() {
         Map<String, Window.WindowStyle> result = new HashMap<>();

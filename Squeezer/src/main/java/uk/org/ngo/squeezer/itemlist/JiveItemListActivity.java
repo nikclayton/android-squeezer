@@ -21,18 +21,22 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
+
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
-import android.widget.AbsListView;
 import android.widget.EditText;
-import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.material.button.MaterialButton;
@@ -46,10 +50,10 @@ import uk.org.ngo.squeezer.Preferences;
 import uk.org.ngo.squeezer.R;
 import uk.org.ngo.squeezer.Util;
 import uk.org.ngo.squeezer.dialog.NetworkErrorDialogFragment;
+import uk.org.ngo.squeezer.framework.ItemAdapter;
+import uk.org.ngo.squeezer.framework.ViewParamItemView;
 import uk.org.ngo.squeezer.model.Action;
-import uk.org.ngo.squeezer.framework.BaseItemView;
 import uk.org.ngo.squeezer.framework.BaseListActivity;
-import uk.org.ngo.squeezer.framework.ItemView;
 import uk.org.ngo.squeezer.model.JiveItem;
 import uk.org.ngo.squeezer.model.Window;
 import uk.org.ngo.squeezer.itemlist.dialog.ArtworkListLayout;
@@ -63,7 +67,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * The activity's content view scrolls in from the right, and disappear to the left, to provide a
  * spatial component to navigation.
  */
-public class JiveItemListActivity extends BaseListActivity<JiveItem>
+public class JiveItemListActivity extends BaseListActivity<JiveItemView, JiveItem>
         implements NetworkErrorDialogFragment.NetworkErrorDialogListener {
     private static final int GO = 1;
     private static final String FINISH = "FINISH";
@@ -74,19 +78,28 @@ public class JiveItemListActivity extends BaseListActivity<JiveItem>
     protected JiveItem parent;
     private Action action;
     Window window = new Window();
+    private int selectedIndex;
 
     private MenuItem menuItemList;
     private MenuItem menuItemGrid;
-    private BaseItemView.ViewHolder parentViewHolder;
+    private ViewParamItemView<JiveItem> parentViewHolder;
 
     @Override
-    protected ItemView<JiveItem> createItemView() {
-        return new JiveItemView(this, window.windowStyle);
-    }
+    protected ItemAdapter<JiveItemView, JiveItem> createItemListAdapter() {
+        return new ItemAdapter<JiveItemView, JiveItem>(this) {
 
-    @Override
-    public JiveItemView getItemView() {
-        return (JiveItemView) super.getItemView();
+            @Override
+            public JiveItemView createViewHolder(View view) {
+                return new JiveItemView(JiveItemListActivity.this, view);
+            }
+
+            @Override
+            protected int getItemViewType(JiveItem item) {
+                return item != null && item.hasSlider() ?
+                        R.layout.slider_item :
+                        (JiveItemView.listLayout(JiveItemListActivity.this, window.windowStyle) == ArtworkListLayout.grid) ? R.layout.grid_item : R.layout.list_item;
+            }
+        };
     }
 
     @Override
@@ -157,9 +170,8 @@ public class JiveItemListActivity extends BaseListActivity<JiveItem>
     }
 
     private void setParentViewHolder() {
-        parentViewHolder = new BaseItemView.ViewHolder(this.findViewById(R.id.parent_container));
+        parentViewHolder = new ViewParamItemView<>(this, findViewById(R.id.parent_container));
         parentViewHolder.contextMenuButton.setOnClickListener(v -> pluginViewDelegate.showContextMenu(parentViewHolder, parent));
-        parentViewHolder.contextMenuButtonHolder.setTag(parentViewHolder);
     }
 
     @Override
@@ -171,40 +183,42 @@ public class JiveItemListActivity extends BaseListActivity<JiveItem>
     @Override
     public void onResume() {
         super.onResume();
-        ArtworkListLayout listLayout = JiveItemView.listLayout(this, window.windowStyle);
-        AbsListView listView = getListView();
-        if ((listLayout == ArtworkListLayout.grid && !(listView instanceof GridView))
-         || (listLayout != ArtworkListLayout.grid && (listView instanceof GridView))) {
-            setListView(setupListView(listView));
-        }
+        setupListView();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        getItemView().getLogicDelegate().resetContextMenu();
+        pluginViewDelegate.resetContextMenu();
         pluginViewDelegate.resetContextMenu();
     }
 
     @Override
-    protected AbsListView setupListView(AbsListView listView) {
-        ArtworkListLayout listLayout = JiveItemView.listLayout(this, window.windowStyle);
-        if (listLayout == ArtworkListLayout.grid && !(listView instanceof GridView)) {
-            listView = switchListView(listView, R.layout.item_grid);
-        }
-        if (listLayout != ArtworkListLayout.grid && (listView instanceof GridView)) {
-            listView = switchListView(listView, R.layout.item_list);
-        }
-        return super.setupListView(listView);
+    public void setContentView(@LayoutRes int layoutResID) {
+        super.setContentView(layoutResID);
+        getListView().setRecyclerListener(viewHolder -> {
+            // Release strong reference when a view is recycled
+            final ImageView imageView = ((JiveItemView)viewHolder).icon;
+            if (imageView != null) {
+                imageView.setImageBitmap(null);
+            }
+        });
+
+        setupListView();
     }
 
-    private AbsListView switchListView(AbsListView listView, @LayoutRes int resource) {
-        ViewGroup parent = (ViewGroup) listView.getParent();
-        int i1 = parent.indexOfChild(listView);
-        parent.removeViewAt(i1);
-        listView = (AbsListView) getLayoutInflater().inflate(resource, parent, false);
-        parent.addView(listView, i1);
-        return listView;
+    private void setupListView() {
+        ArtworkListLayout listLayout = JiveItemView.listLayout(this, window.windowStyle);
+        RecyclerView.LayoutManager layoutManager = getListView().getLayoutManager();
+        if (listLayout == ArtworkListLayout.grid && !(layoutManager instanceof GridLayoutManager)) {
+            // TODO calculate column count OR use a (vertical) LinearLayoutManager for rows with a horizontal LinearLayout on each row
+            getListView().setLayoutManager(new GridLayoutManager(this, 2));
+            getListView().removeItemDecorationAt(0);
+        }
+        if (listLayout == ArtworkListLayout.list && (layoutManager instanceof GridLayoutManager)) {
+            getListView().setLayoutManager(new LinearLayoutManager(this));
+            getListView().addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
+        }
     }
 
     void updateHeader(String windowTitle) {
@@ -254,19 +268,18 @@ public class JiveItemListActivity extends BaseListActivity<JiveItem>
 
 
     void applyWindowStyle(Window.WindowStyle windowStyle) {
-        applyWindowStyle(windowStyle, getItemView().listLayout());
+        applyWindowStyle(windowStyle, JiveItemView.listLayout(this, window.windowStyle));
     }
 
     void applyWindowStyle(Window.WindowStyle windowStyle, ArtworkListLayout prevListLayout) {
         ArtworkListLayout listLayout = JiveItemView.listLayout(this, windowStyle);
         updateViewMenuItems(listLayout, windowStyle);
-        if (windowStyle != window.windowStyle || listLayout != getItemView().listLayout()) {
+        if (windowStyle != window.windowStyle || listLayout != prevListLayout) {
             window.windowStyle = windowStyle;
-            getItemView().setWindowStyle(windowStyle);
             getItemAdapter().notifyDataSetChanged();
         }
         if (listLayout != prevListLayout) {
-            setListView(setupListView(getListView()));
+            setupListView();
         }
     }
 
@@ -459,13 +472,21 @@ public class JiveItemListActivity extends BaseListActivity<JiveItem>
     }
 
     public void setPreferredListLayout(ArtworkListLayout listLayout) {
-        ArtworkListLayout prevListLayout = getItemView().listLayout();
+        ArtworkListLayout prevListLayout = JiveItemView.listLayout(this, window.windowStyle);
         saveListLayout(listLayout);
         applyWindowStyle(window.windowStyle, prevListLayout);
     }
 
     protected void saveListLayout(ArtworkListLayout listLayout) {
         new Preferences(this).setAlbumListLayout(listLayout);
+    }
+
+    public int getSelectedIndex() {
+        return selectedIndex;
+    }
+
+    public void setSelectedIndex(int index) {
+        selectedIndex = index;
     }
 
     /**

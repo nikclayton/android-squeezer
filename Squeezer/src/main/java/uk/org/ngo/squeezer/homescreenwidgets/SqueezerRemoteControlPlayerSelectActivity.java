@@ -3,7 +3,6 @@ package uk.org.ngo.squeezer.homescreenwidgets;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -71,8 +70,8 @@ public class SqueezerRemoteControlPlayerSelectActivity extends PlayerListBaseAct
 
     }
 
-    public PlayerBaseView createPlayerView() {
-        return new SqueezerRemoteControlConfigureActivityPlayerBaseView();
+    public PlayerBaseView createPlayerView(View view) {
+        return new SqueezerRemoteControlConfigureActivityPlayerView(view);
     }
 
     /*
@@ -81,9 +80,8 @@ public class SqueezerRemoteControlPlayerSelectActivity extends PlayerListBaseAct
      */
     @Override
     public void setContentView(@LayoutRes int layoutResID) {
-        getDelegate().setContentView(layoutResID);
-
-        setListView(setupListView(findViewById(R.id.item_list)));
+        // TODO rcv implement method comment
+        super.setContentView(layoutResID);
     }
 
     /*
@@ -104,28 +102,29 @@ public class SqueezerRemoteControlPlayerSelectActivity extends PlayerListBaseAct
 
     }
 
-    private class SqueezerRemoteControlConfigureActivityPlayerBaseView extends PlayerBaseView<SqueezerRemoteControlPlayerSelectActivity> {
+    private class SqueezerRemoteControlConfigureActivityPlayerView extends PlayerBaseView<SqueezerRemoteControlPlayerSelectActivity> {
 
-        public SqueezerRemoteControlConfigureActivityPlayerBaseView() {
-            super(SqueezerRemoteControlPlayerSelectActivity.this, R.layout.list_item_player_simple);
+        public SqueezerRemoteControlConfigureActivityPlayerView(View view) {
+            super(SqueezerRemoteControlPlayerSelectActivity.this, view);
+            // TODO rcv where to put this R.layout.list_item_player_simple
             setViewParams(VIEW_PARAM_ICON);
         }
 
         @Override
-        public void bindView(View view, Player player) {
-            super.bindView(view, player);
-            ViewHolder viewHolder = (ViewHolder) view.getTag();
-            viewHolder.icon.setImageResource(getModelIcon(player.getModel()));
+        public void bindView(Player player) {
+            super.bindView(player);
+            icon.setImageResource(getModelIcon(player.getModel()));
 
             PlayerState playerState = player.getPlayerState();
 
             if (playerState.isPoweredOn()) {
-                viewHolder.text1.setAlpha(1.0f);
+                text1.setAlpha(1.0f);
             } else {
-                viewHolder.text1.setAlpha(0.25f);
+                text1.setAlpha(0.25f);
             }
         }
 
+        // TODO rcv
         public void onGroupSelected(View view, Player[] items) {
             final Context context = SqueezerRemoteControlPlayerSelectActivity.this;
 

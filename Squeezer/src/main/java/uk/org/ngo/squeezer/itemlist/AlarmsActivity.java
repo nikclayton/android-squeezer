@@ -31,7 +31,6 @@ import android.widget.TextView;
 
 import com.android.datetimepicker.time.RadialPickerLayout;
 import com.android.datetimepicker.time.TimePickerDialog;
-import com.google.common.collect.ImmutableList;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -40,9 +39,9 @@ import java.util.List;
 import java.util.Map;
 
 import uk.org.ngo.squeezer.R;
+import uk.org.ngo.squeezer.framework.ItemAdapter;
 import uk.org.ngo.squeezer.itemlist.dialog.AlarmSettingsDialog;
 import uk.org.ngo.squeezer.framework.BaseListActivity;
-import uk.org.ngo.squeezer.framework.ItemView;
 import uk.org.ngo.squeezer.model.Alarm;
 import uk.org.ngo.squeezer.model.AlarmPlaylist;
 import uk.org.ngo.squeezer.model.Player;
@@ -52,11 +51,9 @@ import uk.org.ngo.squeezer.service.event.PlayerPrefReceived;
 import uk.org.ngo.squeezer.util.CompoundButtonWrapper;
 import uk.org.ngo.squeezer.widget.UndoBarController;
 
-public class AlarmsActivity extends BaseListActivity<Alarm> implements AlarmSettingsDialog.HostActivity {
+public class AlarmsActivity extends BaseListActivity<AlarmView, Alarm> implements AlarmSettingsDialog.HostActivity {
     /** The most recent active player. */
     private Player mActivePlayer;
-
-    private AlarmView mAlarmView;
 
     /** Toggle/Switch that controls whether all alarms are enabled or disabled. */
     private CompoundButtonWrapper mAlarmsEnabledButton;
@@ -73,6 +70,8 @@ public class AlarmsActivity extends BaseListActivity<Alarm> implements AlarmSett
     /** Maps from a @Player.Pref.Name to its value. */
     private final Map<String, String> mPlayerPrefs = new HashMap<>();
 
+    private final List<AlarmPlaylist> alarmPlaylists = new ArrayList<>();
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,20 +80,10 @@ public class AlarmsActivity extends BaseListActivity<Alarm> implements AlarmSett
         mAllAlarmsHintView = findViewById(R.id.all_alarms_hint);
 
         mAlarmsEnabledButton = new CompoundButtonWrapper((CompoundButton) findViewById(R.id.alarms_enabled));
-        findViewById(R.id.add_alarm).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                TimePickerFragment.show(getSupportFragmentManager(), DateFormat.is24HourFormat(AlarmsActivity.this), getThemeId() == R.style.AppTheme);
-            }
-        });
+        findViewById(R.id.add_alarm).setOnClickListener(v -> TimePickerFragment.show(getSupportFragmentManager(), DateFormat.is24HourFormat(AlarmsActivity.this), getThemeId() == R.style.AppTheme));
 
         mSettingsButton = findViewById(R.id.settings);
-        mSettingsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                new AlarmSettingsDialog().show(getSupportFragmentManager(), "AlarmSettingsDialog");
-            }
-        });
+        mSettingsButton.setOnClickListener(view -> new AlarmSettingsDialog().show(getSupportFragmentManager(), "AlarmSettingsDialog"));
 
         if (savedInstanceState != null) {
             mActivePlayer = savedInstanceState.getParcelable("activePlayer");
@@ -104,13 +93,10 @@ public class AlarmsActivity extends BaseListActivity<Alarm> implements AlarmSett
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-        mAlarmsEnabledButton.setOncheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                mAllAlarmsHintView.setText(isChecked ? R.string.all_alarms_on_hint : R.string.all_alarms_off_hint);
-                if (getService() != null) {
-                    getService().playerPref(Player.Pref.ALARMS_ENABLED, isChecked ? "1" : "0");
-                }
+        mAlarmsEnabledButton.setOncheckedChangeListener((buttonView, isChecked) -> {
+            mAllAlarmsHintView.setText(isChecked ? R.string.all_alarms_on_hint : R.string.all_alarms_off_hint);
+            if (getService() != null) {
+                getService().playerPref(Player.Pref.ALARMS_ENABLED, isChecked ? "1" : "0");
             }
         });
     }
@@ -165,9 +151,25 @@ public class AlarmsActivity extends BaseListActivity<Alarm> implements AlarmSett
     }
 
     @Override
-    public ItemView<Alarm> createItemView() {
-        mAlarmView = new AlarmView(this);
-        return mAlarmView;
+    protected ItemAdapter<AlarmView, Alarm> createItemListAdapter() {
+        return new AlarmsAdapter(this);
+    }
+
+    private static class AlarmsAdapter extends ItemAdapter<AlarmView, Alarm> {
+
+        public AlarmsAdapter(AlarmsActivity activity) {
+            super(activity);
+        }
+
+        @Override
+        public AlarmView createViewHolder(View view) {
+            return new AlarmView((AlarmsActivity) getActivity(), view);
+        }
+
+        @Override
+        protected int getItemViewType(Alarm item) {
+            return R.layout.list_item_alarm;
+        }
     }
 
     @Override
@@ -180,31 +182,28 @@ public class AlarmsActivity extends BaseListActivity<Alarm> implements AlarmSett
         service.alarms(start, this);
         if (start == 0) {
             mActivePlayer = service.getActivePlayer();
-            service.alarmPlaylists(mAlarmPlaylistsCallback);
+            service.alarmPlaylists(alarmPlaylistsCallback);
 
             mAlarmsEnabledButton.setEnabled(false);
             service.playerPref(Player.Pref.ALARMS_ENABLED);
         }
     }
 
-    private final IServiceItemListCallback<AlarmPlaylist> mAlarmPlaylistsCallback = new IServiceItemListCallback<AlarmPlaylist>() {
-        private final List<AlarmPlaylist> mAlarmPlaylists = new ArrayList<>();
+    private final IServiceItemListCallback<AlarmPlaylist> alarmPlaylistsCallback = new IServiceItemListCallback<AlarmPlaylist>() {
+        private final List<AlarmPlaylist> alarmPlaylists = new ArrayList<>();
 
         @Override
         public void onItemsReceived(final int count, final int start, Map<String, Object> parameters, final List<AlarmPlaylist> items, Class<AlarmPlaylist> dataType) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (start == 0) {
-                        mAlarmPlaylists.clear();
-                    }
+            runOnUiThread(() -> {
+                if (start == 0) {
+                    alarmPlaylists.clear();
+                }
 
-                    mAlarmPlaylists.addAll(items);
-                    if (start + items.size() >= count) {
-                        mAlarmView.setAlarmPlaylists(ImmutableList.copyOf(mAlarmPlaylists));
-                        getItemAdapter().notifyDataSetChanged();
+                alarmPlaylists.addAll(items);
+                if (start + items.size() >= count) {
+                    setAlarmPlaylists(alarmPlaylists);
+                    getItemAdapter().notifyDataSetChanged();
 
-                    }
                 }
             });
         }
@@ -215,6 +214,21 @@ public class AlarmsActivity extends BaseListActivity<Alarm> implements AlarmSett
         }
     };
 
+    public void setAlarmPlaylists(List<AlarmPlaylist> alarmPlaylists) {
+        String currentCategory = null;
+
+        this.alarmPlaylists.clear();
+        for (AlarmPlaylist alarmPlaylist : alarmPlaylists) {
+            if (!alarmPlaylist.getCategory().equals(currentCategory)) {
+                AlarmPlaylist categoryAlarmPlaylist = new AlarmPlaylist();
+                categoryAlarmPlaylist.setCategory(alarmPlaylist.getCategory());
+                this.alarmPlaylists.add(categoryAlarmPlaylist);
+            }
+            this.alarmPlaylists.add(alarmPlaylist);
+            currentCategory = alarmPlaylist.getCategory();
+        }
+    }
+
     public void onEventMainThread(PlayerPrefReceived event) {
         if (!event.player.equals(getService().getActivePlayer())) {
             return;
@@ -223,7 +237,7 @@ public class AlarmsActivity extends BaseListActivity<Alarm> implements AlarmSett
         mPlayerPrefs.put(event.pref, event.value);
 
         if (Player.Pref.ALARMS_ENABLED.equals(event.pref)) {
-            boolean checked = Integer.valueOf(event.value) > 0;
+            boolean checked = Integer.parseInt(event.value) > 0;
             mAlarmsEnabledButton.setEnabled(true);
             mAlarmsEnabledButton.setChecked(checked);
             mAllAlarmsHintView.setText(checked ? R.string.all_alarms_on_hint : R.string.all_alarms_off_hint);
@@ -261,6 +275,10 @@ public class AlarmsActivity extends BaseListActivity<Alarm> implements AlarmSett
             ret = def;
         }
         return ret;
+    }
+
+    public List<AlarmPlaylist> getAlarmPlaylists() {
+        return alarmPlaylists;
     }
 
     @Override

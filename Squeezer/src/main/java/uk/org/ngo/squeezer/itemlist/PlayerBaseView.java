@@ -1,28 +1,24 @@
 package uk.org.ngo.squeezer.itemlist;
 
 import android.view.View;
-import android.view.ViewGroup;
-
-import androidx.annotation.LayoutRes;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
+
 import uk.org.ngo.squeezer.R;
-import uk.org.ngo.squeezer.framework.BaseItemView;
+import uk.org.ngo.squeezer.framework.ViewParamItemView;
 import uk.org.ngo.squeezer.model.Player;
 
 
-public abstract class PlayerBaseView<A extends PlayerListBaseActivity> extends BaseItemView<Player> {
+public abstract class PlayerBaseView<A extends PlayerListBaseActivity> extends ViewParamItemView<Player> {
     private static final Map<String, Integer> modelIcons = PlayerBaseView.initializeModelIcons();
     protected final A activity;
-    private @LayoutRes
-    int layoutResource;
 
-    public PlayerBaseView(A activity, @LayoutRes int layoutResource) {
-        super(activity);
+    public PlayerBaseView(A activity, @Nonnull View view) {
+        super(activity, view);
         this.activity = activity;
-        this.layoutResource = layoutResource;
     }
 
     private static Map<String, Integer> initializeModelIcons() {
@@ -45,11 +41,6 @@ public abstract class PlayerBaseView<A extends PlayerListBaseActivity> extends B
     protected static int getModelIcon(String model) {
         Integer icon = modelIcons.get(model);
         return (icon != null ? icon : R.drawable.ic_blank);
-    }
-
-    @Override
-    public View getAdapterView(View convertView, ViewGroup parent, int position, @ViewParam int viewParams) {
-        return getAdapterView(convertView, parent, position, viewParams, layoutResource);
     }
 
 }

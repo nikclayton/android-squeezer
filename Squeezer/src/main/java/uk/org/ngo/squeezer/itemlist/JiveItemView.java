@@ -17,26 +17,25 @@
 package uk.org.ngo.squeezer.itemlist;
 
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import androidx.annotation.LayoutRes;
+import androidx.annotation.NonNull;
 
 import java.util.EnumSet;
 
 import uk.org.ngo.squeezer.R;
-import uk.org.ngo.squeezer.model.Action;
-import uk.org.ngo.squeezer.framework.BaseItemView;
-import uk.org.ngo.squeezer.framework.BaseListActivity;
+import uk.org.ngo.squeezer.framework.ItemAdapter;
+import uk.org.ngo.squeezer.framework.ViewParamItemView;
 import uk.org.ngo.squeezer.framework.ItemListActivity;
+import uk.org.ngo.squeezer.model.Action;
 import uk.org.ngo.squeezer.model.JiveItem;
 import uk.org.ngo.squeezer.model.Slider;
 import uk.org.ngo.squeezer.model.Window;
 import uk.org.ngo.squeezer.itemlist.dialog.ArtworkListLayout;
 import uk.org.ngo.squeezer.util.ImageFetcher;
 
-public class JiveItemView extends BaseItemView<JiveItem> {
+public class JiveItemView extends ViewParamItemView<JiveItem> {
     private final JiveItemViewLogic logicDelegate;
     private Window.WindowStyle windowStyle;
 
@@ -46,15 +45,16 @@ public class JiveItemView extends BaseItemView<JiveItem> {
     /** Height of the icon, if VIEW_PARAM_ICON is used. */
     private int mIconHeight;
 
-    JiveItemView(BaseListActivity<JiveItem> activity, Window.WindowStyle windowStyle) {
-        super(activity);
-        setWindowStyle(windowStyle);
+    JiveItemView(@NonNull JiveItemListActivity activity, @NonNull View view) {
+        super(activity, view);
+        setWindowStyle(activity.window.windowStyle);
         this.logicDelegate = new JiveItemViewLogic(activity);
         setLoadingViewParams(viewParamIcon() | VIEW_PARAM_TWO_LINE );
     }
 
-    JiveItemViewLogic getLogicDelegate() {
-        return logicDelegate;
+    @Override
+    public JiveItemListActivity getActivity() {
+        return (JiveItemListActivity) super.getActivity();
     }
 
     void setWindowStyle(Window.WindowStyle windowStyle) {
@@ -69,24 +69,55 @@ public class JiveItemView extends BaseItemView<JiveItem> {
     }
 
     @Override
-    public View getAdapterView(View convertView, ViewGroup parent, int position, final JiveItem item, boolean selected) {
-        if (item.radio != null) {
-            item.radio = selected;
-        }
+    public void bindView(JiveItem item) {
         if (item.hasSlider()) {
-            return sliderView(parent, item);
+            bindSlider(item);
+            return;
+        }
+
+        if (item.radio != null && item.radio) {
+            getActivity().setSelectedIndex(getAdapterPosition());
+        }
+
+        setItemViewParams((viewParamIcon() | VIEW_PARAM_TWO_LINE | viewParamContext(item)));
+        super.bindView(item);
+
+        text2.setText(item.text2);
+
+        // If the item has an image, then fetch and display it
+        if (item.hasArtwork()) {
+            ImageFetcher.getInstance(getActivity()).loadImage(
+                    item.getIcon(),
+                    icon,
+                    mIconWidth,
+                    mIconHeight,
+                    this::onIcon
+            );
         } else {
-            @ViewParam int viewParams = (viewParamIcon() | VIEW_PARAM_TWO_LINE | viewParamContext(item));
-            View view = getAdapterView(convertView, parent, position, viewParams);
-            bindView(view, item);
-            return view;
+            icon.setImageDrawable(item.getIconDrawable(getActivity()));
+            onIcon();
+        }
+
+        if (item.isSelectable()) {
+            itemView.setOnClickListener(view -> onItemSelected(item));
+        }
+
+        if (item.hasContextMenu()) {
+            contextMenuButton.setVisibility(item.checkbox == null && item.radio == null ? View.VISIBLE : View.GONE);
+            contextMenuCheckbox.setVisibility(item.checkbox != null ? View.VISIBLE : View.GONE);
+            contextMenuRadio.setVisibility(item.radio != null ? View.VISIBLE : View.GONE);
+            if (item.checkbox != null) {
+                contextMenuCheckbox.setChecked(item.checkbox);
+            } else if (item.radio != null) {
+                contextMenuRadio.setChecked(item.radio);
+            }
         }
     }
 
-    private View sliderView(ViewGroup parent, final JiveItem item) {
-        View view = getLayoutInflater().inflate(R.layout.slider_item, parent, false);
-        final TextView sliderValue = view.findViewById(R.id.slider_value);
-        SeekBar seekBar = view.findViewById(R.id.slider);
+
+    private void bindSlider(final JiveItem item) {
+        final TextView sliderValue = itemView.findViewById(R.id.slider_value);
+        SeekBar seekBar = itemView.findViewById(R.id.slider);
         final int thumbWidth = seekBar.getThumb().getIntrinsicWidth();
         final int thumbOffset = seekBar.getThumbOffset();
         final Slider slider = item.slider;
@@ -119,16 +150,6 @@ public class JiveItemView extends BaseItemView<JiveItem> {
                 return slider.min + (slider.max - slider.min) * progress / max;
             }
         });
-        return view;
-    }
-
-    @Override
-    public View getAdapterView(View convertView, ViewGroup parent, int position, @ViewParam int viewParams) {
-        return getAdapterView(convertView, parent, position, viewParams, layoutResource());
-    }
-
-    @LayoutRes private int layoutResource() {
-        return (listLayout() == ArtworkListLayout.grid) ? R.layout.grid_item : R.layout.list_item;
     }
 
     ArtworkListLayout listLayout() {
@@ -154,55 +175,10 @@ public class JiveItemView extends BaseItemView<JiveItem> {
         return item.hasContextMenu() ? VIEW_PARAM_CONTEXT_BUTTON : 0;
     }
 
-    @Override
-    public void bindView(View view, JiveItem item) {
-        super.bindView(view, item);
-        ViewHolder viewHolder = (ViewHolder) view.getTag();
-
-        viewHolder.text2.setText(item.text2);
-
-        // If the item has an image, then fetch and display it
-        if (item.hasArtwork()) {
-            ImageFetcher.getInstance(getActivity()).loadImage(
-                    item.getIcon(),
-                    viewHolder.icon,
-                    mIconWidth,
-                    mIconHeight,
-                    () -> onIcon(viewHolder)
-
-            );
-        } else {
-            viewHolder.icon.setImageDrawable(item.getIconDrawable(getActivity()));
-            onIcon(viewHolder);
-        }
-
-        if (item.hasContextMenu()) {
-            viewHolder.contextMenuButton.setVisibility(item.checkbox == null && item.radio == null ? View.VISIBLE : View.GONE);
-            viewHolder.contextMenuCheckbox.setVisibility(item.checkbox != null ? View.VISIBLE : View.GONE);
-            viewHolder.contextMenuRadio.setVisibility(item.radio != null ? View.VISIBLE : View.GONE);
-            if (item.checkbox != null) {
-                viewHolder.contextMenuCheckbox.setChecked(item.checkbox);
-            } else if (item.radio != null) {
-                viewHolder.contextMenuRadio.setChecked(item.radio);
-            }
-        }
+    protected void onIcon() {
     }
 
-    protected void onIcon(ViewHolder viewHolder) {
-    }
-
-    @Override
-    public boolean isSelectable(JiveItem item) {
-        return item.isSelectable();
-    }
-
-    @Override
-    public boolean isSelected(JiveItem item) {
-        return item.radio != null && item.radio;
-    }
-
-    @Override
-    public boolean onItemSelected(View view, int index, JiveItem item) {
+    private void onItemSelected(JiveItem item) {
         Action.JsonAction action = (item.goAction != null && item.goAction.action != null) ? item.goAction.action : null;
         Action.NextWindow nextWindow = (action != null ? action.nextWindow : item.nextWindow);
         if (item.checkbox != null) {
@@ -211,13 +187,12 @@ public class JiveItemView extends BaseItemView<JiveItem> {
             if (checkboxAction != null) {
                 getActivity().action(item, checkboxAction);
             }
-            ViewHolder viewHolder = (ViewHolder) view.getTag();
-            viewHolder.contextMenuCheckbox.setChecked(item.checkbox);
+            contextMenuCheckbox.setChecked(item.checkbox);
         } else if (nextWindow != null && !item.hasInput()) {
             getActivity().action(item, item.goAction);
         } else {
             if (item.goAction != null)
-                logicDelegate.execGoAction((ViewHolder) view.getTag(), item, 0);
+                logicDelegate.execGoAction(this, item, 0);
             else if (item.hasSubItems())
                 JiveItemListActivity.show(getActivity(), item);
             else if (item.getNode() != null) {
@@ -225,11 +200,23 @@ public class JiveItemView extends BaseItemView<JiveItem> {
             }
         }
 
-        return (item.radio != null);
+        if (item.radio != null) {
+            ItemAdapter<JiveItemView, JiveItem> itemAdapter = getActivity().getItemAdapter();
+            JiveItem prevItem = itemAdapter.getItem(getActivity().getSelectedIndex());
+            if (prevItem != null && prevItem.radio != null) {
+                prevItem.radio = false;
+                itemAdapter.notifyItemChanged(getActivity().getSelectedIndex());
+            }
+
+            item.radio = true;
+            getActivity().setSelectedIndex(getAdapterPosition());
+            itemAdapter.notifyItemChanged(getAdapterPosition());
+        }
    }
 
     @Override
-    public void showContextMenu(ViewHolder viewHolder, JiveItem item) {
-        logicDelegate.showContextMenu(viewHolder, item);
+    public void showContextMenu(JiveItem item) {
+        logicDelegate.showContextMenu(this, item);
     }
+
 }

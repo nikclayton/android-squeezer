@@ -17,6 +17,7 @@
 package uk.org.ngo.squeezer.itemlist;
 
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 
@@ -88,8 +89,8 @@ public class PlayerListActivity extends PlayerListBaseActivity implements
         mResultsAdapter.notifyDataSetChanged();
     }
 
-    public PlayerBaseView createPlayerView() {
-        return new PlayerView(this);
+    public PlayerBaseView createPlayerView(View view) {
+        return new PlayerView(this, view);
     }
 
     /**

@@ -24,8 +24,6 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-
 import uk.org.ngo.squeezer.R;
 import uk.org.ngo.squeezer.Util;
 import uk.org.ngo.squeezer.itemlist.dialog.DefeatDestructiveTouchToPlayDialog;
@@ -37,52 +35,47 @@ import uk.org.ngo.squeezer.model.PlayerState;
 import uk.org.ngo.squeezer.service.ISqueezeService;
 
 public class PlayerView extends PlayerBaseView<PlayerListActivity> {
+    private final SeekBar volumeBar;
+    private TextView volumeValue;
 
-    public PlayerView(PlayerListActivity activity) {
-        super(activity, R.layout.list_item_player);
+    public PlayerView(PlayerListActivity activity, View view) {
+        super(activity, view);
+        // TODO rcv R.layout.list_item_player
 
         setViewParams(VIEW_PARAM_ICON | VIEW_PARAM_TWO_LINE | VIEW_PARAM_CONTEXT_BUTTON);
         setLoadingViewParams(VIEW_PARAM_ICON | VIEW_PARAM_TWO_LINE);
+
+        volumeBar = view.findViewById(R.id.volume_slider);
     }
 
     @Override
-    public ViewHolder createViewHolder(View view) {
-        return new PlayerViewHolder(view);
-    }
-
-    @Override
-    public void bindView(View view, Player item) {
+    public void bindView(Player item) {
         PlayerState playerState = item.getPlayerState();
-        PlayerViewHolder viewHolder = (PlayerViewHolder) view.getTag();
 
-        super.bindView(view, item);
-        viewHolder.icon.setImageResource(getModelIcon(item.getModel()));
+        super.bindView(item);
+        icon.setImageResource(getModelIcon(item.getModel()));
 
-        if (viewHolder.volumeBar == null) {
-            viewHolder.volumeBar = view.findViewById(R.id.volume_slider);
-            viewHolder.volumeBar.setOnSeekBarChangeListener(new VolumeSeekBarChangeListener(item, viewHolder.volumeValue));
-        }
-
-        viewHolder.volumeBar.setVisibility(View.VISIBLE);
+        volumeBar.setOnSeekBarChangeListener(new VolumeSeekBarChangeListener(item, volumeValue));
+        volumeBar.setVisibility(View.VISIBLE);
 
         if (playerState.isPoweredOn()) {
-            viewHolder.text1.setAlpha(1.0f);
+            text1.setAlpha(1.0f);
         } else {
-            viewHolder.text1.setAlpha(0.25f);
+            text1.setAlpha(0.25f);
         }
 
-        viewHolder.volumeBar.setProgress(playerState.getCurrentVolume());
+        volumeBar.setProgress(playerState.getCurrentVolume());
 
-        viewHolder.text2.setVisibility(playerState.getSleepDuration() > 0 ? View.VISIBLE : View.INVISIBLE);
+        text2.setVisibility(playerState.getSleepDuration() > 0 ? View.VISIBLE : View.INVISIBLE);
         if (playerState.getSleepDuration() > 0) {
-            viewHolder.text2.setText(activity.getString(R.string.SLEEPING_IN)
+            text2.setText(activity.getString(R.string.SLEEPING_IN)
                     + " " + Util.formatElapsedTime(item.getSleepingIn()));
         }
     }
 
     @Override
-    public void showContextMenu(ViewHolder viewHolder, final Player item) {
-        PopupMenu popup = new PopupMenu(getActivity(), viewHolder.contextMenuButtonHolder);
+    public void showContextMenu(final Player item) {
+        PopupMenu popup = new PopupMenu(getActivity(), contextMenuButtonHolder);
         popup.inflate(R.menu.playercontextmenu);
 
         Menu menu = popup.getMenu();
@@ -193,12 +186,4 @@ public class PlayerView extends PlayerBaseView<PlayerListActivity> {
         }
     }
 
-    private static class PlayerViewHolder extends ViewHolder {
-        SeekBar volumeBar;
-        TextView volumeValue;
-
-        public PlayerViewHolder(@NonNull View view) {
-            super(view);
-        }
-    }
 }

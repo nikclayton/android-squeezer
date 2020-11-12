@@ -22,12 +22,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.AbsListView;
-import android.widget.ListView;
+import android.view.View;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.core.view.GestureDetectorCompat;
@@ -35,7 +35,7 @@ import androidx.core.view.GestureDetectorCompat;
 import java.util.Map;
 
 import uk.org.ngo.squeezer.R;
-import uk.org.ngo.squeezer.framework.ItemView;
+import uk.org.ngo.squeezer.framework.ItemAdapter;
 import uk.org.ngo.squeezer.itemlist.dialog.PlaylistSaveDialog;
 import uk.org.ngo.squeezer.model.JiveItem;
 import uk.org.ngo.squeezer.service.ISqueezeService;
@@ -97,14 +97,25 @@ public class CurrentPlaylistActivity extends JiveItemListActivity {
     }
 
     @Override
-    public void setListView(AbsListView listView) {
-        super.setListView(listView);
-        listView.setOnDragListener(new ListDragListener(this));
+    public void setContentView(@LayoutRes int layoutResID) {
+        super.setContentView(layoutResID);
+        getListView().setOnDragListener(new ListDragListener(this));
     }
 
     @Override
-    public ItemView<JiveItem> createItemView() {
-        return new CurrentPlaylistItemView(this);
+    protected ItemAdapter<JiveItemView, JiveItem> createItemListAdapter() {
+        return new ItemAdapter<JiveItemView, JiveItem>(this) {
+
+            @Override
+            public JiveItemView createViewHolder(View view) {
+                return new CurrentPlaylistItemView(CurrentPlaylistActivity.this, view);
+            }
+
+            @Override
+            protected int getItemViewType(JiveItem item) {
+                return R.layout.list_item;
+            }
+        };
     }
 
     @Override
@@ -152,7 +163,7 @@ public class CurrentPlaylistActivity extends JiveItemListActivity {
                 PlaylistSaveDialog.addTo(this, getCurrentPlaylist());
                 return true;
             case R.id.menu_item_playlist_show_current_song:
-                getListView().smoothScrollToPositionFromTop(getItemAdapter().getSelectedIndex(), 0);
+                getListView().smoothScrollToPosition(getSelectedIndex());
                 return true;
 
         }
@@ -171,8 +182,10 @@ public class CurrentPlaylistActivity extends JiveItemListActivity {
             return;
         }
         if (event.player.equals(getService().getActivePlayer())) {
-            getItemAdapter().setSelectedIndex(event.playerState.getCurrentPlaylistIndex());
-            getItemAdapter().notifyDataSetChanged();
+            int prevSelectedIndex = getSelectedIndex();
+            setSelectedIndex(event.playerState.getCurrentPlaylistIndex());
+            getItemAdapter().notifyItemChanged(prevSelectedIndex);
+            getItemAdapter().notifyItemChanged(getSelectedIndex());
         }
     }
 
@@ -226,12 +239,12 @@ public class CurrentPlaylistActivity extends JiveItemListActivity {
         }
 
         int selectedIndex = service.getPlayerState().getCurrentPlaylistIndex();
-        getItemAdapter().setSelectedIndex(selectedIndex);
+        setSelectedIndex(selectedIndex);
         // Initially position the list at the currently playing song.
         // Do it again once it has loaded because the newly displayed items
         // may push the current song outside the displayed area
         if (start == 0 || (start <= selectedIndex && selectedIndex < start + playlistItems.size())) {
-            runOnUiThread(() -> ((ListView) getListView()).setSelectionFromTop(selectedIndex, 0));
+            runOnUiThread(() -> getListView().scrollToPosition(selectedIndex));
         }
     }
 

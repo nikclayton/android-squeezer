@@ -92,7 +92,6 @@ for the implementation.
         android:layout_alignStart="@+id/icon" />
 
     <include
-        android:id="@+id/context_menu"
         layout="@layout/context_menu_image_button"
         android:layout_width="48dp"
         android:layout_height="48dp"

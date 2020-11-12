@@ -21,10 +21,10 @@ import android.os.Looper;
 import android.os.Message;
 import android.view.DragEvent;
 import android.view.View;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 import uk.org.ngo.squeezer.R;
 
@@ -52,6 +52,8 @@ class ListDragListener extends Handler implements View.OnDragListener {
                 return true;
 
             case DragEvent.ACTION_DRAG_ENTERED:
+            case DragEvent.ACTION_DRAG_EXITED:
+            case DragEvent.ACTION_DROP:
                 return true;
 
             case DragEvent.ACTION_DRAG_LOCATION: {
@@ -61,13 +63,13 @@ class ListDragListener extends Handler implements View.OnDragListener {
                 if (position != AdapterView.INVALID_POSITION && position != viewPosition && activity.getItemAdapter().getItem(position) != null) {
                     // Prevent moving back if we have just swapped the current drag item with a taller item
                     if (lastMoveY == -1 || !((event.getY() > lastMoveY && position < viewPosition) || (event.getY() < lastMoveY && position > viewPosition))) {
-                        int selectedIndex = activity.getItemAdapter().getSelectedIndex();
+                        int selectedIndex = activity.getSelectedIndex();
                         if (selectedIndex == viewPosition) {
-                            activity.getItemAdapter().setSelectedIndex(position);
+                            activity.setSelectedIndex(position);
                         } else if (viewPosition < selectedIndex && position >= selectedIndex) {
-                            activity.getItemAdapter().setSelectedIndex(selectedIndex - 1);
+                            activity.setSelectedIndex(selectedIndex - 1);
                         } else if (viewPosition > selectedIndex && position <= selectedIndex) {
-                            activity.getItemAdapter().setSelectedIndex(selectedIndex + 1);
+                            activity.setSelectedIndex(selectedIndex + 1);
                         }
 
                         activity.getItemAdapter().moveItem(viewPosition, position);
@@ -79,12 +81,7 @@ class ListDragListener extends Handler implements View.OnDragListener {
                 setScrollSpeed(event);
                 return true;
             }
-            case DragEvent.ACTION_DRAG_EXITED:
-                return true;
 
-            case DragEvent.ACTION_DROP: {
-                return true;
-            }
             case DragEvent.ACTION_DRAG_ENDED:
                 activity.setDraggedIndex(-1);
                 scrollSpeed = 0;
@@ -104,7 +101,7 @@ class ListDragListener extends Handler implements View.OnDragListener {
         lastMoveY = -1;
         int distance = activity.getResources().getDimensionPixelSize(R.dimen.playlist_scroll_distance);
         int duration = 250 - Math.abs(scrollSpeed);
-        activity.getListView().smoothScrollBy(scrollSpeed < 0 ? -distance : distance, duration);
+        activity.getListView().smoothScrollBy(0, scrollSpeed < 0 ? -distance : distance, null, duration);
         removeMessages(MSG_SCROLL_ENDED);
         sendEmptyMessageDelayed(MSG_SCROLL_ENDED, duration-10);
     }
@@ -117,8 +114,9 @@ class ListDragListener extends Handler implements View.OnDragListener {
     }
 
     private int getPosition(DragEvent event) {
-        AbsListView listView = activity.getListView();
-        return listView.pointToPosition((int) (event.getX()), (int) (event.getY()));
+        RecyclerView listView = activity.getListView();
+        View childView = listView.findChildViewUnder((int) (event.getX()), (int) (event.getY()));
+        return listView.getChildAdapterPosition(childView);
     }
 
     private int getScrollSpeed(DragEvent event) {

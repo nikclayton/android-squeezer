@@ -19,14 +19,13 @@ package uk.org.ngo.squeezer.framework;
 
 import android.os.Bundle;
 import androidx.annotation.MainThread;
-import android.widget.AbsListView;
-import android.widget.ImageView;
-import android.widget.ListView;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 import java.util.Map;
 
-import uk.org.ngo.squeezer.R;
 import uk.org.ngo.squeezer.itemlist.IServiceItemListCallback;
 import uk.org.ngo.squeezer.model.Item;
 import uk.org.ngo.squeezer.service.event.HandshakeComplete;
@@ -36,18 +35,18 @@ import uk.org.ngo.squeezer.util.ImageFetcher;
 /**
  * A generic base class for an activity to list items of a particular SqueezeServer data type. The
  * data type is defined by the generic type argument, and must be an extension of {@link Item}. You
- * must provide an {@link ItemView} to provide the view logic used by this activity. This is done by
- * implementing {@link #createItemView()}.
+ * must provide an {@link ItemAdapter} to provide the view logic used by this activity. This is done by
+ * implementing {@link #createItemListAdapter()}}.
  * <p>
  * When the activity is first created ({@link #onCreate(Bundle)}), an empty {@link ItemAdapter}
- * is created using the provided {@link ItemView}. See {@link ItemListActivity} for see details of
- * ordering and receiving of list items from SqueezeServer, and handling of item selection.
+ * is created. See {@link ItemListActivity} for see details of
+ * ordering and receiving of list items from SqueezeServer.
  *
  * @param <T> Denotes the class of the items this class should list
  *
  * @author Kurt Aaholst
  */
-public abstract class BaseListActivity<T extends Item> extends ItemListActivity implements IServiceItemListCallback<T> {
+public abstract class BaseListActivity<VH extends ItemViewHolder<T>, T extends Item> extends ItemListActivity implements IServiceItemListCallback<T> {
 
     /**
      * Tag for first visible position in mRetainFragment.
@@ -59,38 +58,15 @@ public abstract class BaseListActivity<T extends Item> extends ItemListActivity 
      */
     public static final String TAG_ADAPTER = "adapter";
 
-    private ItemAdapter<T> itemAdapter;
-
-    /**
-     * Can't do much here, as content is based on settings, and which data to display, which is controlled by data
-     * returned from server.
-     * <p>
-     * See {@link #setupListView(AbsListView)} and {@link #onItemsReceived(int, int, Map, List, Class)} for the actual setup of
-     * views and adapter
-     */
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(getContentView());
-    }
+    private ItemAdapter<VH, T> itemAdapter;
 
     @Override
-    protected AbsListView setupListView(AbsListView listView) {
-        listView.setOnItemClickListener((parent, view, position, id) -> getItemAdapter().onItemSelected(view, position));
+    public void setContentView(int layoutResID) {
+        super.setContentView(layoutResID);
 
-        listView.setOnScrollListener(new ScrollListener());
+        getListView().addOnScrollListener(new ScrollListener());
 
-        listView.setRecyclerListener(view -> {
-            // Release strong reference when a view is recycled
-            final ImageView imageView = view.findViewById(R.id.icon);
-            if (imageView != null) {
-                imageView.setImageBitmap(null);
-            }
-        });
-
-        setupAdapter(listView);
-
-        return listView;
+        setupAdapter(getListView());
     }
 
     @MainThread
@@ -104,23 +80,6 @@ public abstract class BaseListActivity<T extends Item> extends ItemListActivity 
     }
 
     /**
-     * Returns the ID of a content view to be used by this list activity.
-     * <p>
-     * The content view must contain a {@link AbsListView} with the id {@literal item_list} in order
-     * to be valid.
-     *
-     * @return The ID
-     */
-    protected int getContentView() {
-        return R.layout.slim_browser_layout;
-    }
-
-    /**
-     * @return A new view logic to be used by this activity
-     */
-    abstract protected ItemView<T> createItemView();
-
-    /**
      * Set our adapter on the list view.
      * <p>
      * This can't be done in {@link #onCreate(android.os.Bundle)} because getView might be called
@@ -131,16 +90,13 @@ public abstract class BaseListActivity<T extends Item> extends ItemListActivity 
      * <p>
      * Call this method after the handshake is complete.
      */
-    private void setupAdapter(AbsListView listView) {
+    private void setupAdapter(RecyclerView listView) {
         listView.setAdapter(getItemAdapter());
+        // TODO call setHasFixedSize (not for grid)
 
         Integer position = (Integer) getRetainedValue(TAG_POSITION);
         if (position != null) {
-            if (listView instanceof ListView) {
-                ((ListView) listView).setSelectionFromTop(position, 0);
-            } else {
-                listView.setSelection(position);
-            }
+            listView.scrollToPosition(position);
         }
     }
 
@@ -157,30 +113,21 @@ public abstract class BaseListActivity<T extends Item> extends ItemListActivity 
      * @see android.widget.AbsListView#getFirstVisiblePosition()
      */
     private void saveVisiblePosition() {
-        putRetainedValue(TAG_POSITION, getListView().getFirstVisiblePosition());
-    }
-
-    /**
-     * @return The current {@link ItemAdapter}'s {@link ItemView}
-     */
-    public ItemView<T> getItemView() {
-        return getItemAdapter().getItemView();
+        LinearLayoutManager layoutManager = (LinearLayoutManager) getListView().getLayoutManager();
+        putRetainedValue(TAG_POSITION, layoutManager.findFirstVisibleItemPosition());
     }
 
     /**
      * @return The current {@link ItemAdapter}, creating it if necessary.
      */
-    public ItemAdapter<T> getItemAdapter() {
+    public ItemAdapter<VH, T> getItemAdapter() {
         if (itemAdapter == null) {
             //noinspection unchecked
-            itemAdapter = (ItemAdapter<T>) getRetainedValue(TAG_ADAPTER);
+            itemAdapter = (ItemAdapter<VH, T>) getRetainedValue(TAG_ADAPTER);
             if (itemAdapter == null) {
-                itemAdapter = createItemListAdapter(createItemView());
+                itemAdapter = createItemListAdapter();
                 putRetainedValue(TAG_ADAPTER, itemAdapter);
             } else {
-                // We have just retained the item adapter, we need to create a new
-                // item view logic, cause it holds a reference to the old activity
-                itemAdapter.setItemView(createItemView());
                 // Update views with the count from the retained item adapter
                 itemAdapter.onCountUpdated();
             }
@@ -194,9 +141,7 @@ public abstract class BaseListActivity<T extends Item> extends ItemListActivity 
         getItemAdapter().clear();
     }
 
-    protected ItemAdapter<T> createItemListAdapter(ItemView<T> itemView) {
-        return new ItemAdapter<>(itemView);
-    }
+    protected abstract ItemAdapter<VH, T> createItemListAdapter();
 
     @Override
     @SuppressWarnings("unchecked")
@@ -216,24 +161,16 @@ public abstract class BaseListActivity<T extends Item> extends ItemListActivity 
 
     protected class ScrollListener extends ItemListActivity.ScrollListener {
 
-        ScrollListener() {
-            super();
-        }
-
         /**
          * Pauses cache disk fetches if the user is flinging the list, or if their finger is still
          * on the screen.
          */
         @Override
-        public void onScrollStateChanged(AbsListView listView, int scrollState) {
+        public void onScrollStateChanged(@NonNull RecyclerView listView, int scrollState) {
             super.onScrollStateChanged(listView, scrollState);
 
-            if (scrollState == AbsListView.OnScrollListener.SCROLL_STATE_FLING ||
-                    scrollState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
-                ImageFetcher.getInstance(BaseListActivity.this).setPauseWork(true);
-            } else {
-                ImageFetcher.getInstance(BaseListActivity.this).setPauseWork(false);
-            }
+            ImageFetcher.getInstance(BaseListActivity.this).setPauseWork(scrollState == RecyclerView.SCROLL_STATE_SETTLING ||
+                    scrollState == RecyclerView.SCROLL_STATE_DRAGGING);
         }
     }
 }

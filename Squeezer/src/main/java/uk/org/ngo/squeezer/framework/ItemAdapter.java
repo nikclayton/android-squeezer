@@ -16,35 +16,40 @@
 
 package uk.org.ngo.squeezer.framework;
 
+import android.os.Parcelable;
 import android.util.SparseArray;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.lang.reflect.Field;
 import java.util.List;
 
 import uk.org.ngo.squeezer.R;
 import uk.org.ngo.squeezer.model.Item;
+import uk.org.ngo.squeezer.util.Reflection;
 
 
 /**
  * A generic class for an adapter to list items of a particular SqueezeServer data type. The data
  * type is defined by the generic type argument, and must be an extension of {@link Item}.
  * <p>
- * Normally there is no need to extend this, as we delegate all type dependent stuff to
- * {@link ItemView}.
+ * Extend this and {@link VH}, to display a list of items
  *
  * @param <T> Denotes the class of the items this class should list
  *
  * @author Kurt Aaholst
- * @see ItemView
+ * @see ItemViewHolder
  */
-public class ItemAdapter<T extends Item> extends BaseAdapter {
+public abstract class ItemAdapter<VH extends ItemViewHolder<T>, T extends Item> extends RecyclerView.Adapter<VH> {
 
     /**
-     * View logic for this adapter
+     * Activity which hosts this adapter
      */
-    private ItemView<T> mItemView;
+    private final ItemListActivity activity;
 
     /**
      * List of items, possibly headed with an empty item.
@@ -66,36 +71,31 @@ public class ItemAdapter<T extends Item> extends BaseAdapter {
     private final String loadingText;
 
     /**
-     * Number of elements to by fetched at a time
+     * Number of elements to be fetched at a time
      */
     private final int pageSize;
-
-    /**
-     * Index of the latest selected item see {@link #onItemSelected(View, int)}
-     */
-    private int selectedIndex;
 
     /**
      * Creates a new adapter. Initially the item list is populated with items displaying the
      * localized "loading" text. Call {@link #update(int, int, List)} as items arrives from
      * SqueezeServer.
      *
-     * @param itemView The {@link ItemView} to use with this adapter
+     * @param activity The {@link ItemListActivity} which hosts this adapter
      * @param emptyItem If set the list of items shall start with an empty item
      */
-    public ItemAdapter(ItemView<T> itemView, boolean emptyItem) {
-        mItemView = itemView;
+    public ItemAdapter(ItemListActivity activity, boolean emptyItem) {
+        this.activity = activity;
         mEmptyItem = emptyItem;
-        loadingText = itemView.getActivity().getString(R.string.loading_text);
-        pageSize = itemView.getActivity().getResources().getInteger(R.integer.PageSize);
+        loadingText = getActivity().getString(R.string.loading_text);
+        pageSize = getActivity().getResources().getInteger(R.integer.PageSize);
         pages.clear();
     }
 
     /**
-     * Calls {@link #(ItemView, boolean)}, with emptyItem = false
+     * Calls {@link #(ItemListActivity, boolean)}, with emptyItem = false
      */
-    public ItemAdapter(ItemView<T> itemView) {
-        this(itemView, false);
+    public ItemAdapter(ItemListActivity activity) {
+        this(activity, false);
     }
 
     private int pageNumber(int position) {
@@ -111,50 +111,37 @@ public class ItemAdapter<T extends Item> extends BaseAdapter {
         notifyDataSetChanged();
     }
 
+    @NonNull
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(viewType, parent, false);
+        return createViewHolder(view);
+    }
+
+    public abstract VH createViewHolder(View view);
+
+    @Override
+    public void onBindViewHolder(@NonNull VH holder, int position) {
         T item = getItem(position);
-        if (item != null) {
-            return mItemView.getAdapterView(convertView, parent, position, item, position == selectedIndex);
-        }
-
-        return mItemView.getAdapterView(convertView, parent, position, (position == 0 && mEmptyItem ? "" : loadingText));
-    }
-
-    public ItemListActivity getActivity() {
-        return mItemView.getActivity();
-    }
-
-    public int getSelectedIndex() {
-        return selectedIndex;
-    }
-
-    public void setSelectedIndex(int index) {
-        selectedIndex = index;
-    }
-
-    public void onItemSelected(View view, int position) {
-        T item = getItem(position);
-        if (item != null) {
-            selectedIndex = position;
-            if (mItemView.onItemSelected(view, position, item)) {
-                notifyDataSetChanged();
-            }
-        }
-    }
-    public void onSelected(View view) {
-        mItemView.onGroupSelected(view, getPage(0));
-    }
-    public ItemView<T> getItemView() {
-        return mItemView;
-    }
-
-    public void setItemView(ItemView<T> itemView) {
-        mItemView = itemView;
+        if (item != null)
+            holder.bindView(item);
+        else
+            holder.bindView((position == 0 && mEmptyItem ? "" : loadingText));
     }
 
     @Override
-    public int getCount() {
+    public int getItemViewType(int position) {
+        return getItemViewType(getItem(position));
+    }
+
+    protected abstract int getItemViewType(T item);
+
+    protected ItemListActivity getActivity() {
+        return activity;
+    }
+
+    @Override
+    public int getItemCount() {
         return count;
     }
 
@@ -171,9 +158,6 @@ public class ItemAdapter<T extends Item> extends BaseAdapter {
         T[] page = getPage(start);
         int offset = start % pageSize;
         for (T item : items) {
-            if (mItemView.isSelected(item)) {
-                selectedIndex = start + offset;
-            }
             if (offset >= pageSize) {
                 start += offset;
                 page = getPage(start);
@@ -183,7 +167,6 @@ public class ItemAdapter<T extends Item> extends BaseAdapter {
         }
     }
 
-    @Override
     public T getItem(int position) {
         T item = getPage(position)[position % pageSize];
         if (item == null) {
@@ -198,12 +181,6 @@ public class ItemAdapter<T extends Item> extends BaseAdapter {
     @Override
     public long getItemId(int position) {
         return position;
-    }
-
-    @Override
-    public boolean isEnabled(int position) {
-        T item = getItem(position);
-        return item != null && mItemView.isSelectable(item);
     }
 
     /**
@@ -226,20 +203,23 @@ public class ItemAdapter<T extends Item> extends BaseAdapter {
         int offset = (mEmptyItem ? 1 : 0);
         count += offset;
         start += offset;
-        if (count == 0 || count != getCount()) {
+        boolean countUpdated = (count == 0 || count != getItemCount());
+
+        setItems(start, items);
+        if (countUpdated) {
             this.count = count;
             onCountUpdated();
+            notifyDataSetChanged();
+        } else {
+            notifyItemRangeChanged(start, items.size());
         }
-        setItems(start, items);
-
-        notifyDataSetChanged();
     }
 
     /**
      * @return The position of the given item in this adapter or 0 if not found
      */
     public int findItem(T item) {
-        for (int pos = 0; pos < getCount(); pos++) {
+        for (int pos = 0; pos < getItemCount(); pos++) {
             if (getItem(pos) == null) {
                 if (item == null) {
                     return pos;
@@ -258,7 +238,7 @@ public class ItemAdapter<T extends Item> extends BaseAdapter {
         T item = getItem(fromPosition);
         remove(fromPosition);
         insert(toPosition, item);
-        notifyDataSetChanged();
+        notifyItemMoved(fromPosition, toPosition);
     }
 
     /**
@@ -268,7 +248,7 @@ public class ItemAdapter<T extends Item> extends BaseAdapter {
         remove(position);
         count--;
         onCountUpdated();
-        notifyDataSetChanged();
+        notifyItemRemoved(position);
     }
 
     /**
@@ -278,7 +258,7 @@ public class ItemAdapter<T extends Item> extends BaseAdapter {
         insert(position, item);
         count++;
         onCountUpdated();
-        notifyDataSetChanged();
+        notifyItemInserted(position);
     }
 
     private void remove(int position) {
@@ -317,7 +297,46 @@ public class ItemAdapter<T extends Item> extends BaseAdapter {
     }
 
     private T[] arrayInstance(int size) {
-        return mItemView.getCreator().newArray(size);
+        return getItemCreator().newArray(size);
+    }
+
+    private Class<T> _itemClass;
+
+    private Parcelable.Creator<T> _itemCreator;
+    /**
+     * @return The generic argument of the implementation
+     */
+    @SuppressWarnings("unchecked")
+    public Class<T> getItemClass() {
+        if (_itemClass == null) {
+            _itemClass = (Class<T>) Reflection.getGenericClass(getClass(), ItemAdapter.class,
+                    1);
+            if (_itemClass == null) {
+                throw new RuntimeException("Could not read generic argument for: " + getClass());
+            }
+        }
+        return _itemClass;
+    }
+
+    /**
+     * @return the creator for the current {@link Item} implementation
+     */
+    @SuppressWarnings("unchecked")
+    public Parcelable.Creator<T> getItemCreator() {
+        if (_itemCreator == null) {
+            Field field;
+            try {
+                field = getItemClass().getField("CREATOR");
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            try {
+                _itemCreator = (Parcelable.Creator<T>) field.get(null);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return _itemCreator;
     }
 
 }

@@ -44,12 +44,22 @@ public class PlayerListAdapter extends BaseExpandableListAdapter {
      * A list adapter for a synchronization group, containing players.
      * This class is comparable and it has a name for the synchronization group.
      */
-    private class SyncGroup extends ItemAdapter<Player> implements Comparable {
+    private class SyncGroup extends ItemAdapter<PlayerView, Player> implements Comparable {
 
         public String syncGroupName; // the name of the synchronization group as displayed in the players screen
 
-        public SyncGroup(PlayerBaseView playerView) {
-            super(playerView);
+        public SyncGroup() {
+            super(mActivity);
+        }
+
+        @Override
+        public PlayerView createViewHolder(View view) {
+            return new PlayerView((PlayerListActivity) getActivity(), view);
+        }
+
+        @Override
+        protected int getItemViewType(Player item) {
+            return R.layout.list_item_player;
         }
 
         @Override
@@ -67,7 +77,7 @@ public class PlayerListAdapter extends BaseExpandableListAdapter {
 
             // determine and set synchronization group name (player names divided by commas)
             List<String> playerNames = new ArrayList<>();
-            for (int i = 0; i < this.getCount(); i++) {
+            for (int i = 0; i < this.getItemCount(); i++) {
                 Player p = this.getItem(i);
                 playerNames.add(p.getName());
             }
@@ -93,10 +103,12 @@ public class PlayerListAdapter extends BaseExpandableListAdapter {
 
     
     public void onGroupClick(View view, int groupPosition) {
-        mChildAdapters.get(groupPosition).onSelected(view);
+        // TODO rcv move to view holder
+        // mChildAdapters.get(groupPosition).onSelected(view);
     }
     public void onChildClick(View view, int groupPosition, int childPosition) {
-        mChildAdapters.get(groupPosition).onItemSelected(view, childPosition);
+        // TODO rcv move to view holder
+        // mChildAdapters.get(groupPosition).onItemSelected(view, childPosition);
     }
 
     public void clear() {
@@ -128,7 +140,7 @@ public class PlayerListAdapter extends BaseExpandableListAdapter {
         // Get a list of slaves for every synchronization group
         for (Collection<Player> slaves: playerSyncGroups.asMap().values()) {
             // create a new synchronization group
-            SyncGroup syncGroup = new SyncGroup(mActivity.createPlayerView());
+            SyncGroup syncGroup = new SyncGroup();
             mPlayerCount += slaves.size();
             // add the slaves (the players) to the synchronization group
             syncGroup.update(slaves.size(), 0, new ArrayList<>(slaves));
@@ -146,7 +158,9 @@ public class PlayerListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-        return mChildAdapters.get(groupPosition).getView(childPosition, convertView, parent);
+        // TODO rcv implement
+        // return mChildAdapters.get(groupPosition).getView(childPosition, convertView, parent);
+        return null;
     }
 
     @Override
@@ -156,7 +170,7 @@ public class PlayerListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public int getChildrenCount(int groupPosition) {
-        return mChildAdapters.get(groupPosition).getCount();
+        return mChildAdapters.get(groupPosition).getItemCount();
     }
 
     @Override

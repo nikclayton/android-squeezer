@@ -27,10 +27,9 @@ import java.util.Map;
 
 import uk.org.ngo.squeezer.Preferences;
 import uk.org.ngo.squeezer.R;
+import uk.org.ngo.squeezer.framework.ViewParamItemView;
 import uk.org.ngo.squeezer.model.Action;
 import uk.org.ngo.squeezer.framework.BaseActivity;
-import uk.org.ngo.squeezer.framework.BaseItemView;
-import uk.org.ngo.squeezer.model.Item;
 import uk.org.ngo.squeezer.itemlist.dialog.ArtworkDialog;
 import uk.org.ngo.squeezer.itemlist.dialog.ChoicesDialog;
 import uk.org.ngo.squeezer.itemlist.dialog.InputTextDialog;
@@ -62,7 +61,7 @@ public class JiveItemViewLogic implements IServiceItemListCallback<JiveItem>, Po
      * action will return an artwork id or URL, which can be used the fetch an image to display in a
      * popup. See {@link ArtworkDialog#show(BaseActivity, Action)}
      */
-    void execGoAction(BaseItemView.ViewHolder viewHolder, JiveItem item, int alreadyPopped) {
+    void execGoAction(ViewParamItemView<JiveItem> viewHolder, JiveItem item, int alreadyPopped) {
         if (item.showBigArtwork) {
             ArtworkDialog.show(activity, item.goAction);
         } else if (item.goAction.isSlideShow()) {
@@ -90,9 +89,9 @@ public class JiveItemViewLogic implements IServiceItemListCallback<JiveItem>, Po
     private int contextStack = 0;
     private JiveItem contextMenuItem;
     private PopupMenu contextPopup;
-    private BaseItemView.ViewHolder contextMenuViewHolder;
+    private ViewParamItemView<JiveItem> contextMenuViewHolder;
 
-    public void showContextMenu(BaseItemView.ViewHolder viewHolder, JiveItem item) {
+    public void showContextMenu(ViewParamItemView<JiveItem> viewHolder, JiveItem item) {
         if (item.moreAction != null) {
             showContextMenu(viewHolder, item, item.moreAction);
         } else {
@@ -100,7 +99,7 @@ public class JiveItemViewLogic implements IServiceItemListCallback<JiveItem>, Po
         }
     }
 
-    private void showContextMenu(BaseItemView.ViewHolder viewHolder, JiveItem item, Action action) {
+    private void showContextMenu(ViewParamItemView<JiveItem> viewHolder, JiveItem item, Action action) {
         contextMenuViewHolder = viewHolder;
         contextStack = 1;
         contextMenuItem = item;
@@ -124,12 +123,7 @@ public class JiveItemViewLogic implements IServiceItemListCallback<JiveItem>, Po
             menu.add(Menu.NONE, R.id.more, Menu.NONE, R.string.MORE);
         }
 
-        contextPopup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                return doStandardItemContext(menuItem, item);
-            }
-        });
+        contextPopup.setOnMenuItemClickListener(menuItem -> doStandardItemContext(menuItem, item));
         contextPopup.setOnDismissListener(this);
         contextPopup.show();
     }
@@ -152,7 +146,7 @@ public class JiveItemViewLogic implements IServiceItemListCallback<JiveItem>, Po
         return false;
     }
 
-    private void showContextMenu(final BaseItemView.ViewHolder viewHolder, final List<JiveItem> items) {
+    private void showContextMenu(final ViewParamItemView<JiveItem> viewHolder, final List<JiveItem> items) {
         Preferences preferences = new Preferences(activity);
         contextPopup = new PopupMenu(activity, viewHolder.contextMenuButtonHolder);
         Menu menu = contextPopup.getMenu();
@@ -166,22 +160,19 @@ public class JiveItemViewLogic implements IServiceItemListCallback<JiveItem>, Po
             menu.add(Menu.NONE, index++, Menu.NONE, jiveItem.getName()).setEnabled(jiveItem.goAction != null);
         }
 
-        contextPopup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                if (menuItem.getItemId() < offset) {
-                    activity.downloadItem(contextMenuItem);
-                } else {
-                    doItemContext(viewHolder, items.get(menuItem.getItemId() - offset));
-                }
-                return true;
+        contextPopup.setOnMenuItemClickListener(menuItem -> {
+            if (menuItem.getItemId() < offset) {
+                activity.downloadItem(contextMenuItem);
+            } else {
+                doItemContext(viewHolder, items.get(menuItem.getItemId() - offset));
             }
+            return true;
         });
         contextPopup.setOnDismissListener(this);
         contextPopup.show();
     }
 
-    private void doItemContext(BaseItemView.ViewHolder viewHolder, JiveItem item) {
+    private void doItemContext(ViewParamItemView<JiveItem> viewHolder, JiveItem item) {
         Action.NextWindow nextWindow = (item.goAction != null ? item.goAction.action.nextWindow : item.nextWindow);
         if (nextWindow != null) {
             activity.action(item, item.goAction, contextStack);
@@ -206,16 +197,13 @@ public class JiveItemViewLogic implements IServiceItemListCallback<JiveItem>, Po
 
     @Override
     public void onItemsReceived(int count, int start, final Map<String, Object> parameters, final List<JiveItem> items, Class<JiveItem> dataType) {
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
+        activity.runOnUiThread(() -> {
                 // If #resetContextMenu has been called while we were in the main looper #contextMenuViewHolder will be null, so skip the items
                 if (contextMenuViewHolder != null) {
                     contextMenuViewHolder.contextMenuButton.setVisibility(View.VISIBLE);
                     contextMenuViewHolder.contextMenuLoading.setVisibility(View.GONE);
                     showContextMenu(contextMenuViewHolder, items);
                 }
-            }
         });
     }
 

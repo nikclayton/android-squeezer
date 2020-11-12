@@ -21,10 +21,12 @@ import android.os.Bundle;
 import androidx.annotation.MainThread;
 import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.util.Log;
 import android.view.View;
-import android.widget.AbsListView;
-import android.widget.AbsListView.OnScrollListener;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
@@ -100,7 +102,7 @@ public abstract class ItemListActivity extends BaseActivity {
     /**
      * List view to show the received items
      */
-    private AbsListView listView;
+    private RecyclerView listView;
 
     /**
      * Tag for mReceivedPages in mRetainFragment.
@@ -125,9 +127,22 @@ public abstract class ItemListActivity extends BaseActivity {
         emptyView = checkNotNull(findViewById(R.id.empty_view),
                 "activity layout did not return a view containing R.id.empty_view");
 
-        AbsListView listView = checkNotNull(subActivityContent.findViewById(R.id.item_list),
+        listView = checkNotNull(subActivityContent.findViewById(R.id.item_list),
                 "getContentView() did not return a view containing R.id.item_list");
-        setListView(setupListView(listView));
+        listView.setLayoutManager(new LinearLayoutManager(this));
+        listView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
+    }
+
+    /**
+     * Returns the ID of a content view to be used by this list activity.
+     * <p>
+     * The content view must contain a {@link RecyclerView} with the id {@literal item_list} in order
+     * to be valid.
+     *
+     * @return The ID
+     */
+    protected int getContentView() {
+        return R.layout.slim_browser_layout;
     }
 
     @Override
@@ -137,6 +152,7 @@ public abstract class ItemListActivity extends BaseActivity {
         mPageSize = getResources().getInteger(R.integer.PageSize);
 
         mRetainFragment = RetainFragment.getInstance(TAG, getSupportFragmentManager());
+        setContentView(getContentView());
 
         //noinspection unchecked
         mReceivedPages = (Set<Integer>) getRetainedValue(TAG_RECEIVED_PAGES);
@@ -202,19 +218,10 @@ public abstract class ItemListActivity extends BaseActivity {
     }
 
     /**
-     * Set the list view to host received items
-     */
-    protected abstract AbsListView setupListView(AbsListView listView);
-
-    /**
      * @return The view listing the items for this acitvity
      */
-    public final AbsListView getListView() {
+    public final RecyclerView getListView() {
         return listView;
-    }
-
-    public void setListView(AbsListView listView) {
-        this.listView = listView;
     }
 
     /**
@@ -294,13 +301,20 @@ public abstract class ItemListActivity extends BaseActivity {
      *
      * @param listView The listview with visible rows.
      */
-    public void maybeOrderVisiblePages(AbsListView listView) {
-        int pos = (listView.getFirstVisiblePosition() / mPageSize) * mPageSize;
-        int end = listView.getFirstVisiblePosition() + listView.getChildCount();
+    public void maybeOrderVisiblePages(RecyclerView listView) {
+        LinearLayoutManager layoutManager = (LinearLayoutManager) listView.getLayoutManager();
+        int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
 
-        while (pos <= end) {
-            maybeOrderPage(pos);
-            pos += mPageSize;
+        if (firstVisibleItemPosition == RecyclerView.NO_POSITION) {
+            maybeOrderPage(0);
+        } else {
+            int pos = (firstVisibleItemPosition / mPageSize) * mPageSize;
+            int end = firstVisibleItemPosition + listView.getChildCount();
+
+            while (pos <= end) {
+                maybeOrderPage(pos);
+                pos += mPageSize;
+            }
         }
     }
 
@@ -370,39 +384,29 @@ public abstract class ItemListActivity extends BaseActivity {
      * <p>
      * When the list is idle, new pages of data are fetched from the server.
      */
-    protected class ScrollListener implements AbsListView.OnScrollListener {
-        private int mPrevScrollState = OnScrollListener.SCROLL_STATE_IDLE;
+    protected class ScrollListener extends RecyclerView.OnScrollListener {
 
-        public ScrollListener() {
-        }
+        private int mPrevScrollState = RecyclerView.SCROLL_STATE_IDLE;
 
         @Override
-        public void onScrollStateChanged(AbsListView listView, int scrollState) {
+        public void onScrollStateChanged(@NonNull RecyclerView listView, int scrollState) {
             if (scrollState == mPrevScrollState) {
                 return;
             }
 
             switch (scrollState) {
-                case OnScrollListener.SCROLL_STATE_IDLE:
+                case RecyclerView.SCROLL_STATE_IDLE:
                     mListScrolling = false;
                     maybeOrderVisiblePages(listView);
                     break;
 
-                case OnScrollListener.SCROLL_STATE_FLING:
-                case OnScrollListener.SCROLL_STATE_TOUCH_SCROLL:
+                case RecyclerView.SCROLL_STATE_SETTLING:
+                case RecyclerView.SCROLL_STATE_DRAGGING:
                     mListScrolling = true;
                     break;
             }
 
             mPrevScrollState = scrollState;
         }
-
-        // Do not use: is not called when the scroll completes, appears to be
-        // called multiple time during a scroll, including during flinging.
-        @Override
-        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
-                int totalItemCount) {
-        }
-
     }
 }

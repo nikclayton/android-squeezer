@@ -71,7 +71,7 @@ import java.util.List;
 import uk.org.ngo.squeezer.dialog.AboutDialog;
 import uk.org.ngo.squeezer.dialog.EnableWifiDialog;
 import uk.org.ngo.squeezer.framework.BaseActivity;
-import uk.org.ngo.squeezer.framework.BaseItemView;
+import uk.org.ngo.squeezer.framework.ViewParamItemView;
 import uk.org.ngo.squeezer.itemlist.AlarmsActivity;
 import uk.org.ngo.squeezer.itemlist.CurrentPlaylistActivity;
 import uk.org.ngo.squeezer.itemlist.HomeActivity;
@@ -283,7 +283,7 @@ public class NowPlayingFragment extends Fragment {
             volumeButton = v.findViewById(R.id.volume);
             playlistButton = v.findViewById(R.id.playlist);
 
-            final BaseItemView.ViewHolder viewHolder = new BaseItemView.ViewHolder(v);
+            final ViewParamItemView<JiveItem> viewHolder = new ViewParamItemView<JiveItem>(mActivity, v);
             viewHolder.contextMenuButton.setOnClickListener(view -> {
                 CurrentPlaylistItem currentSong = getCurrentSong();
                 // This extra check is if user pressed the button before visibility is set to GONE
@@ -292,7 +292,6 @@ public class NowPlayingFragment extends Fragment {
                 }
             });
             btnContextMenu = viewHolder.contextMenuButtonHolder;
-            btnContextMenu.setTag(viewHolder);
         } else {
             v = inflater.inflate(R.layout.now_playing_fragment_mini, container, false);
 

@@ -19,7 +19,6 @@ package uk.org.ngo.squeezer.itemlist;
 import android.content.ClipData;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
-import android.graphics.drawable.TransitionDrawable;
 import android.os.Build;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -29,13 +28,13 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.ScaleAnimation;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.view.GestureDetectorCompat;
 import androidx.palette.graphics.Palette;
 
 import uk.org.ngo.squeezer.R;
 import uk.org.ngo.squeezer.Util;
-import uk.org.ngo.squeezer.framework.BaseItemView;
 import uk.org.ngo.squeezer.model.JiveItem;
 import uk.org.ngo.squeezer.service.ISqueezeService;
 import uk.org.ngo.squeezer.widget.AnimationEndListener;
@@ -47,93 +46,88 @@ class CurrentPlaylistItemView extends JiveItemView {
 
     private final CurrentPlaylistActivity activity;
 
-    public CurrentPlaylistItemView(CurrentPlaylistActivity activity) {
-        super(activity, activity.window.windowStyle);
+    public CurrentPlaylistItemView(CurrentPlaylistActivity activity, @NonNull View view) {
+        super(activity, view);
         this.activity = activity;
     }
 
     @Override
-    public BaseItemView.ViewHolder createViewHolder(View itemView) {
-        return new ViewHolder(itemView);
-    }
+    public void bindView(JiveItem item) {
+        super.bindView(item);
+        itemView.setBackgroundResource(getActivity().getAttributeValue(R.attr.selectableItemBackground));
 
-    @Override
-    public void bindView(View view, JiveItem item) {
-        super.bindView(view, item);
-        view.setBackgroundResource(getActivity().getAttributeValue(R.attr.selectableItemBackground));
-        ViewHolder viewHolder = (ViewHolder) view.getTag();
-
-        if (viewHolder.position == activity.getItemAdapter().getSelectedIndex()) {
-            viewHolder.text1.setTextAppearance(getActivity(), R.style.SqueezerTextAppearance_ListItem_Primary_Highlight);
-            viewHolder.text2.setTextAppearance(getActivity(), R.style.SqueezerTextAppearance_ListItem_Secondary_Highlight);
+        if (getAdapterPosition() == activity.getSelectedIndex()) {
+            text1.setTextAppearance(getActivity(), R.style.SqueezerTextAppearance_ListItem_Primary_Highlight);
+            text2.setTextAppearance(getActivity(), R.style.SqueezerTextAppearance_ListItem_Secondary_Highlight);
         } else {
-            viewHolder.text1.setTextAppearance(getActivity(), R.style.SqueezerTextAppearance_ListItem_Primary);
-            viewHolder.text2.setTextAppearance(getActivity(), R.style.SqueezerTextAppearance_ListItem_Secondary);
+            text1.setTextAppearance(getActivity(), R.style.SqueezerTextAppearance_ListItem_Primary);
+            text2.setTextAppearance(getActivity(), R.style.SqueezerTextAppearance_ListItem_Secondary);
         }
 
-        view.setAlpha(viewHolder.position == activity.getDraggedIndex() ? 0 : 1);
+        itemView.setAlpha(getAdapterPosition() == activity.getDraggedIndex() ? 0 : 1);
 
         final GestureDetectorCompat detector = new GestureDetectorCompat(getActivity(), new OnSwipeListener() {
             @Override
             public boolean onDown(MotionEvent e) {
-                view.setPressed(true);
+                itemView.setPressed(true);
                 return super.onDown(e);
             }
 
             @Override
             public void onLongPress(MotionEvent e) {
-                activity.setDraggedIndex(viewHolder.position);
-                view.setPressed(false);
+                activity.setDraggedIndex(getAdapterPosition());
+                itemView.setPressed(false);
                 ClipData data = ClipData.newPlainText("", "");
-                View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(view);
-                view.setActivated(true);
-                view.startDrag(data, shadowBuilder, null, 0);
+                View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(itemView);
+                itemView.setActivated(true);
+                itemView.startDrag(data, shadowBuilder, null, 0);
             }
 
             @Override
             public boolean onSingleTapUp(MotionEvent e) {
-                onItemSelected(view, viewHolder.position, item);
+                onItemSelected();
                 return true;
             }
 
             @Override
             public boolean onSwipeLeft() {
-                removeItem(view, viewHolder.position, item);
+                removeItem(item);
                 return true;
             }
 
             @Override
             public boolean onSwipeRight() {
-                removeItem(view, viewHolder.position, item);
+                removeItem(item);
                 return true;
             }
         });
 
-        view.setOnTouchListener((v, event) -> {
+        itemView.setOnTouchListener((v, event) -> {
             if (event.getAction() == MotionEvent.ACTION_UP) {
-                view.setPressed(false);
-                view.performClick();
+                itemView.setPressed(false);
+                itemView.performClick();
             }
             return detector.onTouchEvent(event);
         });
     }
 
     @Override
-    public void onIcon(ViewHolder viewHolder) {
-        if (viewHolder.position == activity.getItemAdapter().getSelectedIndex() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            Drawable icon = viewHolder.icon.getDrawable();
+    public void onIcon() {
+        if (getAdapterPosition() == activity.getSelectedIndex() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Drawable drawable = icon.getDrawable();
             Drawable marker = AppCompatResources.getDrawable(activity, R.drawable.ic_action_nowplaying);
-            Palette colorPalette = Palette.from(Util.drawableToBitmap(icon)).generate();
+            Palette colorPalette = Palette.from(Util.drawableToBitmap(drawable)).generate();
             marker.setTint(colorPalette.getDominantSwatch().getBodyTextColor());
 
-            LayerDrawable layerDrawable = new LayerDrawable(new Drawable[]{icon, marker});
+            LayerDrawable layerDrawable = new LayerDrawable(new Drawable[]{drawable, marker});
             layerDrawable.setLayerGravity(1, Gravity.CENTER);
 
-            viewHolder.icon.setImageDrawable(layerDrawable);
+            icon.setImageDrawable(layerDrawable);
         }
     }
 
-    private void removeItem(View view, int position, JiveItem item) {
+    private void removeItem(JiveItem item) {
+        final int position = getAdapterPosition();
         final AnimationSet animationSet = new AnimationSet(true);
         animationSet.addAnimation(new ScaleAnimation(1F, 1F, 1F, 0.5F));
         animationSet.addAnimation(new AlphaAnimation(1F, 0F));
@@ -160,25 +154,18 @@ class CurrentPlaylistItemView extends JiveItemView {
             }
         });
 
-        view.startAnimation(animationSet);
+        itemView.startAnimation(animationSet);
 
 
-    }
-
-    @Override
-    public boolean isSelectable(JiveItem item) {
-        return true;
     }
 
     /**
      * Jumps to whichever song the user chose.
      */
-    @Override
-    public boolean onItemSelected(View view, int index, JiveItem item) {
+    public void onItemSelected() {
         ISqueezeService service = getActivity().getService();
         if (service != null) {
-            getActivity().getService().playlistIndex(index);
+            getActivity().getService().playlistIndex(getAdapterPosition());
         }
-        return false;
     }
 }

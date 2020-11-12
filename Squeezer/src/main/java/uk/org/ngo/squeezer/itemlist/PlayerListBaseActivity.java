@@ -5,9 +5,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.AbsListView;
 import android.widget.ExpandableListView;
 
+import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 
 import com.google.common.collect.HashMultimap;
@@ -90,26 +90,20 @@ public abstract class PlayerListBaseActivity extends ItemListActivity {
     }
 
     @Override
-    protected AbsListView setupListView(AbsListView listView) {
-        mResultsExpandableListView = (ExpandableListView) listView;
-        mResultsExpandableListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
-            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
-                mResultsAdapter.onGroupClick(v, groupPosition);
-                return true;
-            }
-        });
-        mResultsExpandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-            @Override
-            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition,
-                                        int childPosition, long id) {
-                mResultsAdapter.onChildClick(v, groupPosition, childPosition);
-                return true;
-            }
-        });
-
-        mResultsExpandableListView.setOnScrollListener(new ScrollListener());
-
-        return listView;
+    public void setContentView(@LayoutRes int layoutResId) {
+        super.setContentView(layoutResId);
+        // TODO rcv
+//        mResultsExpandableListView = (ExpandableListView) listView;
+//        mResultsExpandableListView.setOnGroupClickListener((parent, v, groupPosition, id) -> {
+//            mResultsAdapter.onGroupClick(v, groupPosition);
+//            return true;
+//        });
+//        mResultsExpandableListView.setOnChildClickListener((parent, v, groupPosition, childPosition, id) -> {
+//            mResultsAdapter.onChildClick(v, groupPosition, childPosition);
+//            return true;
+//        });
+//
+//        mResultsExpandableListView.setOnScrollListener(new ScrollListener());
     }
 
     public void onEventMainThread(HandshakeComplete event) {
@@ -193,5 +187,5 @@ public abstract class PlayerListBaseActivity extends ItemListActivity {
         mResultsAdapter.clear();
     }
 
-    public abstract PlayerBaseView createPlayerView();
+    public abstract PlayerBaseView createPlayerView(View view);
 }

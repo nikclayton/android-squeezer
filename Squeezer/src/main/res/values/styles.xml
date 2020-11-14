@@ -292,15 +292,15 @@
     </style>
 
     <style name="DisplayMessageArtwork">
-        <item name="android:layout_width">@dimen/album_art_icon_grid_width</item>
-        <item name="android:layout_height">@dimen/album_art_icon_grid_height</item>
+        <item name="android:layout_width">@dimen/display_message_icon_width</item>
+        <item name="android:layout_height">@dimen/display_message_icon_height</item>
         <item name="android:padding">8dp</item>
         <item name="android:layout_gravity">center</item>
         <item name="android:gravity">center</item>
-        <item name="android:maxHeight">@dimen/album_art_icon_grid_height</item>
-        <item name="android:maxWidth">@dimen/album_art_icon_grid_width</item>
-        <item name="android:minHeight">@dimen/album_art_icon_grid_height</item>
-        <item name="android:minWidth">@dimen/album_art_icon_grid_width</item>
+        <item name="android:maxHeight">@dimen/display_message_icon_height</item>
+        <item name="android:maxWidth">@dimen/display_message_icon_width</item>
+        <item name="android:minHeight">@dimen/display_message_icon_height</item>
+        <item name="android:minWidth">@dimen/display_message_icon_width</item>
     </style>
 
     <style name="DisplayMessageIcon">

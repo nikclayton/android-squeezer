@@ -70,7 +70,7 @@ for the implementation.
         android:layout_toStartOf="@id/context_menu"
         android:ellipsize="end"
         android:paddingTop="4dp"
-        android:singleLine="true"
+        android:maxLines="2"
         android:textAppearance="@style/SqueezerTextAppearance.GridItem.Primary"
         tools:text="Album name"/>
 
@@ -81,7 +81,7 @@ for the implementation.
         android:layout_below="@id/text1"
         android:layout_toStartOf="@id/context_menu"
         android:ellipsize="end"
-        android:singleLine="true"
+        android:maxLines="2"
         android:textAppearance="@style/SqueezerTextAppearance.GridItem.Secondary"
         tools:text="Artist info"/>
 

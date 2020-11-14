@@ -60,6 +60,7 @@ import uk.org.ngo.squeezer.itemlist.dialog.ArtworkListLayout;
 import uk.org.ngo.squeezer.service.ISqueezeService;
 import uk.org.ngo.squeezer.service.event.HandshakeComplete;
 import uk.org.ngo.squeezer.util.ImageFetcher;
+import uk.org.ngo.squeezer.widget.GridAutofitLayoutManager;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -211,8 +212,7 @@ public class JiveItemListActivity extends BaseListActivity<JiveItemView, JiveIte
         ArtworkListLayout listLayout = JiveItemView.listLayout(this, window.windowStyle);
         RecyclerView.LayoutManager layoutManager = getListView().getLayoutManager();
         if (listLayout == ArtworkListLayout.grid && !(layoutManager instanceof GridLayoutManager)) {
-            // TODO calculate column count OR use a (vertical) LinearLayoutManager for rows with a horizontal LinearLayout on each row
-            getListView().setLayoutManager(new GridLayoutManager(this, 2));
+            getListView().setLayoutManager(new GridAutofitLayoutManager(this, R.dimen.grid_column_width));
             getListView().removeItemDecorationAt(0);
         }
         if (listLayout == ArtworkListLayout.list && (layoutManager instanceof GridLayoutManager)) {

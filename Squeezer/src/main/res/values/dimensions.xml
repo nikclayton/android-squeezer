@@ -9,9 +9,13 @@
     <dimen name="album_art_large_icon_height">96dp</dimen>
 
     <!-- Icons in grid -->
-    <dimen name="album_art_icon_grid_width">128dp</dimen>
-    <dimen name="album_art_icon_grid_height">128dp</dimen>
-    <dimen name="grid_column_width">160dp</dimen>
+    <dimen name="album_art_icon_grid_width">160dp</dimen>
+    <dimen name="album_art_icon_grid_height">160dp</dimen>
+    <dimen name="grid_column_width">192dp</dimen>
+
+    <!-- Icons in display messages. -->
+    <dimen name="display_message_icon_width">96dp</dimen>
+    <dimen name="display_message_icon_height">96dp</dimen>
 
     <!-- Icons in normal notification -->
     <dimen name="album_art_icon_normal_notification_width">64dp</dimen>

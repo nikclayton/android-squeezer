@@ -33,10 +33,6 @@ import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
-import android.view.animation.AnimationSet;
-import android.view.animation.ScaleAnimation;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckedTextView;
@@ -61,12 +57,9 @@ import uk.org.ngo.squeezer.framework.ItemViewHolder;
 import uk.org.ngo.squeezer.model.Alarm;
 import uk.org.ngo.squeezer.model.AlarmPlaylist;
 import uk.org.ngo.squeezer.util.CompoundButtonWrapper;
-import uk.org.ngo.squeezer.widget.AnimationEndListener;
 import uk.org.ngo.squeezer.widget.UndoBarController;
 
 public class AlarmView extends ItemViewHolder<Alarm> {
-    private static final int ANIMATION_DURATION = 300;
-
     private final AlarmsActivity mActivity;
     private final Resources mResources;
     private final int mColorSelected;
@@ -141,19 +134,8 @@ public class AlarmView extends ItemViewHolder<Alarm> {
             dowTexts[day] = (TextView) dowButton.getChildAt(0);
         }
         delete.setOnClickListener(v -> {
-            final AnimationSet animationSet = new AnimationSet(true);
-            animationSet.addAnimation(new ScaleAnimation(1F, 1F, 1F, 0.5F));
-            animationSet.addAnimation(new AlphaAnimation(1F, 0F));
-            animationSet.setDuration(ANIMATION_DURATION);
-            animationSet.setAnimationListener(new AnimationEndListener() {
-                @Override
-                public void onAnimationEnd(Animation animation) {
-                    UndoBarController.show(getActivity(), R.string.ALARM_DELETING, new UndoListener(getAdapterPosition(), alarm));
-                    mActivity.getItemAdapter().removeItem(getAdapterPosition());
-                }
-            });
-
-            view.startAnimation(animationSet);
+            UndoBarController.show(getActivity(), R.string.ALARM_DELETING, new UndoListener(getAdapterPosition(), alarm));
+            mActivity.getItemAdapter().removeItem(getAdapterPosition());
         });
         playlist.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override

@@ -23,10 +23,6 @@ import android.os.Build;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
-import android.view.animation.AnimationSet;
-import android.view.animation.ScaleAnimation;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.content.res.AppCompatResources;
@@ -37,13 +33,10 @@ import uk.org.ngo.squeezer.R;
 import uk.org.ngo.squeezer.Util;
 import uk.org.ngo.squeezer.model.JiveItem;
 import uk.org.ngo.squeezer.service.ISqueezeService;
-import uk.org.ngo.squeezer.widget.AnimationEndListener;
 import uk.org.ngo.squeezer.widget.OnSwipeListener;
 import uk.org.ngo.squeezer.widget.UndoBarController;
 
 class CurrentPlaylistItemView extends JiveItemView {
-    private static final int ANIMATION_DURATION = 200;
-
     private final CurrentPlaylistActivity activity;
 
     public CurrentPlaylistItemView(CurrentPlaylistActivity activity, @NonNull View view) {
@@ -128,35 +121,22 @@ class CurrentPlaylistItemView extends JiveItemView {
 
     private void removeItem(JiveItem item) {
         final int position = getAdapterPosition();
-        final AnimationSet animationSet = new AnimationSet(true);
-        animationSet.addAnimation(new ScaleAnimation(1F, 1F, 1F, 0.5F));
-        animationSet.addAnimation(new AlphaAnimation(1F, 0F));
-        animationSet.setDuration(ANIMATION_DURATION);
-        animationSet.setAnimationListener(new AnimationEndListener() {
+        activity.getItemAdapter().removeItem(position);
+        UndoBarController.show(activity, activity.getString(R.string.JIVE_POPUP_REMOVING_FROM_PLAYLIST, item.getName()), new UndoBarController.UndoListener() {
             @Override
-            public void onAnimationEnd(Animation animation) {
-                activity.getItemAdapter().removeItem(position);
-                UndoBarController.show(activity, activity.getString(R.string.JIVE_POPUP_REMOVING_FROM_PLAYLIST, item.getName()), new UndoBarController.UndoListener() {
-                    @Override
-                    public void onUndo() {
-                        activity.getItemAdapter().insertItem(position, item);
-                    }
+            public void onUndo() {
+                activity.getItemAdapter().insertItem(position, item);
+            }
 
-                    @Override
-                    public void onDone() {
-                        ISqueezeService service = activity.getService();
-                        if (service != null) {
-                            service.playlistRemove(position);
-                            activity.skipPlaylistChanged();
-                        }
-                    }
-                });
+            @Override
+            public void onDone() {
+                ISqueezeService service = activity.getService();
+                if (service != null) {
+                    service.playlistRemove(position);
+                    activity.skipPlaylistChanged();
+                }
             }
         });
-
-        itemView.startAnimation(animationSet);
-
-
     }
 
     /**

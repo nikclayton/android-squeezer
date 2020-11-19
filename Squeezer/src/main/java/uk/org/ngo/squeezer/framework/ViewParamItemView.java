@@ -109,7 +109,7 @@ public class ViewParamItemView<T extends Item> extends ItemViewHolder<T> {
         }
     }
 
-    public void setViewParams(@ViewParam int viewParams) {
+    private void setViewParams(@ViewParam int viewParams) {
         icon.setVisibility((viewParams & VIEW_PARAM_ICON) != 0 ? View.VISIBLE : View.GONE);
         text2.setVisibility((viewParams & VIEW_PARAM_TWO_LINE) != 0 ? View.VISIBLE : View.GONE);
 

@@ -4,7 +4,6 @@ import android.appwidget.AppWidgetManager;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,6 +14,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -42,8 +42,8 @@ public class SqueezerRemoteControlButtonSelectActivity extends BaseActivity {
     This Activity leverages a base Activity which almost all of squeezer uses, itself adding an
     actionBar, which we don't want on this activity.
      */
-    protected boolean addActionBar() {
-        return false;
+    @Override
+    protected void addActionBar() {
     }
 
     @Override
@@ -78,6 +78,7 @@ public class SqueezerRemoteControlButtonSelectActivity extends BaseActivity {
 
         remoteButtonListView = findViewById(R.id.remoteButtonList);
         remoteButtonListView.setLayoutManager(new LinearLayoutManager(this));
+        remoteButtonListView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         remoteButtonListAdapter = new ItemAdapter(
                 Arrays.stream(remoteButtonListItems).filter(b -> b != RemoteButton.UNKNOWN).toArray(RemoteButton[]::new),
                 this::finish);
@@ -89,8 +90,8 @@ public class SqueezerRemoteControlButtonSelectActivity extends BaseActivity {
 
     private class ItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-        private RemoteButton[] buttons;
-        private Consumer<RemoteButton> clickHandler;
+        private final RemoteButton[] buttons;
+        private final Consumer<RemoteButton> clickHandler;
 
         public ItemAdapter(RemoteButton[] buttons, Consumer<RemoteButton> clickHandler) {
             this.buttons = buttons;
@@ -120,9 +121,9 @@ public class SqueezerRemoteControlButtonSelectActivity extends BaseActivity {
     }
 
     private class RemoteButtonViewHolder extends RecyclerView.ViewHolder {
-        private TextView textView;
-        private ImageView imageView;
-        private Consumer<RemoteButton> clickHandler;
+        private final TextView textView;
+        private final ImageView imageView;
+        private final Consumer<RemoteButton> clickHandler;
 
         public RemoteButtonViewHolder(final View itemView, Consumer<RemoteButton> clickHandler) {
             super(itemView);

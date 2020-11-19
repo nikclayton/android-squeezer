@@ -20,9 +20,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.PopupMenu;
-import android.widget.SeekBar;
-import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+
+import com.google.android.material.slider.Slider;
 
 import uk.org.ngo.squeezer.R;
 import uk.org.ngo.squeezer.Util;
@@ -34,42 +36,51 @@ import uk.org.ngo.squeezer.model.Player;
 import uk.org.ngo.squeezer.model.PlayerState;
 import uk.org.ngo.squeezer.service.ISqueezeService;
 
-public class PlayerView extends PlayerBaseView<PlayerListActivity> {
-    private final SeekBar volumeBar;
-    private TextView volumeValue;
+public class PlayerView extends PlayerBaseView {
+    private final PlayerListActivity activity;
+    private final Slider volumeBar;
 
     public PlayerView(PlayerListActivity activity, View view) {
         super(activity, view);
-        // TODO rcv R.layout.list_item_player
+        this.activity = activity;
 
-        setViewParams(VIEW_PARAM_ICON | VIEW_PARAM_TWO_LINE | VIEW_PARAM_CONTEXT_BUTTON);
-        setLoadingViewParams(VIEW_PARAM_ICON | VIEW_PARAM_TWO_LINE);
+        setItemViewParams(VIEW_PARAM_ICON | VIEW_PARAM_TWO_LINE | VIEW_PARAM_CONTEXT_BUTTON);
 
         volumeBar = view.findViewById(R.id.volume_slider);
     }
 
     @Override
-    public void bindView(Player item) {
-        PlayerState playerState = item.getPlayerState();
+    public void bindView(Player player) {
+        super.bindView(player);
 
-        super.bindView(item);
-        icon.setImageResource(getModelIcon(item.getModel()));
+        PlayerState playerState = player.getPlayerState();
 
-        volumeBar.setOnSeekBarChangeListener(new VolumeSeekBarChangeListener(item, volumeValue));
-        volumeBar.setVisibility(View.VISIBLE);
+        volumeBar.addOnSliderTouchListener(new Slider.OnSliderTouchListener() {
+            @Override
+            public void onStartTrackingTouch(@NonNull Slider slider) {
+                activity.setTrackingTouch(true);
+            }
 
-        if (playerState.isPoweredOn()) {
-            text1.setAlpha(1.0f);
-        } else {
-            text1.setAlpha(0.25f);
-        }
-
-        volumeBar.setProgress(playerState.getCurrentVolume());
+            @Override
+            public void onStopTrackingTouch(@NonNull Slider slider) {
+                activity.setTrackingTouch(false);
+            }
+        });
+        volumeBar.addOnChangeListener((slider, value, fromUser) -> {
+            if (fromUser) {
+                ISqueezeService service = activity.getService();
+                if (service == null) {
+                    return;
+                }
+                service.adjustVolumeTo(player, (int)value);
+            }
+        });
+        volumeBar.setValue(playerState.getCurrentVolume());
 
         text2.setVisibility(playerState.getSleepDuration() > 0 ? View.VISIBLE : View.INVISIBLE);
         if (playerState.getSleepDuration() > 0) {
             text2.setText(activity.getString(R.string.SLEEPING_IN)
-                    + " " + Util.formatElapsedTime(item.getSleepingIn()));
+                    + " " + Util.formatElapsedTime(player.getSleepingIn()));
         }
     }
 
@@ -89,7 +100,7 @@ public class PlayerView extends PlayerBaseView<PlayerListActivity> {
         menu.findItem(R.id.toggle_power).setTitle(playerState.isPoweredOn() ? R.string.menu_item_power_off : R.string.menu_item_power_on);
 
         // Enable player sync menu options if there's more than one player.
-        menu.findItem(R.id.player_sync).setVisible(activity.mResultsAdapter.mPlayerCount > 1);
+        menu.findItem(R.id.player_sync).setVisible(activity.adapter.mPlayerCount > 1);
 
         menu.findItem(R.id.play_track_album).setVisible(playerState.prefs.containsKey(Player.Pref.PLAY_TRACK_ALBUM));
 
@@ -97,12 +108,12 @@ public class PlayerView extends PlayerBaseView<PlayerListActivity> {
 
         popup.setOnMenuItemClickListener(menuItem -> doItemContext(menuItem, item));
 
-        activity.mResultsAdapter.mPlayersChanged = false;
+        activity.adapter.mPlayersChanged = false;
         popup.show();
     }
 
     private boolean doItemContext(MenuItem menuItem, Player selectedItem) {
-        if (activity.mResultsAdapter.mPlayersChanged) {
+        if (activity.adapter.mPlayersChanged) {
             Toast.makeText(activity, activity.getText(R.string.player_list_changed),
                     Toast.LENGTH_LONG).show();
             return true;
@@ -136,54 +147,6 @@ public class PlayerView extends PlayerBaseView<PlayerListActivity> {
         }
 
         return false;
-    }
-
-    private class VolumeSeekBarChangeListener implements SeekBar.OnSeekBarChangeListener {
-        private final Player player;
-        private final TextView valueView;
-
-        public VolumeSeekBarChangeListener(Player player, TextView valueView) {
-            this.player = player;
-            this.valueView = valueView;
-        }
-
-        @Override
-        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-            if (fromUser) {
-                ISqueezeService service = activity.getService();
-                if (service == null) {
-                    return;
-                }
-                service.adjustVolumeTo(player, progress);
-            }
-        }
-
-        @Override
-        public void onStartTrackingTouch(SeekBar seekBar) {
-            activity.setTrackingTouch(true);
-        }
-
-        @Override
-        public void onStopTrackingTouch(SeekBar seekBar) {
-            activity.setTrackingTouch(false);
-        }
-    }
-
-    private class PowerButtonClickListener implements View.OnClickListener {
-        private final Player player;
-
-        private PowerButtonClickListener(Player player) {
-            this.player = player;
-        }
-
-        @Override
-        public void onClick(View v) {
-            ISqueezeService service = activity.getService();
-            if (service == null) {
-                return;
-            }
-            service.togglePower(player);
-        }
     }
 
 }

@@ -8,17 +8,16 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 
 import uk.org.ngo.squeezer.R;
+import uk.org.ngo.squeezer.framework.BaseActivity;
 import uk.org.ngo.squeezer.framework.ViewParamItemView;
 import uk.org.ngo.squeezer.model.Player;
+import uk.org.ngo.squeezer.model.PlayerState;
 
-
-public abstract class PlayerBaseView<A extends PlayerListBaseActivity> extends ViewParamItemView<Player> {
+public abstract class PlayerBaseView extends ViewParamItemView<Player> {
     private static final Map<String, Integer> modelIcons = PlayerBaseView.initializeModelIcons();
-    protected final A activity;
 
-    public PlayerBaseView(A activity, @Nonnull View view) {
+    public PlayerBaseView(BaseActivity activity, @Nonnull View view) {
         super(activity, view);
-        this.activity = activity;
     }
 
     private static Map<String, Integer> initializeModelIcons() {
@@ -41,6 +40,20 @@ public abstract class PlayerBaseView<A extends PlayerListBaseActivity> extends V
     protected static int getModelIcon(String model) {
         Integer icon = modelIcons.get(model);
         return (icon != null ? icon : R.drawable.ic_blank);
+    }
+
+    @Override
+    public void bindView(Player player) {
+        super.bindView(player);
+        icon.setImageResource(getModelIcon(player.getModel()));
+
+        PlayerState playerState = player.getPlayerState();
+
+        if (playerState.isPoweredOn()) {
+            text1.setAlpha(1.0f);
+        } else {
+            text1.setAlpha(0.25f);
+        }
     }
 
 }

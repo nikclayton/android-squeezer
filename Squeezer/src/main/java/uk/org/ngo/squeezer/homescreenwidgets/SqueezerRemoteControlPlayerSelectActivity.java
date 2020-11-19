@@ -5,42 +5,47 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 
-import androidx.annotation.LayoutRes;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import uk.org.ngo.squeezer.R;
+import uk.org.ngo.squeezer.framework.BaseActivity;
 import uk.org.ngo.squeezer.itemlist.PlayerBaseView;
-import uk.org.ngo.squeezer.itemlist.PlayerListBaseActivity;
-import uk.org.ngo.squeezer.model.Item;
 import uk.org.ngo.squeezer.model.Player;
-import uk.org.ngo.squeezer.model.PlayerState;
+import uk.org.ngo.squeezer.service.ISqueezeService;
+import uk.org.ngo.squeezer.service.event.HandshakeComplete;
+import uk.org.ngo.squeezer.service.event.PlayerStateChanged;
 
 /**
  * The configuration screen for the {@link SqueezerRemoteControl SqueezerRemoteControl} AppWidget.
  */
-public class SqueezerRemoteControlPlayerSelectActivity extends PlayerListBaseActivity {
+public class SqueezerRemoteControlPlayerSelectActivity extends BaseActivity {
 
     private static final String TAG = SqueezerRemoteControlPlayerSelectActivity.class.getName();
 
     private static final int GET_BUTTON_ACTIVITY = 1001;
 
     private int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
+    private PlayerAdapter adapter;
 
-
-    public SqueezerRemoteControlPlayerSelectActivity() {
-        super();
-    }
 
     @Override
     public void onCreate(Bundle icicle) {
+        adapter = new PlayerAdapter();
         super.onCreate(icicle);
-
-        Log.d(TAG, "onCreate");
+        setContentView(R.layout.slim_browser_layout);
 
         // Set the result to CANCELED.  This will cause the widget host to cancel
         // out of the widget placement if the user presses the back button.
@@ -51,8 +56,6 @@ public class SqueezerRemoteControlPlayerSelectActivity extends PlayerListBaseAct
         if (actionBar != null) {
             actionBar.setTitle(R.string.configure_select_player);
         }
-
-        setContentView(R.layout.squeezer_remote_control_configure);
 
         // Find the widget id from the intent.
         Intent intent = getIntent();
@@ -68,72 +71,88 @@ public class SqueezerRemoteControlPlayerSelectActivity extends PlayerListBaseAct
             return;
         }
 
+        RecyclerView listView = findViewById(R.id.item_list);
+        listView.setAdapter(adapter);
+        listView.setLayoutManager(new LinearLayoutManager(this));
+        listView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
     }
 
-    public PlayerBaseView createPlayerView(View view) {
-        return new SqueezerRemoteControlConfigureActivityPlayerView(view);
-    }
-
-    /*
-    This Activity leverages a base Activity which almost all of squeezer uses, itself adding a
-    player status, which we don't want on this activity.
-     */
     @Override
-    public void setContentView(@LayoutRes int layoutResID) {
-        // TODO rcv implement method comment
-        super.setContentView(layoutResID);
+    protected void onServiceConnected(@NonNull ISqueezeService service) {
+        super.onServiceConnected(service);
+        Log.d(TAG, "onServiceConnected: service.isConnected=" + service.isConnected());
+
+        if (!service.isConnected()) {
+            service.startConnect();
+        }
+    }
+
+    private class PlayerAdapter extends RecyclerView.Adapter<SqueezerRemoteControlConfigureActivityPlayerView> {
+        private List<Player> players = Collections.emptyList();
+
+        @NonNull
+        @Override
+        public SqueezerRemoteControlConfigureActivityPlayerView onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item, parent, false);
+            return new SqueezerRemoteControlConfigureActivityPlayerView(SqueezerRemoteControlPlayerSelectActivity.this, view);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull SqueezerRemoteControlConfigureActivityPlayerView holder, int position) {
+            holder.bindView(players.get(position));
+        }
+
+        @Override
+        public int getItemCount() {
+            return players.size();
+        }
+    }
+
+    public void onEventMainThread(HandshakeComplete event) {
+        updatePlayerList();
+    }
+
+
+    public void onEventMainThread(PlayerStateChanged event) {
+        updatePlayerList();
+    }
+
+    protected void updatePlayerList() {
+        adapter.players = new ArrayList<>(getService().getPlayers());
+        Collections.sort(adapter.players);
+        adapter.notifyDataSetChanged();
     }
 
     /*
     This Activity leverages a base Activity which almost all of squeezer uses, itself adding an
     actionBar, which we don't want on this activity.
      */
-    protected boolean addActionBar() {
-        return false;
-    }
-
     @Override
-    protected boolean needPlayer() {
-        return false;
+    protected void addActionBar() {
+        Log.d(TAG, "addActionBar");
     }
 
-    @Override
-    protected <T extends Item> void updateAdapter(int count, int start, List<T> items, Class<T> dataType) {
-
-    }
-
-    private class SqueezerRemoteControlConfigureActivityPlayerView extends PlayerBaseView<SqueezerRemoteControlPlayerSelectActivity> {
-
-        public SqueezerRemoteControlConfigureActivityPlayerView(View view) {
-            super(SqueezerRemoteControlPlayerSelectActivity.this, view);
-            // TODO rcv where to put this R.layout.list_item_player_simple
-            setViewParams(VIEW_PARAM_ICON);
+    public class SqueezerRemoteControlConfigureActivityPlayerView extends PlayerBaseView {
+        public SqueezerRemoteControlConfigureActivityPlayerView(BaseActivity activity, View view) {
+            super(activity, view);
+            setItemViewParams(VIEW_PARAM_ICON);
         }
 
         @Override
         public void bindView(Player player) {
             super.bindView(player);
-            icon.setImageResource(getModelIcon(player.getModel()));
+            itemView.setOnClickListener(view -> {
+                final Context context = SqueezerRemoteControlPlayerSelectActivity.this;
 
-            PlayerState playerState = player.getPlayerState();
+                Intent intent = new Intent(context, SqueezerRemoteControlButtonSelectActivity.class);
+                intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
+                intent.putExtra(SqueezerRemoteControl.EXTRA_PLAYER, player);
 
-            if (playerState.isPoweredOn()) {
-                text1.setAlpha(1.0f);
-            } else {
-                text1.setAlpha(0.25f);
-            }
+                startActivityForResult(intent, GET_BUTTON_ACTIVITY);
+            });
+
         }
 
-        // TODO rcv
-        public void onGroupSelected(View view, Player[] items) {
-            final Context context = SqueezerRemoteControlPlayerSelectActivity.this;
-
-            Intent intent = new Intent(context, SqueezerRemoteControlButtonSelectActivity.class);
-            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
-            intent.putExtra(SqueezerRemoteControl.EXTRA_PLAYER, items[0]);
-
-            startActivityForResult(intent, GET_BUTTON_ACTIVITY);
-        }
     }
 
     @Override

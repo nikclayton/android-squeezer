@@ -439,30 +439,6 @@ public class JiveItem extends Item {
         return (getId() != null ? getId().hashCode() : 0);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (o == this) {
-            return true;
-        }
-
-        if (o == null) {
-            return false;
-        }
-
-        if (o.getClass() != getClass()) {
-            // There is no guarantee that SqueezeServer items have globally unique IDs.
-            return false;
-        }
-
-        // Both might be empty items. For example a Song initialised
-        // with an empty token map, because no song is currently playing.
-        if (getId() == null && ((Item) o).getId() == null) {
-            return true;
-        }
-
-        return getId() != null && getId().equals(((Item) o).getId());
-    }
-
     private String toStringOpen() {
         return getClass().getSimpleName() + " { id: " + getId()
                 + ", name: " + getName()

@@ -32,6 +32,7 @@
         <item name="colorSecondary">@color/amberDark</item>
         <item name="colorSecondaryVariant">@color/amberDarkVariant</item>
         <item name="actionBarStyle">@style/SqueezerActionBar.Dark</item>
+        <item name="sliderStyle">@style/Widget.App.Slider</item>
 
         <item name="volume_panel_back_circle_color">@color/volume_panel_back_circle_color</item>
     </style>
@@ -50,12 +51,24 @@
         <item name="colorSecondary">@color/amberLight</item>
         <item name="colorSecondaryVariant">@color/amberLightVariant</item>
         <item name="actionBarTheme">@style/ThemeOverlay.MaterialComponents.Dark.ActionBar</item>
+        <item name="sliderStyle">@style/Widget.App.Slider</item>
 
         <item name="volume_panel_back_circle_color">@color/volume_panel_back_circle_color_light</item>
     </style>
 
     <style name="SqueezerActionBar.Dark" parent="@style/Widget.MaterialComponents.ActionBar.Primary">
         <item name="background">@color/actionBarBackgroundDark</item>
+    </style>
+
+    <style name="Widget.App.Slider" parent="Widget.MaterialComponents.Slider">
+        <item name="trackHeight">2dp</item>
+        <item name="thumbRadius">6dp</item>
+        <item name="haloRadius">12dp</item>
+        <item name="thumbColor">?attr/colorSecondary</item>
+        <item name="trackColorActive">?attr/colorSecondary</item>
+        <item name="tickColorActive">?attr/colorSecondary</item>
+        <item name="trackColorInactive">@color/line_dark</item>
+        <item name="tickColorInactive">@color/line_dark</item>
     </style>
 
     <!-- Text Styles. Apply these to the android:textAppearance attribute of the views. -->

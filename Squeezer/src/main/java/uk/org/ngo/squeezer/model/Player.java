@@ -35,7 +35,7 @@ import uk.org.ngo.squeezer.Util;
 import uk.org.ngo.squeezer.service.event.SongTimeChanged;
 
 
-public class Player extends Item implements Comparable {
+public class Player extends Item implements Comparable<Player> {
 
     private String mName;
 
@@ -57,8 +57,8 @@ public class Player extends Item implements Comparable {
     private boolean mConnected;
 
     @Override
-    public int compareTo(@NonNull Object otherPlayer) {
-        return this.mName.compareToIgnoreCase(((Player)otherPlayer).mName);
+    public int compareTo(@NonNull Player otherPlayer) {
+        return this.mName.compareToIgnoreCase((otherPlayer).mName);
     }
 
     public static class Pref {
@@ -192,6 +192,18 @@ public class Player extends Item implements Comparable {
             return lhs.getId().compareTo(rhs.getId());
         }
     };
+
+    @Override
+    public boolean equals(Object o) {
+        if (!super.equals(o)) {
+            return false;
+        }
+
+        // super.equals() has already checked that o is not null and is of the same class.
+        Player p = (Player) o;
+
+        return getName().equals(p.getName());
+    }
 
     @NonNull
     @Override

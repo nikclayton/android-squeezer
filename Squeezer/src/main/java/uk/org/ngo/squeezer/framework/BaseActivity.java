@@ -125,8 +125,13 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
     };
 
-    protected boolean addActionBar(){
-        return true;
+    protected void addActionBar() {
+        // Set the icon as the home button, and display it.
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_action_home);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
     }
 
     @Override
@@ -135,14 +140,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         mTheme.onCreate(this);
         super.onCreate(savedInstanceState);
 
-        if (addActionBar()) {
-            // Set the icon as the home button, and display it.
-            ActionBar actionBar = getSupportActionBar();
-            if (actionBar != null) {
-                actionBar.setHomeAsUpIndicator(R.drawable.ic_action_home);
-                actionBar.setDisplayHomeAsUpEnabled(true);
-            }
-        }
+        addActionBar();
 
         boundService = bindService(new Intent(this, SqueezeService.class), serviceConnection,
                 Context.BIND_AUTO_CREATE);

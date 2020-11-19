@@ -129,7 +129,7 @@ public class JiveItemView extends ViewParamItemView<JiveItem> {
                 sliderValue.setText(String.valueOf(getValue(progress)));
 
                 int pos = progress * (seekBar.getWidth() - 2 * thumbWidth) / seekBar.getMax();
-                sliderValue.setX(seekBar.getX() + pos + thumbOffset + thumbWidth);
+                sliderValue.setX(seekBar.getX() + pos - thumbOffset + thumbWidth);
             }
 
             @Override
@@ -139,8 +139,8 @@ public class JiveItemView extends ViewParamItemView<JiveItem> {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
+                sliderValue.setVisibility(View.INVISIBLE);
                 if (item.goAction != null) {
-                    sliderValue.setVisibility(View.INVISIBLE);
                     item.inputValue = String.valueOf(getValue(seekBar.getProgress()));
                     getActivity().action(item, item.goAction);
                 }

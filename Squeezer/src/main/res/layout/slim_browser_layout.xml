@@ -97,7 +97,8 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:visibility="visible"
+        android:visibility="gone"
+        tools:visibility="visible"
         android:orientation="horizontal">
 
         <com.google.android.material.textfield.TextInputLayout
@@ -123,7 +124,6 @@
 
     <include layout="@layout/item_list"
         android:id="@+id/item_list"
-        tools:listitem="@layout/list_item"
         android:layout_width="fill_parent"
         android:layout_height="0dip"
         android:layout_weight="1"/>

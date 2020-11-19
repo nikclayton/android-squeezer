@@ -20,6 +20,7 @@ package uk.org.ngo.squeezer.framework;
 import android.os.Bundle;
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -64,6 +65,7 @@ public abstract class BaseListActivity<VH extends ItemViewHolder<T>, T extends I
     public void setContentView(int layoutResID) {
         super.setContentView(layoutResID);
 
+        getListView().addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
         getListView().addOnScrollListener(new ScrollListener());
 
         setupAdapter(getListView());

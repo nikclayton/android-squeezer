@@ -21,7 +21,6 @@ import android.os.Bundle;
 import androidx.annotation.MainThread;
 import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -130,7 +129,6 @@ public abstract class ItemListActivity extends BaseActivity {
         listView = checkNotNull(subActivityContent.findViewById(R.id.item_list),
                 "getContentView() did not return a view containing R.id.item_list");
         listView.setLayoutManager(new LinearLayoutManager(this));
-        listView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
     }
 
     /**

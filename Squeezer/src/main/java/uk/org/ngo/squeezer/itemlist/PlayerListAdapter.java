@@ -16,10 +16,15 @@
 
 package uk.org.ngo.squeezer.itemlist;
 
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.HashMultimap;
@@ -35,8 +40,8 @@ import uk.org.ngo.squeezer.framework.ItemAdapter;
 import uk.org.ngo.squeezer.model.CurrentPlaylistItem;
 import uk.org.ngo.squeezer.model.Player;
 
-public class PlayerListAdapter extends BaseExpandableListAdapter {
-    private final PlayerListBaseActivity mActivity;
+public class PlayerListAdapter extends RecyclerView.Adapter<PlayerListAdapter.PlayerGroupViewHolder> {
+    private final PlayerListActivity mActivity;
 
     private final List<SyncGroup> mChildAdapters = new ArrayList<>();
 
@@ -44,7 +49,7 @@ public class PlayerListAdapter extends BaseExpandableListAdapter {
      * A list adapter for a synchronization group, containing players.
      * This class is comparable and it has a name for the synchronization group.
      */
-    private class SyncGroup extends ItemAdapter<PlayerView, Player> implements Comparable {
+    private class SyncGroup extends ItemAdapter<PlayerView, Player> implements Comparable<SyncGroup> {
 
         public String syncGroupName; // the name of the synchronization group as displayed in the players screen
 
@@ -63,14 +68,14 @@ public class PlayerListAdapter extends BaseExpandableListAdapter {
         }
 
         @Override
-        public int compareTo(Object otherSyncGroup) {
-            // compare this syncgroup name with the other one, alphabetically
-            return this.syncGroupName.compareToIgnoreCase(((SyncGroup)otherSyncGroup).syncGroupName);
+        public int compareTo(SyncGroup otherSyncGroup) {
+            // compare this sync group name with the other one, alphabetically
+            return this.syncGroupName.compareToIgnoreCase((otherSyncGroup).syncGroupName);
         }
 
         @Override
         public void update(int count, int start, List<Player> syncedPlayersList) {
-            Collections.sort(syncedPlayersList); // first order players in syncgroup alphabetically
+            Collections.sort(syncedPlayersList); // first order players in sync group alphabetically
 
             // add the list
             super.update(count, start, syncedPlayersList);
@@ -97,19 +102,10 @@ public class PlayerListAdapter extends BaseExpandableListAdapter {
     /** Count of how many players are in the adapter. */
     int mPlayerCount;
 
-    public PlayerListAdapter(PlayerListBaseActivity activity) {
+    public PlayerListAdapter(PlayerListActivity activity) {
         mActivity = activity;
     }
 
-    
-    public void onGroupClick(View view, int groupPosition) {
-        // TODO rcv move to view holder
-        // mChildAdapters.get(groupPosition).onSelected(view);
-    }
-    public void onChildClick(View view, int groupPosition, int childPosition) {
-        // TODO rcv move to view holder
-        // mChildAdapters.get(groupPosition).onItemSelected(view, childPosition);
-    }
 
     public void clear() {
         mPlayersChanged = true;
@@ -121,7 +117,7 @@ public class PlayerListAdapter extends BaseExpandableListAdapter {
     /**
      * Sets the players in to the adapter.
      *
-     * @param playerSyncGroups Multimap, mapping from the player ID of the syncmaster to the
+     * @param playerSyncGroups Multimap, mapping from the player ID of the sync master to the
      *     Players synced to that master. See
      *     {@link PlayerListActivity#updateSyncGroups(Collection)} for how this map is
      *     generated.
@@ -147,86 +143,47 @@ public class PlayerListAdapter extends BaseExpandableListAdapter {
             // add synchronization group to the child adapters
             mChildAdapters.add(syncGroup);
         }
-        Collections.sort(mChildAdapters); // sort syncgroup list alphabetically by syncgroup name
+        Collections.sort(mChildAdapters); // sort sync group list alphabetically by sync group name
         notifyDataSetChanged();
     }
 
     @Override
-    public boolean areAllItemsEnabled() {
-        return true; // Should be false, but then there is no divider
-    }
-
-    @Override
-    public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-        // TODO rcv implement
-        // return mChildAdapters.get(groupPosition).getView(childPosition, convertView, parent);
-        return null;
-    }
-
-    @Override
-    public int getGroupCount() {
+    public int getItemCount() {
         return mChildAdapters.size();
     }
 
+    @NonNull
     @Override
-    public int getChildrenCount(int groupPosition) {
-        return mChildAdapters.get(groupPosition).getItemCount();
+    public PlayerGroupViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        return new PlayerGroupViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.player_group_layout, parent, false));
     }
 
     @Override
-    public Object getGroup(int groupPosition) {
-        return mChildAdapters.get(groupPosition);
-    }
-
-    @Override
-    public Object getChild(int groupPosition, int childPosition) {
-        return mChildAdapters.get(groupPosition).getItem(childPosition);
-    }
-
-    /**
-     * Use the ID of the first player in the group as the identifier for the group.
-     * <p>
-     * {@inheritDoc}
-     * @param groupPosition
-     * @return
-     */
-    @Override
-    public long getGroupId(int groupPosition) {
-        return mChildAdapters.get(groupPosition).getItem(0).getIdAsLong();
-    }
-
-    @Override
-    public long getChildId(int groupPosition, int childPosition) {
-        return mChildAdapters.get(groupPosition).getItem(childPosition).getIdAsLong();
-    }
-
-    @Override
-    public boolean hasStableIds() {
-        return true;
-    }
-
-    @Override
-    public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
-        View row = mActivity.getLayoutInflater().inflate(R.layout.group_player, parent, false);
-
-        TextView text1 = row.findViewById(R.id.text1);
-        TextView text2 = row.findViewById(R.id.text2);
-
-        SyncGroup syncGroup = mChildAdapters.get(groupPosition);
-        String header = syncGroup.syncGroupName;
-        text1.setText(mActivity.getString(R.string.player_group_header, header));
+    public void onBindViewHolder(@NonNull PlayerGroupViewHolder holder, int position) {
+        SyncGroup syncGroup = mChildAdapters.get(position);
+        holder.text1.setText(mActivity.getString(R.string.player_group_header, syncGroup.syncGroupName));
 
         CurrentPlaylistItem groupSong = syncGroup.getItem(0).getPlayerState().getCurrentSong();
-
         if (groupSong != null) {
-            text2.setText(mJoiner.join(groupSong.getName(), groupSong.getArtist(),
+            holder.text2.setText(mJoiner.join(groupSong.getName(), groupSong.getArtist(),
                     groupSong.getAlbum()));
         }
-        return row;
+
+        holder.players.setAdapter(syncGroup);
+        holder.players.addItemDecoration(new DividerItemDecoration(holder.players.getContext(), LinearLayoutManager.VERTICAL));
+        holder.players.setLayoutManager(new LinearLayoutManager(holder.players.getContext()));
     }
 
-    @Override
-    public boolean isChildSelectable(int groupPosition, int childPosition) {
-        return false;
+    public static class PlayerGroupViewHolder extends RecyclerView.ViewHolder {
+        TextView text1;
+        TextView text2;
+        RecyclerView players;
+
+        public PlayerGroupViewHolder(@NonNull View itemView) {
+            super(itemView);
+            text1 = itemView.findViewById(R.id.text1);
+            text2 = itemView.findViewById(R.id.text2);
+            players = itemView.findViewById(R.id.players_container);
+        }
     }
 }

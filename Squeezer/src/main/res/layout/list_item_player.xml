@@ -37,16 +37,16 @@ for the implementation.
 
 -->
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="fill_parent"
+    android:layout_marginVertical="8dp"
+    android:layout_marginHorizontal="4dp"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:descendantFocusability="blocksDescendants"
-    android:minHeight="48dp"
-    android:paddingBottom="4dp"
-    android:paddingStart="16dp"
-    android:paddingEnd="32dp"
-    android:paddingTop="4dp">
+    android:minHeight="48dp">
 
     <uk.org.ngo.squeezer.widget.SquareImageView
         android:id="@+id/icon"
@@ -62,34 +62,48 @@ for the implementation.
 
     <TextView
         android:id="@+id/text1"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_toEndOf="@id/icon"
-        android:textAppearance="@style/SqueezerTextAppearance.GridItem.Primary"
+        android:textAppearance="@style/SqueezerTextAppearance.ListItem.Primary"
         tools:text="Player name" />
 
     <TextView
         android:id="@+id/text2"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/text1"
         android:layout_toEndOf="@+id/icon"
         android:textAppearance="@style/SqueezerTextAppearance.ListItem.Secondary"
         tools:text="Sleeping in ..."
-        tools:visibility="visible"
         android:layout_above="@+id/volume_slider" />
 
-    <SeekBar
-        android:id="@+id/volume_slider"
-        android:layout_width="fill_parent"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:layout_toStartOf="@+id/context_menu"
-        android:max="100"
-        android:thumbOffset="8dp"
-        tools:visibility="visible"
         android:layout_below="@+id/icon"
-        android:layout_alignStart="@+id/icon" />
+        android:layout_alignStart="@+id/icon"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginTop="12dp"
+            app:srcCompat="@drawable/ic_volume_up"/>
+
+        <com.google.android.material.slider.Slider
+            android:id="@+id/volume_slider"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            tools:value="50"
+            android:valueFrom="0"
+            android:valueTo="100"
+            android:stepSize="1"
+            />
+    </LinearLayout>
+
 
     <include
         layout="@layout/context_menu_image_button"

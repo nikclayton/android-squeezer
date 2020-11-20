@@ -27,38 +27,29 @@
     android:paddingBottom="4dp"
     android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/slider_value"
-        style="@style/SqueezerTextAppearance.ListItem.Secondary"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:text="0"
-        tools:visibility="visible"
-        android:visibility="invisible"/>
-
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:orientation="horizontal">
 
         <ImageView
             android:layout_width="24dp"
             android:layout_height="24dp"
+            android:layout_marginTop="12dp"
             app:srcCompat="@drawable/ic_volume_down"/>
 
-        <SeekBar
+        <com.google.android.material.slider.Slider
             android:id="@+id/slider"
             android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:max="100"
-            android:thumbOffset="8dp"/>
+            android:stepSize="1"
+            />
 
         <ImageView
             android:layout_width="24dp"
             android:layout_height="24dp"
+            android:layout_marginTop="12dp"
             app:srcCompat="@drawable/ic_volume_up"/>
     </LinearLayout>
 

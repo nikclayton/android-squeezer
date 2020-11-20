@@ -54,11 +54,10 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.SeekBar;
-import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.google.android.material.slider.Slider;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 
@@ -156,7 +155,7 @@ public class NowPlayingFragment extends Fragment {
     private ImageView albumArt;
 
     /** In full-screen mode, shows the current progress through the track. */
-    private SeekBar seekBar;
+    private Slider slider;
 
     /** In mini-mode, shows the current progress through the track. */
     private ProgressBar mProgressBar;
@@ -279,11 +278,11 @@ public class NowPlayingFragment extends Fragment {
             repeatButton = v.findViewById(R.id.repeat);
             currentTime = v.findViewById(R.id.currenttime);
             totalTime = v.findViewById(R.id.totaltime);
-            seekBar = v.findViewById(R.id.seekbar);
+            slider = v.findViewById(R.id.seekbar);
             volumeButton = v.findViewById(R.id.volume);
             playlistButton = v.findViewById(R.id.playlist);
 
-            final ViewParamItemView<JiveItem> viewHolder = new ViewParamItemView<JiveItem>(mActivity, v);
+            final ViewParamItemView<JiveItem> viewHolder = new ViewParamItemView<>(mActivity, v);
             viewHolder.contextMenuButton.setOnClickListener(view -> {
                 CurrentPlaylistItem currentSong = getCurrentSong();
                 // This extra check is if user pressed the button before visibility is set to GONE
@@ -361,21 +360,19 @@ public class NowPlayingFragment extends Fragment {
 
             playlistButton.setOnClickListener(view -> CurrentPlaylistActivity.show(mActivity));
 
-            seekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
-                CurrentPlaylistItem seekingSong;
-
-                // Update the time indicator to reflect the dragged thumb
-                // position.
-                @Override
-                public void onProgressChanged(SeekBar s, int progress, boolean fromUser) {
-                    if (fromUser) {
-                        currentTime.setText(Util.formatElapsedTime(progress));
-                    }
+            // Update the time indicator to reflect the dragged thumb position.
+            slider.addOnChangeListener((s, value, fromUser) -> {
+                if (fromUser) {
+                    currentTime.setText(Util.formatElapsedTime((int)value));
                 }
+            });
+
+            slider.addOnSliderTouchListener(new Slider.OnSliderTouchListener() {
+                CurrentPlaylistItem seekingSong;
 
                 // Disable updates when user drags the thumb.
                 @Override
-                public void onStartTrackingTouch(SeekBar s) {
+                public void onStartTrackingTouch(@NonNull Slider s) {
                     seekingSong = getCurrentSong();
                     updateSeekBar = false;
                 }
@@ -384,13 +381,13 @@ public class NowPlayingFragment extends Fragment {
                 // we started seeking then jump to the new point in the track,
                 // otherwise ignore the seek.
                 @Override
-                public void onStopTrackingTouch(SeekBar s) {
+                public void onStopTrackingTouch(@NonNull Slider s) {
                     CurrentPlaylistItem thisSong = getCurrentSong();
 
                     updateSeekBar = true;
 
                     if (seekingSong == thisSong) {
-                        setSecondsElapsed(s.getProgress());
+                        setSecondsElapsed((int)s.getValue());
                     }
                 }
             });
@@ -598,11 +595,12 @@ public class NowPlayingFragment extends Fragment {
     private void updateTimeDisplayTo(int secondsIn, int secondsTotal) {
         if (mFullHeightLayout) {
             if (updateSeekBar) {
-                if (seekBar.getMax() != secondsTotal) {
-                    seekBar.setMax(secondsTotal);
+                if (slider.getValueTo() != secondsTotal) {
+                    slider.setValueTo(secondsTotal > 0 ? secondsTotal : 1);
                     totalTime.setText(Util.formatElapsedTime(secondsTotal));
                 }
-                seekBar.setProgress(secondsIn);
+                slider.setEnabled(secondsTotal > 0);
+                slider.setValue(secondsIn);
                 currentTime.setText(Util.formatElapsedTime(secondsIn));
             }
         } else {
@@ -1010,8 +1008,8 @@ public class NowPlayingFragment extends Fragment {
             btnContextMenu.setVisibility(View.GONE);
             currentTime.setText("--:--");
             totalTime.setText("--:--");
-            seekBar.setEnabled(false);
-            seekBar.setProgress(0);
+            slider.setEnabled(false);
+            slider.setValue(0);
         } else {
             albumArt.setImageResource(R.drawable.icon_pending_artwork);
             mProgressBar.setEnabled(false);
@@ -1038,7 +1036,6 @@ public class NowPlayingFragment extends Fragment {
         if (mFullHeightLayout) {
             shuffleButton.setEnabled(true);
             repeatButton.setEnabled(true);
-            seekBar.setEnabled(true);
             volumeButton.setEnabled(true);
             playlistButton.setEnabled(true);
         } else {

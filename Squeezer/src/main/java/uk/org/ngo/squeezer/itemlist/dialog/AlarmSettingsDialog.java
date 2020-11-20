@@ -19,16 +19,15 @@ package uk.org.ngo.squeezer.itemlist.dialog;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 import android.view.View;
 import android.widget.CompoundButton;
-import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.slider.Slider;
 
 import uk.org.ngo.squeezer.R;
 import uk.org.ngo.squeezer.model.Player;
@@ -72,7 +71,7 @@ public class AlarmSettingsDialog extends DialogFragment {
     }
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(@NonNull Activity activity) {
         super.onAttach(activity);
 
         // Verify that the host activity implements the callback interface
@@ -97,79 +96,38 @@ public class AlarmSettingsDialog extends DialogFragment {
         final TextView alarmTimeoutHint = view.findViewById(R.id.alarm_timeout_hint);
         final TextView alarmFadeHint = view.findViewById(R.id.alarm_fade_hint);
 
-        final SeekBar alarmVolume = view.findViewById(R.id.alarm_volume_seekbar);
-        final SeekBar alarmSnooze = view.findViewById(R.id.alarm_snooze_seekbar);
-        final SeekBar alarmTimeout = view.findViewById(R.id.alarm_timeout_seekbar);
+        final Slider alarmVolume = view.findViewById(R.id.alarm_volume_slider);
+        final Slider alarmSnooze = view.findViewById(R.id.alarm_snooze_slider);
+        final Slider alarmTimeout = view.findViewById(R.id.alarm_timeout_slider);
 
         final CompoundButton alarmFadeToggle = view.findViewById(R.id.alarm_fade);
 
-        alarmVolume.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                alarmVolumeHint.setText(String.format("%d%%", progress));
-            }
+        alarmVolume.addOnChangeListener((slider, value, fromUser) -> alarmVolumeHint.setText(String.format("%d%%", (int)value)));
 
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) { }
+        alarmSnooze.addOnChangeListener((slider, value, fromUser) -> alarmSnoozeHint.setText(getResources().getQuantityString(R.plurals.alarm_snooze_hint_text,
+                (int)value, (int)value)));
 
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) { }
-        });
-
-        alarmSnooze.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                alarmSnoozeHint.setText(getResources().getQuantityString(R.plurals.alarm_snooze_hint_text,
-                        progress, progress));
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) { }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) { }
-        });
-
-        alarmTimeout.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (progress == 0) {
-                    alarmTimeoutHint.setText(R.string.alarm_timeout_hint_text_zero);
-                } else {
-                    alarmTimeoutHint.setText(getResources().getQuantityString(R.plurals.alarm_timeout_hint_text,
-                            progress, progress));
-                }
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) { }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) { }
-        });
-
-        alarmFadeToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                alarmFadeHint.setText(isChecked ? R.string.alarm_fade_on_text : R.string.alarm_fade_off_text);
+        alarmTimeout.addOnChangeListener((seekBar, value, fromUser) -> {
+            if (value == 0) {
+                alarmTimeoutHint.setText(R.string.alarm_timeout_hint_text_zero);
+            } else {
+                alarmTimeoutHint.setText(getResources().getQuantityString(R.plurals.alarm_timeout_hint_text,
+                        (int)value, (int)value));
             }
         });
 
-        alarmVolume.setProgress(Integer.valueOf(mHostActivity.getPlayerPref(Player.Pref.ALARM_DEFAULT_VOLUME, "50")));
-        alarmSnooze.setProgress(Integer.valueOf(mHostActivity.getPlayerPref(Player.Pref.ALARM_SNOOZE_SECONDS, "600")) / 60);
-        alarmTimeout.setProgress(Integer.valueOf(mHostActivity.getPlayerPref(Player.Pref.ALARM_TIMEOUT_SECONDS, "300")) / 60);
+        alarmFadeToggle.setOnCheckedChangeListener((buttonView, isChecked) -> alarmFadeHint.setText(isChecked ? R.string.alarm_fade_on_text : R.string.alarm_fade_off_text));
+
+        alarmVolume.setValue(Integer.parseInt(mHostActivity.getPlayerPref(Player.Pref.ALARM_DEFAULT_VOLUME, "50")));
+        alarmSnooze.setValue((float) (Integer.parseInt(mHostActivity.getPlayerPref(Player.Pref.ALARM_SNOOZE_SECONDS, "600")) / 60.0));
+        alarmTimeout.setValue((float) (Integer.parseInt(mHostActivity.getPlayerPref(Player.Pref.ALARM_TIMEOUT_SECONDS, "300")) / 60.0));
         alarmFadeToggle.setChecked("1".equals(mHostActivity.getPlayerPref(Player.Pref.ALARM_FADE_SECONDS, "0")));
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getActivity());
         builder.setView(view);
         builder.setTitle(getResources().getString(R.string.alarms_settings_dialog_title, mHostActivity.getPlayer().getName()));
-        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                mHostActivity.onPositiveClick(alarmVolume.getProgress(), alarmSnooze.getProgress() * 60,
-                        alarmTimeout.getProgress() * 60, alarmFadeToggle.isChecked());
-            }
-        });
+        builder.setPositiveButton(android.R.string.ok, (dialog, which) -> mHostActivity.onPositiveClick((int)alarmVolume.getValue(), (int)alarmSnooze.getValue() * 60,
+                (int)alarmTimeout.getValue() * 60, alarmFadeToggle.isChecked()));
         builder.setNegativeButton(android.R.string.cancel, null);
         return builder.create();
     }

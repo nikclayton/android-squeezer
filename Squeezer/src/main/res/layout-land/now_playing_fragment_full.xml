@@ -20,6 +20,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:paddingTop="8dp"
     android:paddingEnd="8dp">
@@ -82,15 +83,17 @@
         android:layout_gravity="center_horizontal"
         style="@style/SqueezerWidget.NowPlaying.Timestamp"/>
 
-    <SeekBar
+    <com.google.android.material.slider.Slider
         android:id="@+id/seekbar"
-        style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/artistname"
-        android:paddingTop="8dp"
         android:layout_toEndOf="@id/currenttime"
-        android:layout_toStartOf="@id/totaltime"/>
+        android:layout_toStartOf="@id/totaltime"
+        android:valueFrom="0"
+        android:valueTo="1"
+        android:stepSize="1"
+        app:labelBehavior="gone"/>
 
     <TextView
         android:id="@+id/totaltime"

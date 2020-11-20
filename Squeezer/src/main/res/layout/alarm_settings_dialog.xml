@@ -15,6 +15,7 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -41,13 +42,16 @@
         android:paddingEnd="16dp"
         tools:text="Volume hint text" />
 
-    <SeekBar
-        android:id="@+id/alarm_volume_seekbar"
+    <com.google.android.material.slider.Slider
+        android:id="@+id/alarm_volume_slider"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:indeterminate="false"
-        android:max="100"
+        app:labelBehavior="gone"
+        tools:value="50"
+        android:valueFrom="0"
+        android:valueTo="100"
+        android:stepSize="1"
         android:paddingBottom="18dp"
         android:paddingStart="16dp"
         android:paddingEnd="16dp" />
@@ -69,13 +73,16 @@
         android:paddingEnd="16dp"
         tools:text="Snooze hint text" />
 
-    <SeekBar
-        android:id="@+id/alarm_snooze_seekbar"
+    <com.google.android.material.slider.Slider
+        android:id="@+id/alarm_snooze_slider"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:indeterminate="false"
-        android:max="30"
+        app:labelBehavior="gone"
+        tools:value="9"
+        android:valueFrom="0"
+        android:valueTo="30"
+        android:stepSize="1"
         android:paddingBottom="18dp"
         android:paddingStart="16dp"
         android:paddingEnd="16dp" />
@@ -97,13 +104,16 @@
         android:paddingEnd="16dp"
         android:text="@string/alarm_timeout_hint_text_zero" />
 
-    <SeekBar
-        android:id="@+id/alarm_timeout_seekbar"
+    <com.google.android.material.slider.Slider
+        android:id="@+id/alarm_timeout_slider"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:indeterminate="false"
-        android:max="90"
+        app:labelBehavior="gone"
+        tools:value="60"
+        android:valueFrom="0"
+        android:valueTo="90"
+        android:stepSize="1"
         android:paddingBottom="18dp"
         android:paddingStart="16dp"
         android:paddingEnd="16dp" />
@@ -119,6 +129,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:paddingStart="16dp"
+            android:paddingEnd="16dp"
             android:text="@string/alarm_fade_text" />
 
         <TextView

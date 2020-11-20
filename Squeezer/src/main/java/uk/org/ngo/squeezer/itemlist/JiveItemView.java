@@ -17,8 +17,6 @@
 package uk.org.ngo.squeezer.itemlist;
 
 import android.view.View;
-import android.widget.SeekBar;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
@@ -116,38 +114,23 @@ public class JiveItemView extends ViewParamItemView<JiveItem> {
 
 
     private void bindSlider(final JiveItem item) {
-        final TextView sliderValue = itemView.findViewById(R.id.slider_value);
-        SeekBar seekBar = itemView.findViewById(R.id.slider);
-        final int thumbWidth = seekBar.getThumb().getIntrinsicWidth();
-        final int thumbOffset = seekBar.getThumbOffset();
+        com.google.android.material.slider.Slider seekBar = itemView.findViewById(R.id.slider);
         final Slider slider = item.slider;
-        final int max = seekBar.getMax();
-        seekBar.setProgress((slider.initial - slider.min) * max / (slider.max - slider.min));
-        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                sliderValue.setText(String.valueOf(getValue(progress)));
+        seekBar.setValue(slider.initial);
+        seekBar.setValueFrom(slider.min);
+        seekBar.setValueTo(slider.max);
+        seekBar.addOnSliderTouchListener(new com.google.android.material.slider.Slider.OnSliderTouchListener() {
 
-                int pos = progress * (seekBar.getWidth() - 2 * thumbWidth) / seekBar.getMax();
-                sliderValue.setX(seekBar.getX() + pos - thumbOffset + thumbWidth);
+            @Override
+            public void onStartTrackingTouch(@NonNull com.google.android.material.slider.Slider seekBar) {
             }
 
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-                sliderValue.setVisibility(View.VISIBLE);
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                sliderValue.setVisibility(View.INVISIBLE);
+            public void onStopTrackingTouch(@NonNull com.google.android.material.slider.Slider seekBar) {
                 if (item.goAction != null) {
-                    item.inputValue = String.valueOf(getValue(seekBar.getProgress()));
+                    item.inputValue = String.valueOf((int)seekBar.getValue());
                     getActivity().action(item, item.goAction);
                 }
-            }
-
-            private int getValue(int progress) {
-                return slider.min + (slider.max - slider.min) * progress / max;
             }
         });
     }

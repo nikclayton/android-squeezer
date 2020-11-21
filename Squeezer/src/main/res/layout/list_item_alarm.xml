@@ -57,9 +57,8 @@
             android:textColor="?alarm_am_pm_color"
             tools:text="AM" />
 
-        <include
+        <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/enabled"
-            layout="@layout/squeezer_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"

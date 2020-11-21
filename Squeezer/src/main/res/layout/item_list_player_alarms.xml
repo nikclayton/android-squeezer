@@ -54,9 +54,8 @@
             android:text="@string/all_alarms_off_hint"
             android:textAppearance="@style/SqueezerTextAppearance.Small" />
 
-        <include
+        <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/alarms_enabled"
-            layout="@layout/squeezer_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"

@@ -143,9 +143,8 @@
             android:paddingEnd="16dp"
             android:text="@string/alarm_fade_off_text" />
 
-        <include
+        <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/alarm_fade"
-            layout="@layout/squeezer_switch"
             android:layout_width="wrap_content"
             android:layout_height="48dp"
             android:layout_alignParentEnd="true"

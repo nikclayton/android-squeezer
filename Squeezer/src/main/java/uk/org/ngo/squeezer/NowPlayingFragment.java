@@ -24,6 +24,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.res.ColorStateList;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
@@ -33,6 +34,7 @@ import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.UiThread;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.view.GestureDetectorCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
@@ -51,12 +53,12 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.slider.Slider;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
@@ -140,17 +142,17 @@ public class NowPlayingFragment extends Fragment {
 
     private MenuItem menu_item_alarm;
 
-    private ImageButton playPauseButton;
+    private MaterialButton playPauseButton;
 
     @Nullable
-    private ImageButton nextButton;
+    private Button nextButton;
 
     @Nullable
-    private ImageButton prevButton;
+    private Button prevButton;
 
-    private ImageButton shuffleButton;
+    private MaterialButton shuffleButton;
 
-    private ImageButton repeatButton;
+    private MaterialButton repeatButton;
 
     private ImageView albumArt;
 
@@ -415,24 +417,27 @@ public class NowPlayingFragment extends Fragment {
 
     @UiThread
     private void updatePlayPauseIcon(@PlayerState.PlayState String playStatus) {
-        playPauseButton
-                .setImageResource((PlayerState.PLAY_STATE_PLAY.equals(playStatus)) ?
-                        R.drawable.ic_action_pause
-                        : R.drawable.ic_action_play);
+        playPauseButton.setIconResource((PlayerState.PLAY_STATE_PLAY.equals(playStatus)) ? R.drawable.ic_action_pause : R.drawable.ic_action_play);
     }
 
     @UiThread
     private void updateShuffleStatus(ShuffleStatus shuffleStatus) {
         if (mFullHeightLayout && shuffleStatus != null) {
-            shuffleButton.setImageResource(shuffleStatus.getIcon());
+            shuffleButton.setIconResource(shuffleStatus.getIcon());
+            shuffleButton.setIconTint(getTint(shuffleStatus == ShuffleStatus.SHUFFLE_OFF));
         }
     }
 
     @UiThread
     private void updateRepeatStatus(RepeatStatus repeatStatus) {
         if (mFullHeightLayout && repeatStatus != null) {
-            repeatButton.setImageResource(repeatStatus.getIcon());
+            repeatButton.setIconResource(repeatStatus.getIcon());
+            repeatButton.setIconTint(getTint(repeatStatus == RepeatStatus.REPEAT_OFF));
         }
+    }
+
+    private ColorStateList getTint(boolean off) {
+        return AppCompatResources.getColorStateList(mActivity, mActivity.getAttributeValue(off ? R.attr.colorControlNormal : R.attr.colorPrimary));
     }
 
     @UiThread
@@ -701,7 +706,7 @@ public class NowPlayingFragment extends Fragment {
      *
      * @param button the button to enable.
      */
-    private static void enableButton(@Nullable ImageButton button) {
+    private static void enableButton(@Nullable Button button) {
         setButtonState(button, true);
     }
 
@@ -710,7 +715,7 @@ public class NowPlayingFragment extends Fragment {
      *
      * @param button the button to enable.
      */
-    private static void disableButton(@Nullable ImageButton button) {
+    private static void disableButton(@Nullable Button button) {
         setButtonState(button, false);
     }
 
@@ -722,7 +727,7 @@ public class NowPlayingFragment extends Fragment {
      * @param button the button to affect
      * @param state the desired state, {@code true} to enable {@code false} to disable.
      */
-    private static void setButtonState(@Nullable ImageButton button, boolean state) {
+    private static void setButtonState(@Nullable Button button, boolean state) {
         if (button == null) {
             return;
         }
@@ -1001,8 +1006,8 @@ public class NowPlayingFragment extends Fragment {
             playlistButton.setEnabled(false);
 
             albumArt.setImageResource(R.drawable.icon_album_noart_fullscreen);
-            shuffleButton.setImageResource(0);
-            repeatButton.setImageResource(0);
+            shuffleButton.setIconResource(0);
+            repeatButton.setIconResource(0);
             updatePlayerDropDown(Collections.emptyList(), null);
             artistText.setText(getText(R.string.disconnected_text));
             btnContextMenu.setVisibility(View.GONE);

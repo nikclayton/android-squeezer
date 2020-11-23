@@ -57,7 +57,7 @@
         android:paddingStart="4dp"
         style="@style/SqueezerWidget.NowPlayingMini.ArtistAlbumName"/>
 
-    <uk.org.ngo.squeezer.widget.RepeatingImageButton
+    <Button
         android:id="@+id/next"
         style="@style/SqueezerWidget.MediaButton.Next"
         android:layout_width="48dp"
@@ -68,7 +68,7 @@
         android:minWidth="48dp"
         android:layout_alignParentEnd="true"/>
 
-    <ImageButton
+    <Button
         android:id="@+id/pause"
         style="@style/SqueezerWidget.MediaButton"
         android:layout_width="48dp"
@@ -80,7 +80,7 @@
         android:minWidth="48dp"
         tools:src="@drawable/ic_action_pause"/>
 
-    <uk.org.ngo.squeezer.widget.RepeatingImageButton
+    <Button
         android:id="@+id/prev"
         style="@style/SqueezerWidget.MediaButton.Previous"
         android:layout_width="48dp"

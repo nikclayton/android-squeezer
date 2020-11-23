@@ -57,9 +57,9 @@
         android:paddingStart="4dp"
         style="@style/SqueezerWidget.NowPlayingMini.ArtistAlbumName"/>
 
-    <ImageButton
+    <Button
         android:id="@+id/pause"
-        style="@style/SqueezerWidget.MediaButton"
+        style="@style/SqueezerWidget.MediaButton.Play"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_alignParentEnd="true"

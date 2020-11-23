@@ -119,23 +119,23 @@
         android:gravity="center"
         android:orientation="horizontal">
 
-        <ImageButton
+        <Button
             android:id="@+id/shuffle"
             style="@style/SqueezerWidget.MediaButton.Shuffle"/>
 
-        <uk.org.ngo.squeezer.widget.RepeatingImageButton
+        <Button
             android:id="@+id/prev"
             style="@style/SqueezerWidget.MediaButton.Previous"/>
 
-        <ImageButton
+        <Button
             android:id="@+id/pause"
             style="@style/SqueezerWidget.MediaButton.Play"/>
 
-        <uk.org.ngo.squeezer.widget.RepeatingImageButton
+        <Button
             android:id="@+id/next"
             style="@style/SqueezerWidget.MediaButton.Next"/>
 
-        <ImageButton
+        <Button
             android:id="@+id/repeat"
             style="@style/SqueezerWidget.MediaButton.Repeat"/>
     </LinearLayout>

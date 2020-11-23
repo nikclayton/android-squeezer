@@ -182,32 +182,31 @@
     </style>
 
     <!-- Media controller styles -->
-    <style name="SqueezerWidget.MediaButton">
+    <style name="SqueezerWidget.MediaButton" parent="Widget.MaterialComponents.Button.TextButton">
         <item name="android:layout_width">0dip</item>
         <item name="android:layout_height">52dip</item>
         <item name="android:layout_weight">1</item>
-        <item name="android:background">@drawable/list_selector_holo_dark</item>
-        <item name="tint">?colorControlNormal</item>
+        <item name="iconGravity">textStart</item>
     </style>
 
     <style name="SqueezerWidget.MediaButton.Previous">
-        <item name="srcCompat">@drawable/ic_action_previous</item>
+        <item name="icon">@drawable/ic_action_previous</item>
     </style>
 
     <style name="SqueezerWidget.MediaButton.Next">
-        <item name="srcCompat">@drawable/ic_action_next</item>
+        <item name="icon">@drawable/ic_action_next</item>
     </style>
 
     <style name="SqueezerWidget.MediaButton.Play">
-        <item name="srcCompat">@drawable/ic_action_play</item>
+        <item name="icon">@drawable/ic_action_play</item>
     </style>
 
     <style name="SqueezerWidget.MediaButton.Shuffle">
-        <item name="srcCompat">@drawable/btn_shuffle</item>
+        <item name="icon">@drawable/btn_shuffle</item>
     </style>
 
     <style name="SqueezerWidget.MediaButton.Repeat">
-        <item name="srcCompat">@drawable/btn_repeat</item>
+        <item name="icon">@drawable/btn_repeat</item>
     </style>
 
     <style name="SqueezerWidget.MediaButton.Volume" parent="Widget.MaterialComponents.Button.TextButton">

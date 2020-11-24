@@ -605,7 +605,7 @@ public class NowPlayingFragment extends Fragment {
                     totalTime.setText(Util.formatElapsedTime(secondsTotal));
                 }
                 slider.setEnabled(secondsTotal > 0);
-                slider.setValue(secondsIn);
+                slider.setValue(secondsTotal > 0 ? secondsIn : 0);
                 currentTime.setText(Util.formatElapsedTime(secondsIn));
             }
         } else {

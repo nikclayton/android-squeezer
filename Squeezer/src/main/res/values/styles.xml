@@ -20,12 +20,6 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.MaterialComponents">
         <item name="alarm_dow_selected">@android:color/white</item>
-        <item name="alarm_am_pm_color">@android:color/white</item>
-        <item name="alarm_list_background">@color/alarm_list_background</item>
-        <item name="item_background">@drawable/item_background</item>
-        <item name="main_button_background">@drawable/main_button_normal</item>
-        <item name="ic_alarm_settings">@drawable/ic_alarm_settings</item>
-        <item name="ic_delete">@drawable/ic_delete</item>
 
         <item name="colorPrimary">@color/lightBlueDark</item>
         <item name="colorPrimaryVariant">@color/lightBlueDarkVariant</item>
@@ -39,12 +33,6 @@
 
     <style name="AppTheme.Light.DarkActionBar" parent="Theme.MaterialComponents.Light">
         <item name="alarm_dow_selected">@android:color/black</item>
-        <item name="alarm_am_pm_color">@android:color/black</item>
-        <item name="alarm_list_background">@color/alarm_list_background_light</item>
-        <item name="item_background">@drawable/item_background_light</item>
-        <item name="main_button_background">@drawable/main_button_light</item>
-        <item name="ic_alarm_settings">@drawable/ic_alarm_settings_light</item>
-        <item name="ic_delete">@drawable/ic_delete_light</item>
 
         <item name="colorPrimary">@color/lightBlueLight</item>
         <item name="colorPrimaryVariant">@color/lightBlueLightVariant</item>
@@ -182,11 +170,15 @@
     </style>
 
     <!-- Media controller styles -->
-    <style name="SqueezerWidget.MediaButton" parent="Widget.MaterialComponents.Button.TextButton">
+    <style name="ImageButton" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="iconGravity">textStart</item>
+    </style>
+
+    <!-- Media controller styles -->
+    <style name="SqueezerWidget.MediaButton" parent="ImageButton">
         <item name="android:layout_width">0dip</item>
         <item name="android:layout_height">52dip</item>
         <item name="android:layout_weight">1</item>
-        <item name="iconGravity">textStart</item>
     </style>
 
     <style name="SqueezerWidget.MediaButton.Previous">
@@ -335,9 +327,7 @@
         <item name="android:textAppearance">?android:textAppearanceMedium</item>
     </style>
 
-    <style name="RemoteButton"
-        parent="Widget.AppCompat.ButtonBar"
-        >
+    <style name="RemoteButton" parent="Widget.AppCompat.ButtonBar">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_weight">1</item>
         <item name="android:layout_marginLeft">-4dip</item>

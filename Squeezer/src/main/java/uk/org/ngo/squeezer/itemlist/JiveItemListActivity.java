@@ -197,6 +197,7 @@ public class JiveItemListActivity extends BaseListActivity<JiveItemView, JiveIte
     @Override
     public void setContentView(@LayoutRes int layoutResID) {
         super.setContentView(layoutResID);
+        getListView().addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
         getListView().setRecyclerListener(viewHolder -> {
             // Release strong reference when a view is recycled
             final ImageView imageView = ((JiveItemView)viewHolder).icon;

@@ -114,16 +114,11 @@
 
     <color name="actionBarBackgroundDark">#272727</color>
 
-    <color name="alarm_list_background">#1c1e20</color>
-    <color name="transparent">#00000000</color>
-    <color name="transparent_white">#33ffffff</color>
-    <color name="transparent_black">#33000000</color>
     <color name="main_button_normal">#606060</color>
     <color name="main_button_selected">#909090</color>
     <color name="notification_button_pressed">#444444</color>
-    <color name="notification_button_default">@color/transparent</color>
+    <color name="notification_button_default">#00000000</color>
 
-    <color name="alarm_list_background_light">#e5e5e5</color>
     <color name="main_button_normal_light">#b0b0b0</color>
     <color name="main_button_selected_light">#e0e0e0</color>
 

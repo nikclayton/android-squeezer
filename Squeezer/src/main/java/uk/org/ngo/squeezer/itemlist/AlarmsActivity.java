@@ -23,10 +23,10 @@ import android.os.Bundle;
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentManager;
+
 import android.text.format.DateFormat;
 import android.view.View;
-import android.widget.CompoundButton;
-import android.widget.ImageView;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.android.datetimepicker.time.RadialPickerLayout;
@@ -62,7 +62,7 @@ public class AlarmsActivity extends BaseListActivity<AlarmView, Alarm> implement
     private TextView mAllAlarmsHintView;
 
     /** Settings button. */
-    private ImageView mSettingsButton;
+    private Button mSettingsButton;
 
     /** Have player preference values been requested from the server? */
     private boolean mPrefsOrdered = false;
@@ -79,7 +79,7 @@ public class AlarmsActivity extends BaseListActivity<AlarmView, Alarm> implement
         ((TextView)findViewById(R.id.all_alarms_text)).setText(R.string.ALARM_ALL_ALARMS);
         mAllAlarmsHintView = findViewById(R.id.all_alarms_hint);
 
-        mAlarmsEnabledButton = new CompoundButtonWrapper((CompoundButton) findViewById(R.id.alarms_enabled));
+        mAlarmsEnabledButton = new CompoundButtonWrapper(findViewById(R.id.alarms_enabled));
         findViewById(R.id.add_alarm).setOnClickListener(v -> TimePickerFragment.show(getSupportFragmentManager(), DateFormat.is24HourFormat(AlarmsActivity.this), getThemeId() == R.style.AppTheme));
 
         mSettingsButton = findViewById(R.id.settings);

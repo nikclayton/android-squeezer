@@ -24,13 +24,7 @@
     <!-- Alarm -->
     <declare-styleable name="alarm">
         <attr name="alarm_dow_selected" format="reference"/>
-        <attr name="alarm_am_pm_color" format="reference"/>
     </declare-styleable>
-    <attr name="alarm_list_background" format="reference"/>
-    <attr name="item_background" format="reference"/>
-    <attr name="main_button_background" format="reference"/>
-    <attr name="ic_alarm_settings" format="reference"/>
-    <attr name="ic_delete" format="reference"/>
 
     <!-- Volume panel -->
     <attr name="volume_panel_back_circle_color" format="reference"/>

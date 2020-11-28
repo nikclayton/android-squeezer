@@ -37,6 +37,7 @@
     <string name="settings_theme_title">Tema</string>
     <string name="settings_theme_dark">Mørk</string>
     <string name="settings_theme_light_dark">Lys, mørk handlingslinie</string>
+    <string name="settings_clear_current_playlist_confirmation">Bekræft før ryd afspilningsliste</string>
     <string name="settings_username_hint">Eventuelt SqueezeBox Server brugernavn.</string>
     <string name="settings_password_hint">Eventuel SqueezeBox Server adgangskode.</string>
     <string name="settings_server_scan_progress">Scanner efter servere…</string>

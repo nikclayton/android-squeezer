@@ -27,6 +27,7 @@ Automatically generated file. DO NOT MODIFY
   <string name='ADVANCED_SETTINGS'>Geavanceerd</string>
   <string name='ALARM_DELETING'>Bezig met verwijderen van weksignaal…</string>
   <string name='ALARM_SHORT_DAY_2'>di</string>
+  <string name='CLEARING_PLAYLIST'>Playlist wordt gewist…</string>
   <string name='ALARM_SHORT_DAY_3'>wo</string>
   <string name='ALARM_SHORT_DAY_0'>zo</string>
   <string name='ALARM_SHORT_DAY_1'>ma</string>

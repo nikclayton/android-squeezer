@@ -209,6 +209,7 @@ slimstrings {
             'SETUP_DEFEAT_DESTRUCTIVE_TTP_4',
             'NO_PLAYER_FOUND',
             'CLEAR_PLAYLIST',
+            'CLEARING_PLAYLIST',
             'JIVE_POPUP_REMOVING_FROM_PLAYLIST'
     ]
 }

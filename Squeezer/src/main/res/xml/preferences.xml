@@ -53,6 +53,10 @@
         <ListPreference
             android:key="squeezer.theme"
             android:title="@string/settings_theme_title"/>
+
+        <SwitchPreferenceCompat
+            android:key="squeezer.clear.current_playlist.confirmation"
+            android:title="@string/settings_clear_current_playlist_confirmation"/>
     </PreferenceCategory>
 
     <PreferenceCategory

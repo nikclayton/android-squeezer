@@ -35,6 +35,7 @@
     <string name="settings_theme_title">Theme</string>
     <string name="settings_theme_dark">Dark</string>
     <string name="settings_theme_light_dark">Light, dark action bar</string>
+    <string name="settings_clear_current_playlist_confirmation">Ask for confirmation before clear current playlist</string>
     <string name="settings_username_hint">User name (optional)</string>
     <string name="settings_password_hint">Password (optional)</string>
     <string name="settings_server_scan_progress">Scanning for servers…</string>

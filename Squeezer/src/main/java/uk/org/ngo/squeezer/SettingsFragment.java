@@ -80,7 +80,7 @@ public class SettingsFragment  extends PreferenceFragmentCompat implements
         fillScrobblePreferences(sharedPreferences);
 
         fillDownloadPreferences(preferences);
-        fillThemeSelectionPreferences();
+        fillDisplayPreferences(preferences);
 
         SwitchPreferenceCompat startSqueezePlayerPref = findPreference(
                 Preferences.KEY_SQUEEZEPLAYER_ENABLED);
@@ -143,7 +143,7 @@ public class SettingsFragment  extends PreferenceFragmentCompat implements
         filenameStructurePreference.setEnabled(enabled && !useServerPath);
     }
 
-    private void fillThemeSelectionPreferences() {
+    private void fillDisplayPreferences(Preferences preferences) {
         ListPreference onSelectThemePref = findPreference(Preferences.KEY_ON_THEME_SELECT_ACTION);
         ArrayList<String> entryValues = new ArrayList<>();
         ArrayList<String> entries = new ArrayList<>();
@@ -167,6 +167,9 @@ public class SettingsFragment  extends PreferenceFragmentCompat implements
         }
         onSelectThemePref.setOnPreferenceChangeListener(this);
         updateListPreferenceSummary(onSelectThemePref, onSelectThemePref.getValue());
+
+        final SwitchPreferenceCompat clearPlaylistConfirmation = findPreference(Preferences.KEY_CLEAR_PLAYLIST_CONFIRMATION);
+        clearPlaylistConfirmation.setChecked(preferences.isClearPlaylistConfirmation());
     }
 
     private <E extends Enum<E> & EnumWithText> void fillEnumPreference(ListPreference listPreference, Class<E> actionTypes, E defaultValue) {

@@ -485,9 +485,9 @@ public abstract class BaseActivity extends AppCompatActivity {
      */
     public void downloadItem(JiveItem item) {
         if (new Preferences(this).isDownloadConfirmation()) {
-            DownloadDialog.show(getSupportFragmentManager(), item, new DownloadDialog.DownloadDialogListener() {
+            DownloadDialog.show(getSupportFragmentManager(), item, new BaseConfirmDialog.ConfirmDialogListener() {
                 @Override
-                public void download(boolean persist) {
+                public void ok(boolean persist) {
                     if (persist) {
                         new Preferences(BaseActivity.this).setDownloadConfirmation(false);
                     }
@@ -499,7 +499,6 @@ public abstract class BaseActivity extends AppCompatActivity {
                     if (persist) {
                         new Preferences(BaseActivity.this).setDownloadEnabled(false);
                     }
-
                 }
             });
         } else {

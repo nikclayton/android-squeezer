@@ -19,50 +19,36 @@ package uk.org.ngo.squeezer.dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-
 import uk.org.ngo.squeezer.R;
+import uk.org.ngo.squeezer.framework.BaseConfirmDialog;
 import uk.org.ngo.squeezer.model.JiveItem;
 
-public class DownloadDialog extends DialogFragment {
+public class DownloadDialog extends BaseConfirmDialog {
     private static final String TAG = DownloadDialog.class.getSimpleName();
     private static final String TITLE_KEY = "TITLE_KEY";
-    private DownloadDialogListener callback;
 
-    public DownloadDialog(DownloadDialogListener callback) {
-        this.callback = callback;
-    }
-
-    @NonNull
-    @Override
-    public AlertDialog onCreateDialog(Bundle savedInstanceState) {
-        return new MaterialAlertDialogBuilder(getActivity())
-                .setTitle(getString(R.string.download_item, getArguments().getString(TITLE_KEY)))
-                .setMultiChoiceItems(new String[]{getString(R.string.DONT_ASK_AGAIN)}, new boolean[]{false}, (dialogInterface, i, b) -> setNegativeButtonText(b))
-                .setPositiveButton(R.string.DOWNLOAD, (dialogInterface, i) -> callback.download(isPersistChecked()))
-                .setNegativeButton(android.R.string.cancel, (dialogInterface, i) -> callback.cancel(isPersistChecked()))
-                .create();
-    }
-
-    private void setNegativeButtonText(boolean b) {
-        getDialog().getButton(DialogInterface.BUTTON_NEGATIVE).setText(b ? R.string.disable_downloads : android.R.string.cancel);
-    }
-
-    private boolean isPersistChecked() {
-        return getDialog().getListView().isItemChecked(0);
+    public DownloadDialog(ConfirmDialogListener callback) {
+        super(callback);
     }
 
     @Override
-    public AlertDialog getDialog() {
-        return (AlertDialog) super.getDialog();
+    protected String title() {
+        return getString(R.string.download_item, getArguments().getString(TITLE_KEY));
     }
 
-    public static DownloadDialog show(FragmentManager fragmentManager, JiveItem item, DownloadDialogListener callback) {
+    @Override
+    protected String okText() {
+        return getString(R.string.DOWNLOAD);
+    }
+
+    @Override
+    protected void onPersistChecked(boolean persist) {
+        getDialog().getButton(DialogInterface.BUTTON_NEGATIVE).setText(persist ? R.string.disable_downloads : android.R.string.cancel);
+    }
+
+    public static DownloadDialog show(FragmentManager fragmentManager, JiveItem item, ConfirmDialogListener callback) {
         DownloadDialog dialog = new DownloadDialog(callback);
 
         Bundle args = new Bundle();
@@ -71,10 +57,5 @@ public class DownloadDialog extends DialogFragment {
 
         dialog.show(fragmentManager, TAG);
         return dialog;
-    }
-
-    public interface DownloadDialogListener {
-        void download(boolean persist);
-        void cancel(boolean persist);
     }
 }

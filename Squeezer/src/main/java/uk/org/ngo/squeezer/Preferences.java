@@ -103,6 +103,9 @@ public final class Preferences {
     // Preferred UI theme.
     static final String KEY_ON_THEME_SELECT_ACTION = "squeezer.theme";
 
+    // Download confirmation
+    static final String KEY_CLEAR_PLAYLIST_CONFIRMATION = "squeezer.clear.current_playlist.confirmation";
+
     // Download enabled
     static final String KEY_DOWNLOAD_ENABLED = "squeezer.download.enabled";
 
@@ -332,6 +335,14 @@ public final class Preferences {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(Preferences.KEY_ON_THEME_SELECT_ACTION, theme.name());
         editor.apply();
+    }
+
+    public boolean isClearPlaylistConfirmation() {
+        return sharedPreferences.getBoolean(KEY_CLEAR_PLAYLIST_CONFIRMATION, true);
+    }
+
+    public void setClearPlaylistConfirmation(boolean b) {
+        sharedPreferences.edit().putBoolean(Preferences.KEY_CLEAR_PLAYLIST_CONFIRMATION, b).apply();
     }
 
     public boolean isAutoConnect() {

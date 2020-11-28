@@ -64,10 +64,12 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import uk.org.ngo.squeezer.dialog.AboutDialog;
 import uk.org.ngo.squeezer.dialog.EnableWifiDialog;
@@ -76,6 +78,7 @@ import uk.org.ngo.squeezer.framework.ViewParamItemView;
 import uk.org.ngo.squeezer.itemlist.AlarmsActivity;
 import uk.org.ngo.squeezer.itemlist.CurrentPlaylistActivity;
 import uk.org.ngo.squeezer.itemlist.HomeActivity;
+import uk.org.ngo.squeezer.itemlist.IServiceItemListCallback;
 import uk.org.ngo.squeezer.itemlist.PlayerListActivity;
 import uk.org.ngo.squeezer.itemlist.JiveItemListActivity;
 import uk.org.ngo.squeezer.itemlist.JiveItemViewLogic;
@@ -120,6 +123,9 @@ public class NowPlayingFragment extends Fragment {
     private TextView artistText;
 
     private TextView trackText;
+
+    private JiveItem albumItem;
+    private JiveItem artistItem;
 
     @Nullable
     private View btnContextMenu;
@@ -338,12 +344,26 @@ public class NowPlayingFragment extends Fragment {
         }
 
         if (mFullHeightLayout) {
-            /*
-             * TODO: Simplify these following the notes at
-             * http://developer.android.com/resources/articles/ui-1.6.html.
-             * Maybe. because the TextView resources don't support the
-             * android:onClick attribute.
-             */
+            artistText.setOnClickListener(v1 -> {
+                if (artistItem != null) {
+                    JiveItemListActivity.show(mActivity, artistItem, artistItem.goAction);
+                }
+            });
+
+            albumText.setOnClickListener(v12 -> {
+                if (albumItem != null) {
+                    JiveItemListActivity.show(mActivity, albumItem, albumItem.goAction);
+                }
+            });
+
+            trackText.setOnClickListener(v13 -> {
+                CurrentPlaylistItem song = getCurrentSong();
+                if (song != null) {
+                    globalSearch.input.initialText = song.getName();
+                    JiveItemListActivity.show(mActivity, globalSearch, globalSearch.goAction);
+                }
+            });
+
             shuffleButton.setOnClickListener(view -> {
                 if (mService == null) {
                     return;
@@ -678,6 +698,20 @@ public class NowPlayingFragment extends Fragment {
                 artistText.setText(song.getArtist());
                 albumText.setText(song.getAlbum());
                 totalTime.setText(Util.formatElapsedTime(playerState.getCurrentSongDuration()));
+
+
+                mService.pluginItems(song.moreAction, new IServiceItemListCallback<JiveItem>() {
+                    @Override
+                    public void onItemsReceived(int count, int start, Map<String, Object> parameters, List<JiveItem> items, Class<JiveItem> dataType) {
+                        albumItem = findBrowseAction(items, "album_id");
+                        artistItem = findBrowseAction(items, "artist_id");
+                    }
+
+                    @Override
+                    public Object getClient() {
+                        return mActivity;
+                    }
+                });
             } else {
                 artistAlbumText.setText(mJoiner.join(
                         Strings.emptyToNull(song.getArtist()),
@@ -699,6 +733,17 @@ public class NowPlayingFragment extends Fragment {
         } else {
             ImageFetcher.getInstance(mActivity).loadImage(song.getIcon(), albumArt);
         }
+    }
+
+    private JiveItem findBrowseAction(List<JiveItem> items, String idParam) {
+        for (JiveItem item : items) {
+            if (item.goAction != null && item.goAction.action != null &&
+                    item.goAction.action.cmd.equals(Arrays.asList("browselibrary", "items")) &&
+                    item.goAction.action.params.containsKey(idParam)) {
+                return item;
+            }
+        }
+        return null;
     }
 
     /**
@@ -865,6 +910,7 @@ public class NowPlayingFragment extends Fragment {
 
         switch (item.getItemId()) {
             case R.id.menu_item_search:
+                globalSearch.input.initialText = "";
                 JiveItemListActivity.show(mActivity, globalSearch, globalSearch.goAction);
                 return true;
             case R.id.menu_item_settings:

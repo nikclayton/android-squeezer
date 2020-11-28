@@ -153,6 +153,8 @@ public class JiveItemListActivity extends BaseListActivity<JiveItemView, JiveIte
             inputButton.setIconResource(inputImage);
             inputTextLayout.setHint(parent.input.title);
             inputText.setText(parent.input.initialText);
+            parent.inputValue = parent.input.initialText;
+
             inputText.setOnKeyListener((v, keyCode, event) -> {
                 if ((event.getAction() == KeyEvent.ACTION_DOWN)
                         && (keyCode == KeyEvent.KEYCODE_ENTER)) {

@@ -21,28 +21,24 @@
     <uk.org.ngo.squeezer.IntEditTextPreference
         android:key="squeezer.fadeInSecs"
         android:title="@string/settings_fadeinsecs_title"
-        android:dialogMessage="@string/settings_fadeinsecs_summary"
-        android:persistent="true"/>
+        android:dialogMessage="@string/settings_fadeinsecs_summary"/>
 
     <SwitchPreferenceCompat
         android:key="squeezer.autoconnect"
         android:title="@string/settings_autoconnect_title"
-        android:summary="@string/settings_autoconnect_summary"
-        android:persistent="true"/>
+        android:summary="@string/settings_autoconnect_summary"/>
 
     <PreferenceCategory
         android:title="@string/pref_cat_third_party">
 
         <SwitchPreferenceCompat
             android:key="squeezer.scrobble.enabled"
-            android:persistent="true"
             android:summaryOff="@string/settings_scrobble_off"
             android:summaryOn="@string/settings_scrobble_on"
             android:title="@string/settings_scrobble_title"/>
 
         <SwitchPreferenceCompat
             android:key="squeezer.squeezeplayer.enabled"
-            android:persistent="true"
             android:summary="@string/settings_squeezeplayer_summary"
             android:title="@string/settings_squeezeplayer_title"/>
     </PreferenceCategory>

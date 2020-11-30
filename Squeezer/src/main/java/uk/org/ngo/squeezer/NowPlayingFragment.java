@@ -245,8 +245,8 @@ public class NowPlayingFragment extends Fragment {
      * Called before onAttach. Pull out the layout spec to figure out which layout to use later.
      */
     @Override
-    public void onInflate(@NonNull Activity activity, @NonNull AttributeSet attrs, Bundle savedInstanceState) {
-        super.onInflate(activity, attrs, savedInstanceState);
+    public void onInflate(@NonNull Context context, @NonNull AttributeSet attrs, Bundle savedInstanceState) {
+        super.onInflate(context, attrs, savedInstanceState);
 
         int layout_height = attrs.getAttributeUnsignedIntValue(
                 "http://schemas.android.com/apk/res/android",

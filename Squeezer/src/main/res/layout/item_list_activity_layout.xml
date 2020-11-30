@@ -64,7 +64,7 @@
         android:textAppearance="@style/SqueezerTextAppearance.Medium"
         android:visibility="gone" />
 
-    <fragment
+    <androidx.fragment.app.FragmentContainerView
         android:id="@+id/now_playing_fragment"
         android:name="uk.org.ngo.squeezer.NowPlayingFragment"
         android:layout_width="fill_parent"

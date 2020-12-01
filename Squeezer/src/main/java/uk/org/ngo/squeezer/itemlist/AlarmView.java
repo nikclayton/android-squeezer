@@ -112,7 +112,6 @@ public class AlarmView extends ItemViewHolder<Alarm> {
                 dowHolder.setVisibility(b ? View.VISIBLE : View.GONE);
             }
         });
-        repeat.getButton().setText(R.string.ALARM_ALARM_REPEAT);
         delete = view.findViewById(R.id.delete);
         playlist = view.findViewById(R.id.playlist);
         for (int day = 0; day < 7; day++) {

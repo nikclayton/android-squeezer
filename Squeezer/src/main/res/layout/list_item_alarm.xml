@@ -75,7 +75,7 @@
         android:layout_below="@id/line1"
         android:layout_marginTop="12dp"
         android:textAppearance="@style/SqueezerTextAppearance.Medium"
-        tools:text="Repeat" />
+        android:text="@string/ALARM_ALARM_REPEAT" />
 
     <Button style="@style/ImageButton"
         android:id="@+id/delete"

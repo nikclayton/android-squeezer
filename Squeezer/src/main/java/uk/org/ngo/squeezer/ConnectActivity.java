@@ -157,10 +157,11 @@ public class ConnectActivity extends BaseActivity {
      * @param view The view the user pressed.
      */
     public void onUserInitiatesConnect(View view) {
-        serverAddressView.savePreferences();
-        NowPlayingFragment fragment = (NowPlayingFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.now_playing_fragment);
-        fragment.startVisibleConnection();
+        if (serverAddressView.savePreferences()) {
+            NowPlayingFragment fragment = (NowPlayingFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.now_playing_fragment);
+            fragment.startVisibleConnection();
+        }
     }
 
     public void onEventMainThread(HandshakeComplete event) {

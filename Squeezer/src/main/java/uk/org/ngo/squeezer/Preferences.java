@@ -54,6 +54,12 @@ public final class Preferences {
     // Optional Squeezebox Server password
     private static final String KEY_PASSWORD = "squeezer.password";
 
+    // Optional Squeezebox Server password
+    private static final String KEY_WOL = "squeezer.wol";
+
+    // Optional Squeezebox Server password
+    private static final String KEY_MAC = "squeezer.mac";
+
     // The playerId that we were last connected to. e.g. "00:04:20:17:04:7f"
     public static final String KEY_LAST_PLAYER = "squeezer.lastplayer";
 
@@ -162,17 +168,15 @@ public final class Preferences {
     }
 
     public ServerAddress getServerAddress() {
-        return getServerAddress(KEY_SERVER_ADDRESS, defaultHttpPort);
+        return getSelectedServerAddress(KEY_SERVER_ADDRESS, defaultHttpPort);
     }
 
     public ServerAddress getCliServerAddress() {
-        return getServerAddress(KEY_CLI_SERVER_ADDRESS, defaultCliPort);
+        return getSelectedServerAddress(KEY_CLI_SERVER_ADDRESS, defaultCliPort);
     }
 
-    private ServerAddress getServerAddress(String setting, int defaultPort) {
-        ServerAddress serverAddress = new ServerAddress(defaultPort);
-
-        serverAddress.bssId = getBssId();
+    private ServerAddress getSelectedServerAddress(String setting, int defaultPort) {
+        ServerAddress serverAddress = new ServerAddress(getBssId(), defaultPort);
 
         String address = null;
         if (serverAddress.bssId != null) {
@@ -181,11 +185,27 @@ public final class Preferences {
         if (address == null) {
             address = getStringPreference(setting);
         }
+
+        readServerAddress(serverAddress, address, defaultPort);
+        return serverAddress;
+    }
+
+    public ServerAddress getServerAddress(String address) {
+        ServerAddress serverAddress = new ServerAddress(getBssId(), defaultHttpPort);
+        serverAddress.setAddress(address);
+        readServerAddress(serverAddress, address, defaultHttpPort);
+        return serverAddress;
+    }
+
+    private void readServerAddress(ServerAddress serverAddress, String address, int defaultPort) {
         serverAddress.setAddress(address, defaultPort);
 
         serverAddress.squeezeNetwork = sharedPreferences.getBoolean(prefixed(serverAddress.bssId, KEY_SQUEEZE_NETWORK), false);
-
-        return serverAddress;
+        serverAddress.serverName = getStringPreference(prefix(serverAddress) + KEY_SERVER_NAME);
+        serverAddress.userName = getStringPreference(prefix(serverAddress) + KEY_USERNAME);
+        serverAddress.password = getStringPreference(prefix(serverAddress) + KEY_PASSWORD);
+        serverAddress.wakeOnLan = sharedPreferences.getBoolean(prefix(serverAddress) + KEY_WOL, false);
+        serverAddress.mac = Util.parseMac(getStringPreference(prefix(serverAddress) + KEY_MAC));
     }
 
     private String getBssId() {
@@ -206,19 +226,31 @@ public final class Preferences {
     public static class ServerAddress {
         private static final String SN = "mysqueezebox.com";
 
-        private String bssId;
+        private final String bssId;
         public boolean squeezeNetwork;
         private String address; // <host name or ip>:<port>
         private String host;
         private int port;
         private final int defaultPort;
 
-        private ServerAddress(int defaultPort) {
+        private String serverName;
+        public String userName;
+        public String password;
+
+        public boolean wakeOnLan;
+        public byte[] mac;
+
+        private ServerAddress(String bssId, int defaultPort) {
             this.defaultPort = defaultPort;
+            this.bssId = bssId;
         }
 
         public void setAddress(String hostPort) {
             setAddress(hostPort, defaultPort);
+        }
+
+        public void setServerName(String serverName) {
+            this.serverName = serverName;
         }
 
         public String address() {
@@ -243,6 +275,13 @@ public final class Preferences {
 
         public int port() {
             return (squeezeNetwork ? defaultPort : port);
+        }
+
+        public String serverName() {
+            if (squeezeNetwork) {
+                return ServerAddress.SN;
+            }
+            return serverName != null ? serverName : host;
         }
 
         private void setAddress(String hostPort, int defaultPort) {
@@ -295,35 +334,11 @@ public final class Preferences {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(prefixed(serverAddress.bssId, KEY_SERVER_ADDRESS), serverAddress.address);
         editor.putBoolean(prefixed(serverAddress.bssId, KEY_SQUEEZE_NETWORK), serverAddress.squeezeNetwork);
-        editor.apply();
-    }
-
-    public String getServerName(ServerAddress serverAddress) {
-        if (serverAddress.squeezeNetwork) {
-            return ServerAddress.SN;
-        }
-        String serverName = getStringPreference(prefix(serverAddress) + KEY_SERVER_NAME);
-        return serverName != null ? serverName : serverAddress.host;
-    }
-
-    public void saveServerName(ServerAddress serverAddress, String serverName) {
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(prefix(serverAddress) + KEY_SERVER_NAME, serverName);
-        editor.apply();
-    }
-
-    public String getUsername(ServerAddress serverAddress) {
-        return getStringPreference(prefix(serverAddress) + KEY_USERNAME);
-    }
-
-    public String getPassword(ServerAddress serverAddress) {
-        return getStringPreference(prefix(serverAddress) + KEY_PASSWORD);
-    }
-
-    public void saveUserCredentials(ServerAddress serverAddress, String userName, String password) {
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(prefix(serverAddress) + KEY_USERNAME, userName);
-        editor.putString(prefix(serverAddress) + KEY_PASSWORD, password);
+        editor.putString(prefix(serverAddress) + KEY_SERVER_NAME, serverAddress.serverName);
+        editor.putString(prefix(serverAddress) + KEY_USERNAME, serverAddress.userName);
+        editor.putString(prefix(serverAddress) + KEY_PASSWORD, serverAddress.password);
+        editor.putBoolean(prefix(serverAddress) + KEY_WOL, serverAddress.wakeOnLan);
+        editor.putString(prefix(serverAddress) + KEY_MAC, Util.formatMac(serverAddress.mac));
         editor.apply();
     }
 
@@ -427,14 +442,9 @@ public final class Preferences {
      * it, this is the best I can think of.
      */
     private String generateMacLikeId() {
-        StringBuilder sb = new StringBuilder(18);
-        byte[] b = new byte[6];
-        new Random().nextBytes(b);
-        for (int i = 0; i < b.length; i++) {
-            sb.append(String.format("%02X:", b[i]));
-        }
-        sb.deleteCharAt(sb.length() - 1);
-        return sb.toString();
+        byte[] mac = new byte[6];
+        new Random().nextBytes(mac);
+        return Util.formatMac(mac);
     }
 
     /**

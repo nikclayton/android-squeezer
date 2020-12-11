@@ -37,11 +37,10 @@ public class SqueezePlayer extends Handler {
     private SqueezePlayer(AppCompatActivity context, Preferences.ServerAddress serverAddress) {
         this.context = context;
 
-        Preferences preferences = new Preferences(context);
         serverUrl = serverAddress.address();
-        serverName = preferences.getServerName(serverAddress);
-        username = preferences.getUsername(serverAddress);
-        password = preferences.getPassword(serverAddress);
+        serverName = serverAddress.serverName();
+        username = serverAddress.userName;
+        password = serverAddress.password;
 
         Log.d(TAG, "startControllingSqueezePlayer");
         startControllingSqueezePlayer();

@@ -40,6 +40,14 @@
     <string name="settings_clear_current_playlist_confirmation">Bekræft før ryd afspilningsliste</string>
     <string name="settings_username_hint">Eventuelt SqueezeBox Server brugernavn.</string>
     <string name="settings_password_hint">Eventuel SqueezeBox Server adgangskode.</string>
+    <string name="settings_use_wake_on_lan">Væk server (Wake-on-LAN)</string>
+    <string name="settings_MAC_label">MAC-adresse</string>
+    <string name="settings_invalid_MAC">Ugyldig MAC adresse, format: 01:23:45:67:89:AB</string>
+    <string name="settings_MAC_help">Eksempel: 01:23:45:67:89:AB</string>
+    <string name="settings_MAC_info"><![CDATA[Hvis den er udfyldt, sendes en Wake-on-LAN (WoL) -meddelelse inden tilslutning.
+        <p>Wake-on-LAN er en netværksstandard, der gør det muligt at tænde eller vække en computer ved hjælp af en netværksmeddelelse.</p>
+        <p>Dette kræver, at computeren, der kører Squeezebox Server, skal konfigureres til at bruge Wake-on-LAN.</p>]]>
+    </string>
     <string name="settings_server_scan_progress">Scanner efter servere…</string>
     <string name="settings_fadeinsecs_title">Indtoningsperiode</string>
     <string name="settings_fadeinsecs_summary">Angiv hvor mange sekunder der indtones. Angiv 0 for

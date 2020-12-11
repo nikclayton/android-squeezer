@@ -28,6 +28,7 @@ import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.appcompat.content.res.AppCompatResources;
 
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,8 +38,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
@@ -257,17 +260,45 @@ public class Util {
         sTimeArgs[4] = elapsedSeconds % 60;
     }
 
-    /**
-     * Returns {@code true} if the arguments are equal to each other
-     * and {@code false} otherwise.
-     * Consequently, if both arguments are {@code null}, {@code true}
-     * is returned and if exactly one argument is {@code null}, {@code
-     * false} is returned.  Otherwise, equality is determined by using
-     * the {@link Object#equals equals} method of the first
-     * argument.
-     */
-    public static boolean equals(Object a, Object b) {
-        return (a == b) || (a != null && a.equals(b));
+    public static  @NonNull  String formatMac(byte[] mac) {
+        if (mac == null || mac.length != 6) {
+            return "";
+        }
+        String[] parts = new String[6];
+        for (int i = 0; i < 6; i++) {
+            parts[i] = String.format("%02X", mac[i]);
+        }
+        return TextUtils.join(":", parts);
+    }
+
+    public static @NonNull byte[] parseMac(String s) {
+        if (!validateMac(s)) {
+            return null;
+        }
+
+        s = s.toLowerCase().replaceAll("-", ":").replaceAll("\\.", ":");
+        String[] parts = s.split(":");
+
+        if (parts.length == 3) {
+            List<String> newParts = new ArrayList<>();
+            for (String part : parts) {
+                newParts.add(part.substring(0, 2));
+                newParts.add(part.substring(2));
+            }
+            parts = newParts.toArray(new String[0]);
+        }
+
+        byte[] mac = new byte[6];
+        for (int i = 0; i < 6; i++) {
+            mac[i] = (byte)Integer.parseInt(parts[i], 16);
+        }
+        return mac;
+    }
+
+    private static final String MAC_REGEX_STRING = "^((([a-fA-F0-9][a-fA-F0-9]+[-]){5}|([a-fA-F0-9][a-fA-F0-9]+[:]){5})([a-fA-F0-9][a-fA-F0-9])$)|(^([a-fA-F0-9][a-fA-F0-9][a-fA-F0-9][a-fA-F0-9]+[.]){2}([a-fA-F0-9][a-fA-F0-9][a-fA-F0-9][a-fA-F0-9]))$";
+    private static final Pattern MAC_REGEX = Pattern.compile(MAC_REGEX_STRING);
+    public static boolean validateMac(CharSequence mac) {
+        return (mac != null && MAC_REGEX.matcher(mac).matches());
     }
 
     /**

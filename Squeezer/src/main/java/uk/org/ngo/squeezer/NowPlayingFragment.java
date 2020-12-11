@@ -209,7 +209,7 @@ public class NowPlayingFragment extends Fragment {
 
             connectingDialog = ProgressDialog.show(mActivity,
                     getText(R.string.connecting_text),
-                    getString(R.string.connecting_to_text, preferences.getServerName(serverAddress)),
+                    getString(R.string.connecting_to_text, serverAddress.serverName()),
                     true, false);
         }
     }

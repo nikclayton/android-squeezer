@@ -19,6 +19,8 @@ package uk.org.ngo.squeezer.dialog;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.AdapterView;
@@ -31,11 +33,18 @@ import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
+
+import com.google.android.material.checkbox.MaterialCheckBox;
+import com.google.android.material.textfield.TextInputLayout;
+
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import uk.org.ngo.squeezer.Preferences;
 import uk.org.ngo.squeezer.R;
+import uk.org.ngo.squeezer.Util;
 import uk.org.ngo.squeezer.util.ScanNetworkTask;
 
 /**
@@ -45,25 +54,29 @@ import uk.org.ngo.squeezer.util.ScanNetworkTask;
  * A new network scan can be initiated manually if desired.
  */
 public class ServerAddressView extends LinearLayout implements ScanNetworkTask.ScanNetworkCallback {
-    private Preferences mPreferences;
-    private Preferences.ServerAddress mServerAddress;
+    private Preferences preferences;
+    private Preferences.ServerAddress serverAddress;
 
-    private RadioButton mSqueezeNetworkButton;
-    private RadioButton mLocalServerButton;
-    private EditText mServerAddressEditText;
-    private TextView mServerName;
-    private Spinner mServersSpinner;
-    private EditText mUserNameEditText;
-    private EditText mPasswordEditText;
-    private View mScanResults;
-    private View mScanProgress;
+    private RadioButton squeezeNetworkButton;
+    private RadioButton localServerButton;
+    private EditText serverAddressEditText;
+    private TextView serverName;
+    private Spinner serversSpinner;
+    private EditText userNameEditText;
+    private EditText passwordEditText;
+    private MaterialCheckBox wakeOnLan;
+    private TextInputLayout macLayout;
+    private boolean macDirty;
+    private EditText macEditText;
+    private View scanResults;
+    private View scanProgress;
 
-    private ScanNetworkTask mScanNetworkTask;
+    private ScanNetworkTask scanNetworkTask;
 
     /** Map server names to IP addresses. */
-    private TreeMap<String, String> mDiscoveredServers;
+    private TreeMap<String, String> discoveredServers;
 
-    private ArrayAdapter<String> mServersAdapter;
+    private ArrayAdapter<String> serversAdapter;
 
     public ServerAddressView(final Context context) {
         super(context);
@@ -78,40 +91,74 @@ public class ServerAddressView extends LinearLayout implements ScanNetworkTask.S
     private void initialize(final Context context) {
         inflate(context, R.layout.server_address_view, this);
         if (!isInEditMode()) {
-            mPreferences = new Preferences(context);
-            mServerAddress = mPreferences.getServerAddress();
-            if (mServerAddress.localAddress() == null) {
-                Preferences.ServerAddress cliServerAddress = mPreferences.getCliServerAddress();
+            preferences = new Preferences(context);
+            serverAddress = preferences.getServerAddress();
+            if (serverAddress.localAddress() == null) {
+                Preferences.ServerAddress cliServerAddress = preferences.getCliServerAddress();
                 if (cliServerAddress.localAddress() != null) {
-                    mServerAddress.setAddress(cliServerAddress.localHost());
+                    serverAddress.setAddress(cliServerAddress.localHost());
                 }
             }
 
-            mSqueezeNetworkButton = findViewById(R.id.squeezeNetwork);
-            mLocalServerButton = findViewById(R.id.squeezeServer);
+            squeezeNetworkButton = findViewById(R.id.squeezeNetwork);
+            localServerButton = findViewById(R.id.squeezeServer);
 
-            mServerAddressEditText = findViewById(R.id.server_address);
-            mUserNameEditText = findViewById(R.id.username);
-            mPasswordEditText = findViewById(R.id.password);
+            serverAddressEditText = findViewById(R.id.server_address);
+            userNameEditText = findViewById(R.id.username);
+            passwordEditText = findViewById(R.id.password);
+
+            wakeOnLan = findViewById(R.id.wol);
+            wakeOnLan.setOnCheckedChangeListener((compoundButton, b) -> macLayout.setVisibility(b ? VISIBLE : GONE));
+            macLayout = findViewById(R.id.mac_til);
+            macEditText = findViewById(R.id.mac);
+            macLayout.setEndIconOnClickListener(view -> {
+                FragmentManager fragmentManager = ((AppCompatActivity) context).getSupportFragmentManager();
+                InfoDialog.show(fragmentManager, R.string.settings_MAC_label, R.string.settings_MAC_info);
+            });
+            macLayout.setErrorIconOnClickListener(view -> {
+                FragmentManager fragmentManager = ((AppCompatActivity) context).getSupportFragmentManager();
+                InfoDialog.show(fragmentManager, R.string.settings_MAC_label, R.string.settings_MAC_info);
+            });
+            macEditText.setOnFocusChangeListener((view, b) -> {
+                if (!b) {
+                    checkMac();
+                }
+            });
+            macEditText.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                }
+
+                @Override
+                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                }
+
+                @Override
+                public void afterTextChanged(Editable editable) {
+                    if (macDirty) {
+                        macLayout.setError(Util.validateMac(editable.toString()) ? null : getResources().getString(R.string.settings_invalid_MAC));
+                    }
+                }
+            });
 
             final OnClickListener onNetworkSelected = view -> setSqueezeNetwork(view.getId() == R.id.squeezeNetwork);
-            mSqueezeNetworkButton.setOnClickListener(onNetworkSelected);
-            mLocalServerButton.setOnClickListener(onNetworkSelected);
+            squeezeNetworkButton.setOnClickListener(onNetworkSelected);
+            localServerButton.setOnClickListener(onNetworkSelected);
 
             // Set up the servers spinner.
-            mServersAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item);
-            mServersAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            mServerName = findViewById(R.id.server_name);
-            mServersSpinner = findViewById(R.id.found_servers);
-            mServersSpinner.setAdapter(mServersAdapter);
+            serversAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item);
+            serversAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            serverName = findViewById(R.id.server_name);
+            serversSpinner = findViewById(R.id.found_servers);
+            serversSpinner.setAdapter(serversAdapter);
 
-            mScanResults = findViewById(R.id.scan_results);
-            mScanProgress = findViewById(R.id.scan_progress);
-            mScanProgress.setVisibility(GONE);
+            scanResults = findViewById(R.id.scan_results);
+            scanProgress = findViewById(R.id.scan_progress);
+            scanProgress.setVisibility(GONE);
             TextView scanDisabledMessage = findViewById(R.id.scan_disabled_msg);
 
-            setSqueezeNetwork(mServerAddress.squeezeNetwork);
-            setServerAddress(mServerAddress.localAddress());
+            setSqueezeNetwork(serverAddress.squeezeNetwork);
+            setServerAddress(serverAddress.localAddress());
 
             // Only support network scanning on WiFi.
             ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -123,29 +170,42 @@ public class ServerAddressView extends LinearLayout implements ScanNetworkTask.S
                 Button scanButton = findViewById(R.id.scan_button);
                 scanButton.setOnClickListener(v -> startNetworkScan(context));
             } else {
-                mScanResults.setVisibility(GONE);
+                scanResults.setVisibility(GONE);
             }
         }
     }
 
-    public void savePreferences() {
-        mServerAddress.squeezeNetwork = mSqueezeNetworkButton.isChecked();
-        String address = mServerAddressEditText.getText().toString();
-        mServerAddress.setAddress(address);
-        mPreferences.saveServerAddress(mServerAddress);
+    private boolean checkMac() {
+        macDirty = true;
+        String mac = macEditText.getText().toString();
+        boolean macOk = Util.validateMac(mac);
+        macLayout.setError(macOk ? null : "Invalid MAC address");
+        return macOk;
+    }
 
-        mPreferences.saveServerName(mServerAddress, getServerName(address));
+    public boolean savePreferences() {
+        if (wakeOnLan.isChecked() && !checkMac()) {
+            return false;
+        }
 
-        String username = mUserNameEditText.getText().toString();
-        String password = mPasswordEditText.getText().toString();
-        mPreferences.saveUserCredentials(mServerAddress, username, password);
+        serverAddress.squeezeNetwork = squeezeNetworkButton.isChecked();
+        String address = serverAddressEditText.getText().toString();
+        serverAddress.setAddress(address);
+        serverAddress.setServerName(getServerName(address));
+        serverAddress.userName = userNameEditText.getText().toString();
+        serverAddress.password = passwordEditText.getText().toString();
+        serverAddress.wakeOnLan = wakeOnLan.isChecked();
+        serverAddress.mac = Util.parseMac(macEditText.getText().toString());
+        preferences.saveServerAddress(serverAddress);
+
+        return true;
     }
 
     @Override
     protected void onDetachedFromWindow() {
         // Stop scanning
-        if (mScanNetworkTask != null) {
-            mScanNetworkTask.cancel();
+        if (scanNetworkTask != null) {
+            scanNetworkTask.cancel();
         }
 
         super.onDetachedFromWindow();
@@ -155,10 +215,10 @@ public class ServerAddressView extends LinearLayout implements ScanNetworkTask.S
      * Starts scanning for servers.
      */
     void startNetworkScan(Context context) {
-        mScanResults.setVisibility(GONE);
-        mScanProgress.setVisibility(VISIBLE);
-        mScanNetworkTask = new ScanNetworkTask(context, this);
-        new Thread(mScanNetworkTask).start();
+        scanResults.setVisibility(GONE);
+        scanProgress.setVisibility(VISIBLE);
+        scanNetworkTask = new ScanNetworkTask(context, this);
+        new Thread(scanNetworkTask).start();
     }
 
     /**
@@ -166,114 +226,114 @@ public class ServerAddressView extends LinearLayout implements ScanNetworkTask.S
      * @param serverMap Discovered servers, key is the server name, value is the IP address.
      */
     public void onScanFinished(TreeMap<String, String> serverMap) {
-        mScanResults.setVisibility(VISIBLE);
-        mServerName.setVisibility(GONE);
-        mServersSpinner.setVisibility(GONE);
-        mScanProgress.setVisibility(GONE);
-        mServersAdapter.clear();
+        scanResults.setVisibility(VISIBLE);
+        serverName.setVisibility(GONE);
+        serversSpinner.setVisibility(GONE);
+        scanProgress.setVisibility(GONE);
+        serversAdapter.clear();
 
-        if (mScanNetworkTask == null) {
+        if (scanNetworkTask == null) {
             return;
         }
 
-        mDiscoveredServers = serverMap;
+        discoveredServers = serverMap;
 
-        mScanNetworkTask = null;
+        scanNetworkTask = null;
 
-        if (mDiscoveredServers.size() == 0) {
+        if (discoveredServers.size() == 0) {
             // No servers found, manually enter address
             // Populate the edit text widget with current address stored in preferences.
-            setServerAddress(mServerAddress.localAddress());
-            mServerAddressEditText.setEnabled(true);
-            mServerName.setVisibility(VISIBLE);
+            setServerAddress(serverAddress.localAddress());
+            serverAddressEditText.setEnabled(true);
+            serverName.setVisibility(VISIBLE);
         } else {
             // Show the spinner so the user can choose a server or to manually enter address.
             // Don't fire onItemSelected by calling notifyDataSetChanged and
             // setSelection(pos, false) before setting OnItemSelectedListener
-            mServersSpinner.setOnItemSelectedListener(null);
+            serversSpinner.setOnItemSelectedListener(null);
 
-            for (Entry<String, String> e : mDiscoveredServers.entrySet()) {
-                mServersAdapter.add(e.getKey());
+            for (Entry<String, String> e : discoveredServers.entrySet()) {
+                serversAdapter.add(e.getKey());
             }
-            mServersAdapter.add(getContext().getString(R.string.settings_manual_server_addr));
-            mServersAdapter.notifyDataSetChanged();
+            serversAdapter.add(getContext().getString(R.string.settings_manual_server_addr));
+            serversAdapter.notifyDataSetChanged();
 
             // First look the stored server name in the list of found servers
-            String addressOfStoredServerName = mDiscoveredServers.get(mPreferences.getServerName(mServerAddress));
+            String addressOfStoredServerName = discoveredServers.get(serverAddress.serverName());
             int position = getServerPosition(addressOfStoredServerName);
 
             // If that fails, look for the stored server address in the list of found servers
             if (position < 0) {
-                position = getServerPosition(mServerAddress.localAddress());
+                position = getServerPosition(serverAddress.localAddress());
             }
 
-            mServersSpinner.setSelection((position < 0 ? mServersAdapter.getCount() - 1 : position), false);
-            mServerAddressEditText.setEnabled(position < 0 && !mServerAddress.squeezeNetwork);
+            serversSpinner.setSelection((position < 0 ? serversAdapter.getCount() - 1 : position), false);
+            serverAddressEditText.setEnabled(position < 0 && !serverAddress.squeezeNetwork);
 
-            mServersSpinner.setOnItemSelectedListener(new MyOnItemSelectedListener());
-            mServersSpinner.setVisibility(VISIBLE);
+            serversSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+                public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+                    String serverAddress = discoveredServers.get(serversAdapter.getItem(pos));
+                    setSqueezeNetwork(false);
+                    setServerAddress(serverAddress);
+                }
+
+                public void onNothingSelected(AdapterView<?> parent) {
+                    // Do nothing.
+                }
+            });
+            serversSpinner.setVisibility(VISIBLE);
         }
     }
 
     private void setSqueezeNetwork(boolean isSqueezeNetwork) {
-        mSqueezeNetworkButton.setChecked(isSqueezeNetwork);
-        mLocalServerButton.setChecked(!isSqueezeNetwork);
+        squeezeNetworkButton.setChecked(isSqueezeNetwork);
+        localServerButton.setChecked(!isSqueezeNetwork);
         setEditServerAddressAvailability(isSqueezeNetwork);
-        mUserNameEditText.setEnabled(!isSqueezeNetwork);
-        mPasswordEditText.setEnabled(!isSqueezeNetwork);
+        userNameEditText.setEnabled(!isSqueezeNetwork);
+        passwordEditText.setEnabled(!isSqueezeNetwork);
+        wakeOnLan.setEnabled(!isSqueezeNetwork);
+        macEditText.setEnabled(!isSqueezeNetwork);
     }
 
     private void setServerAddress(String address) {
-        mServerAddress.setAddress(address);
+        serverAddress = preferences.getServerAddress(address);
 
-        mServerAddressEditText.setText(mServerAddress.localAddress());
-        mUserNameEditText.setText(mPreferences.getUsername(mServerAddress));
-        mPasswordEditText.setText(mPreferences.getPassword(mServerAddress));
+        serverAddressEditText.setText(serverAddress.localAddress());
+        userNameEditText.setText(serverAddress.userName);
+        passwordEditText.setText(serverAddress.password);
+        wakeOnLan.setChecked(serverAddress.wakeOnLan);
+        macLayout.setVisibility(serverAddress.wakeOnLan ? VISIBLE : GONE);
+        macEditText.setText(Util.formatMac(serverAddress.mac));
     }
 
     private void setEditServerAddressAvailability(boolean isSqueezeNetwork) {
         if (isSqueezeNetwork) {
-            mServerAddressEditText.setEnabled(false);
-        } else if (mServersAdapter.getCount() == 0) {
-            mServerAddressEditText.setEnabled(true);
+            serverAddressEditText.setEnabled(false);
+        } else if (serversAdapter.getCount() == 0) {
+            serverAddressEditText.setEnabled(true);
         } else {
-            mServerAddressEditText.setEnabled(mServersSpinner.getSelectedItemPosition() == mServersSpinner.getCount() - 1);
+            serverAddressEditText.setEnabled(serversSpinner.getSelectedItemPosition() == serversSpinner.getCount() - 1);
         }
     }
 
     private String getServerName(String ipPort) {
-        if (mDiscoveredServers != null)
-            for (Entry<String, String> entry : mDiscoveredServers.entrySet())
+        if (discoveredServers != null)
+            for (Entry<String, String> entry : discoveredServers.entrySet())
                 if (ipPort.equals(entry.getValue()))
                     return entry.getKey();
         return null;
     }
 
     private int getServerPosition(String host) {
-        if (host != null && mDiscoveredServers != null) {
+        if (host != null && discoveredServers != null) {
             int position = 0;
-            for (Entry<String, String> entry : mDiscoveredServers.entrySet()) {
+            for (Entry<String, String> entry : discoveredServers.entrySet()) {
                 if (host.equals(entry.getValue()))
                     return position;
                 position++;
             }
         }
         return -1;
-    }
-
-    /**
-     * Inserts the selected address in to the edit text widget.
-     */
-    private class MyOnItemSelectedListener implements OnItemSelectedListener {
-        public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-            String serverAddress = mDiscoveredServers.get(mServersAdapter.getItem(pos));
-            setSqueezeNetwork(false);
-            setServerAddress(serverAddress);
-        }
-
-        public void onNothingSelected(AdapterView<?> parent) {
-            // Do nothing.
-        }
     }
 
 }

@@ -78,6 +78,7 @@ import uk.org.ngo.squeezer.service.event.PlayerPrefReceived;
 import uk.org.ngo.squeezer.service.event.PlayerVolume;
 import uk.org.ngo.squeezer.service.event.RegisterSqueezeNetwork;
 import uk.org.ngo.squeezer.util.Reflection;
+import uk.org.ngo.squeezer.util.SendWakeOnLan;
 
 class CometClient extends BaseClient {
     private static final String TAG = CometClient.class.getSimpleName();
@@ -175,7 +176,7 @@ class CometClient extends BaseClient {
                     if (request.cmd.get(1).equals("volume")) {
                         String volume = (String) message.getDataAsMap().get("_volume");
                         if (volume != null) {
-                            int newVolume = Integer.valueOf(volume);
+                            int newVolume = Integer.parseInt(volume);
                             player.getPlayerState().setCurrentVolume(newVolume);
                             mEventBus.post(new PlayerVolume(newVolume, player));
                         } else {
@@ -197,8 +198,12 @@ class CometClient extends BaseClient {
                 final Preferences preferences = new Preferences(service);
                 preferences.setManualDisconnect(false);
                 final Preferences.ServerAddress serverAddress = preferences.getServerAddress();
-                final String username = preferences.getUsername(serverAddress);
-                final String password = preferences.getPassword(serverAddress);
+                final String username = serverAddress.userName;
+                final String password = serverAddress.password;
+                if (serverAddress.wakeOnLan) {
+                    Log.i(TAG, "Send Wake-on-LAN to: " + Util.formatMac(serverAddress.mac));
+                    SendWakeOnLan.sendWakeOnLan(serverAddress.mac);
+                }
                 Log.i(TAG, "Connecting to: " + username + "@" + serverAddress.address());
 
                 if (!mEventBus.isRegistered(CometClient.this)) {

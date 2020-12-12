@@ -222,9 +222,12 @@ public class Player extends Item implements Comparable<Player> {
     public SongTimeChanged getTrackElapsed() {
         double now = SystemClock.elapsedRealtime() / 1000.0;
         double trackCorrection = mPlayerState.rate * (now - mPlayerState.statusSeen);
-        double trackElapsed = (trackCorrection <= 0 ? mPlayerState.getCurrentTimeSecond() : mPlayerState.getCurrentTimeSecond() + trackCorrection);
+        int trackElapsed = (int) (trackCorrection <= 0 ? mPlayerState.getCurrentTimeSecond() : mPlayerState.getCurrentTimeSecond() + trackCorrection);
+        if (trackElapsed > mPlayerState.getCurrentSongDuration()) {
+            trackElapsed = mPlayerState.getCurrentSongDuration();
+        }
 
-        return new SongTimeChanged(this, (int) trackElapsed, mPlayerState.getCurrentSongDuration());
+        return new SongTimeChanged(this, trackElapsed, mPlayerState.getCurrentSongDuration());
     }
 
     public int getSleepingIn() {

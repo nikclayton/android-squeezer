@@ -134,19 +134,21 @@ public class NowPlayingFragment extends Fragment {
 
     private TextView totalTime;
 
-    private MenuItem menu_item_disconnect;
+    private MenuItem menuItemDisconnect;
 
     private JiveItem globalSearch;
-    private MenuItem menu_item_search;
+    private MenuItem menuItemSearch;
 
-    private MenuItem menu_item_players;
+    private MenuItem menuItemPlaylist;
 
-    private MenuItem menu_item_toggle_power;
-    private MenuItem menu_item_sleep;
-    private MenuItem menu_item_sleep_at_end_of_song;
-    private MenuItem menu_item_cancel_sleep;
+    private MenuItem menuItemPlayers;
 
-    private MenuItem menu_item_alarm;
+    private MenuItem menuItemTogglePower;
+    private MenuItem menuItemSleep;
+    private MenuItem menuItemSleepAtEndOfSong;
+    private MenuItem menuItemCancelSleep;
+
+    private MenuItem menuItemAlarm;
 
     private MaterialButton playPauseButton;
 
@@ -471,21 +473,21 @@ public class NowPlayingFragment extends Fragment {
         PlayerState playerState = player != null ? player.getPlayerState() : null;
         String playerName = player != null ? player.getName() : "";
 
-        if (menu_item_toggle_power != null) {
+        if (menuItemTogglePower != null) {
             if (playerState != null && player.isCanpoweroff()) {
-                menu_item_toggle_power.setTitle(getString(playerState.isPoweredOn() ? R.string.menu_item_poweroff : R.string.menu_item_poweron, playerName));
-                menu_item_toggle_power.setVisible(true);
+                menuItemTogglePower.setTitle(getString(playerState.isPoweredOn() ? R.string.menu_item_poweroff : R.string.menu_item_poweron, playerName));
+                menuItemTogglePower.setVisible(true);
             } else {
-                menu_item_toggle_power.setVisible(false);
+                menuItemTogglePower.setVisible(false);
             }
         }
 
-        if (menu_item_cancel_sleep != null) {
-            menu_item_cancel_sleep.setVisible(playerState != null && playerState.getSleepDuration() != 0);
+        if (menuItemCancelSleep != null) {
+            menuItemCancelSleep.setVisible(playerState != null && playerState.getSleepDuration() != 0);
         }
 
-        if (menu_item_sleep_at_end_of_song != null) {
-            menu_item_sleep_at_end_of_song.setVisible(playerState != null && playerState.isPlaying());
+        if (menuItemSleepAtEndOfSong != null) {
+            menuItemSleepAtEndOfSong.setVisible(playerState != null && playerState.isPlaying());
         }
     }
 
@@ -853,16 +855,17 @@ public class NowPlayingFragment extends Fragment {
         i.inflate(R.menu.now_playing_fragment, menu);
         PlayerViewLogic.inflatePlayerActions(mActivity, i, menu);
 
-        menu_item_search = menu.findItem(R.id.menu_item_search);
-        menu_item_disconnect = menu.findItem(R.id.menu_item_disconnect);
+        menuItemSearch = menu.findItem(R.id.menu_item_search);
+        menuItemPlaylist = menu.findItem(R.id.menu_item_playlist);
+        menuItemDisconnect = menu.findItem(R.id.menu_item_disconnect);
 
-        menu_item_toggle_power = menu.findItem(R.id.toggle_power);
-        menu_item_sleep = menu.findItem(R.id.sleep);
-        menu_item_sleep_at_end_of_song = menu.findItem(R.id.end_of_song);
-        menu_item_cancel_sleep = menu.findItem(R.id.cancel_sleep);
+        menuItemTogglePower = menu.findItem(R.id.toggle_power);
+        menuItemSleep = menu.findItem(R.id.sleep);
+        menuItemSleepAtEndOfSong = menu.findItem(R.id.end_of_song);
+        menuItemCancelSleep = menu.findItem(R.id.cancel_sleep);
 
-        menu_item_players = menu.findItem(R.id.menu_item_players);
-        menu_item_alarm = menu.findItem(R.id.menu_item_alarm);
+        menuItemPlayers = menu.findItem(R.id.menu_item_players);
+        menuItemAlarm = menu.findItem(R.id.menu_item_alarm);
     }
 
     /**
@@ -874,29 +877,35 @@ public class NowPlayingFragment extends Fragment {
         boolean connected = isConnected();
 
         // These are all set at the same time, so one check is sufficient
-        if (menu_item_disconnect != null) {
+        if (menuItemDisconnect != null) {
             // Set visibility and enabled state of menu items that are not player-specific.
-            menu_item_search.setVisible(globalSearch != null);
-            menu_item_disconnect.setVisible(connected);
+            menuItemSearch.setVisible(globalSearch != null);
+            menuItemDisconnect.setVisible(connected);
 
             // Set visibility and enabled state of menu items that are player-specific and
             // require a connection to the server.
             boolean haveConnectedPlayers = connected && mService != null
                     && !mService.getPlayers().isEmpty();
 
-            menu_item_players.setVisible(haveConnectedPlayers);
-            menu_item_alarm.setVisible(haveConnectedPlayers);
-            menu_item_sleep.setVisible(haveConnectedPlayers);
-        }
+            menuItemPlaylist.setVisible(haveConnectedPlayers);
+            menuItemPlayers.setVisible(haveConnectedPlayers);
+            menuItemAlarm.setVisible(haveConnectedPlayers);
+            menuItemSleep.setVisible(haveConnectedPlayers);
 
-        // Don't show the item to go to players if in PlayersActivity.
-        if (mActivity instanceof PlayerListActivity && menu_item_players != null) {
-            menu_item_players.setVisible(false);
-        }
+            // Don't show the item to go to current playlist if in NowPlayingActivity or CurrentPlaylistActivity.
+            if (mActivity instanceof NowPlayingActivity || mActivity instanceof CurrentPlaylistActivity) {
+                menuItemPlaylist.setVisible(false);
+            }
 
-        // Don't show the item to go to alarms if in AlarmsActivity.
-        if (mActivity instanceof AlarmsActivity && menu_item_alarm != null) {
-            menu_item_alarm.setVisible(false);
+            // Don't show the item to go to players if in PlayersActivity.
+            if (mActivity instanceof PlayerListActivity) {
+                menuItemPlayers.setVisible(false);
+            }
+
+            // Don't show the item to go to alarms if in AlarmsActivity.
+            if (mActivity instanceof AlarmsActivity) {
+                menuItemAlarm.setVisible(false);
+            }
         }
 
         updatePlayerMenuItems();
@@ -908,27 +917,30 @@ public class NowPlayingFragment extends Fragment {
             return true;
         }
 
-        switch (item.getItemId()) {
-            case R.id.menu_item_search:
-                globalSearch.input.initialText = "";
-                JiveItemListActivity.show(mActivity, globalSearch, globalSearch.goAction);
-                return true;
-            case R.id.menu_item_settings:
-                SettingsActivity.show(mActivity);
-                return true;
-            case R.id.menu_item_disconnect:
-                new Preferences(mActivity).setManualDisconnect(true);
-                mService.disconnect();
-                return true;
-            case R.id.menu_item_players:
-                PlayerListActivity.show(mActivity);
-                return true;
-            case R.id.menu_item_alarm:
-                AlarmsActivity.show(mActivity);
-                return true;
-            case R.id.menu_item_about:
-                new AboutDialog().show(getFragmentManager(), "AboutDialog");
-                return true;
+        int itemId = item.getItemId();
+        if (itemId == R.id.menu_item_search) {
+            globalSearch.input.initialText = "";
+            JiveItemListActivity.show(mActivity, globalSearch, globalSearch.goAction);
+            return true;
+        } else if (itemId == R.id.menu_item_playlist) {
+            CurrentPlaylistActivity.show(mActivity);
+            return true;
+        } else if (itemId == R.id.menu_item_settings) {
+            SettingsActivity.show(mActivity);
+            return true;
+        } else if (itemId == R.id.menu_item_disconnect) {
+            new Preferences(mActivity).setManualDisconnect(true);
+            mService.disconnect();
+            return true;
+        } else if (itemId == R.id.menu_item_players) {
+            PlayerListActivity.show(mActivity);
+            return true;
+        } else if (itemId == R.id.menu_item_alarm) {
+            AlarmsActivity.show(mActivity);
+            return true;
+        } else if (itemId == R.id.menu_item_about) {
+            new AboutDialog().show(getFragmentManager(), "AboutDialog");
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -1144,8 +1156,8 @@ public class NowPlayingFragment extends Fragment {
                 break;
             }
         }
-        if (menu_item_search != null) {
-            menu_item_search.setVisible(globalSearch != null);
+        if (menuItemSearch != null) {
+            menuItemSearch.setVisible(globalSearch != null);
         }
     }
 

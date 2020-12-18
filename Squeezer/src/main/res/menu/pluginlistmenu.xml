@@ -22,8 +22,8 @@
         android:id="@+id/menu_item_view"
         android:title="@string/menu_item_view"
         android:icon="@drawable/ic_action_view_as_grid"
-        android:orderInCategory="1"
-        app:showAsAction="ifRoom">
+        android:orderInCategory="2"
+        app:showAsAction="ifRoom|withText">
         <menu>
             <group
                 android:id="@+id/menu_group_theme"

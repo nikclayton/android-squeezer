@@ -25,27 +25,27 @@
         <item name="colorPrimaryVariant">@color/lightBlueDarkVariant</item>
         <item name="colorSecondary">@color/amberDark</item>
         <item name="colorSecondaryVariant">@color/amberDarkVariant</item>
-        <item name="actionBarStyle">@style/SqueezerActionBar.Dark</item>
+        <item name="actionOverflowMenuStyle">@style/OverflowMenu</item>
         <item name="sliderStyle">@style/Widget.App.Slider</item>
 
         <item name="volume_panel_back_circle_color">@color/volume_panel_back_circle_color</item>
     </style>
 
-    <style name="AppTheme.Light.DarkActionBar" parent="Theme.MaterialComponents.Light">
+    <style name="AppTheme.Light.DarkActionBar" parent="Theme.MaterialComponents.Light.DarkActionBar">
         <item name="alarm_dow_selected">@android:color/black</item>
 
         <item name="colorPrimary">@color/lightBlueLight</item>
         <item name="colorPrimaryVariant">@color/lightBlueLightVariant</item>
         <item name="colorSecondary">@color/amberLight</item>
         <item name="colorSecondaryVariant">@color/amberLightVariant</item>
-        <item name="actionBarTheme">@style/ThemeOverlay.MaterialComponents.Dark.ActionBar</item>
+        <item name="actionOverflowMenuStyle">@style/OverflowMenu</item>
         <item name="sliderStyle">@style/Widget.App.Slider</item>
 
         <item name="volume_panel_back_circle_color">@color/volume_panel_back_circle_color_light</item>
     </style>
 
-    <style name="SqueezerActionBar.Dark" parent="@style/Widget.MaterialComponents.ActionBar.Primary">
-        <item name="background">@color/actionBarBackgroundDark</item>
+    <style name="OverflowMenu" parent="Widget.AppCompat.Light.PopupMenu.Overflow">
+        <item name="overlapAnchor">false</item>
     </style>
 
     <style name="Widget.App.Slider" parent="Widget.MaterialComponents.Slider">

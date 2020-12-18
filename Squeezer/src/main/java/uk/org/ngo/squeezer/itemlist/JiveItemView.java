@@ -16,12 +16,15 @@
 
 package uk.org.ngo.squeezer.itemlist;
 
+import android.text.TextUtils;
 import android.view.View;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
 import java.util.EnumSet;
 
+import uk.org.ngo.squeezer.Preferences;
 import uk.org.ngo.squeezer.R;
 import uk.org.ngo.squeezer.framework.ItemAdapter;
 import uk.org.ngo.squeezer.framework.ViewParamItemView;
@@ -48,6 +51,21 @@ public class JiveItemView extends ViewParamItemView<JiveItem> {
         setWindowStyle(activity.window.windowStyle);
         this.logicDelegate = new JiveItemViewLogic(activity);
         setLoadingViewParams(viewParamIcon() | VIEW_PARAM_TWO_LINE );
+
+        int maxLines = getMaxLines();
+        if (maxLines > 0) {
+            setMaxLines(text1, maxLines);
+            setMaxLines(text2, maxLines);
+        }
+    }
+
+    private int getMaxLines() {
+        return new Preferences(getActivity()).getMaxLines(listLayout());
+    }
+
+    private void setMaxLines(TextView view, int maxLines) {
+        view.setMaxLines(maxLines);
+        view.setEllipsize(TextUtils.TruncateAt.END);
     }
 
     @Override
@@ -135,7 +153,7 @@ public class JiveItemView extends ViewParamItemView<JiveItem> {
         });
     }
 
-    ArtworkListLayout listLayout() {
+    private ArtworkListLayout listLayout() {
         return listLayout(getActivity(), windowStyle);
     }
 

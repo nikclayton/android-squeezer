@@ -27,6 +27,7 @@
     <string name="menu_item_players">Platine</string>
     <string name="menu_item_settings_label">Paramètres</string>
     <string name="menu_item_about_label">À propos</string>
+    <string name="menu_item_view">Vue</string>
     <string name="activity_settings_name">Paramètres</string>
     <string name="settings_serveraddr_hint">Nom ou adresse IP du serveur</string>
     <string name="settings_server_prompt">Choisissez un serveur</string>

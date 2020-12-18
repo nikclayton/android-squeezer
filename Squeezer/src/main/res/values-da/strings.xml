@@ -25,6 +25,7 @@
     <string name="menu_item_players">Afspillere</string>
     <string name="menu_item_settings_label">Indstillinger</string>
     <string name="menu_item_about_label">Om</string>
+    <string name="menu_item_view">Visning</string>
     <string name="activity_settings_name">Indstillinger</string>
     <string name="settings_serveraddr_hint">Navn eller IP addresse på server</string>
     <string name="settings_manual_server_addr">Angiv adressen manuelt</string>

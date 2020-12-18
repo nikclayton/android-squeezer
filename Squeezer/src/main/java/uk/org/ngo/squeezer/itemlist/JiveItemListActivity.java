@@ -19,11 +19,17 @@ package uk.org.ngo.squeezer.itemlist;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.content.res.Resources;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
+import androidx.appcompat.content.res.AppCompatResources;
+import androidx.core.view.MenuCompat;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -60,6 +66,7 @@ import uk.org.ngo.squeezer.itemlist.dialog.ArtworkListLayout;
 import uk.org.ngo.squeezer.service.ISqueezeService;
 import uk.org.ngo.squeezer.service.event.HandshakeComplete;
 import uk.org.ngo.squeezer.util.ImageFetcher;
+import uk.org.ngo.squeezer.util.ThemeManager;
 import uk.org.ngo.squeezer.widget.GridAutofitLayoutManager;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -81,8 +88,15 @@ public class JiveItemListActivity extends BaseListActivity<JiveItemView, JiveIte
     Window window = new Window();
     private int selectedIndex;
 
+    private Menu viewMenu;
+    private MenuItem menuItemLight;
+    private MenuItem menuItemDark;
     private MenuItem menuItemList;
     private MenuItem menuItemGrid;
+    private MenuItem menuItemOneLine;
+    private MenuItem menuItemTwoLines;
+    private MenuItem menuItemAllInfo;
+
     private ViewParamItemView<JiveItem> parentViewHolder;
 
     @Override
@@ -97,8 +111,7 @@ public class JiveItemListActivity extends BaseListActivity<JiveItemView, JiveIte
             @Override
             protected int getItemViewType(JiveItem item) {
                 return item != null && item.hasSlider() ?
-                        R.layout.slider_item :
-                        (JiveItemView.listLayout(JiveItemListActivity.this, window.windowStyle) == ArtworkListLayout.grid) ? R.layout.grid_item : R.layout.list_item;
+                        R.layout.slider_item : (getListLayout() == ArtworkListLayout.grid) ? R.layout.grid_item : R.layout.list_item;
             }
         };
     }
@@ -212,7 +225,7 @@ public class JiveItemListActivity extends BaseListActivity<JiveItemView, JiveIte
     }
 
     private void setupListView() {
-        ArtworkListLayout listLayout = JiveItemView.listLayout(this, window.windowStyle);
+        ArtworkListLayout listLayout = getListLayout();
         RecyclerView.LayoutManager layoutManager = getListView().getLayoutManager();
         if (listLayout == ArtworkListLayout.grid && !(layoutManager instanceof GridLayoutManager)) {
             getListView().setLayoutManager(new GridAutofitLayoutManager(this, R.dimen.grid_column_width));
@@ -271,7 +284,7 @@ public class JiveItemListActivity extends BaseListActivity<JiveItemView, JiveIte
 
 
     void applyWindowStyle(Window.WindowStyle windowStyle) {
-        applyWindowStyle(windowStyle, JiveItemView.listLayout(this, window.windowStyle));
+        applyWindowStyle(windowStyle, getListLayout());
     }
 
     void applyWindowStyle(Window.WindowStyle windowStyle, ArtworkListLayout prevListLayout) {
@@ -474,10 +487,29 @@ public class JiveItemListActivity extends BaseListActivity<JiveItemView, JiveIte
         }
     }
 
+    /**
+     * Save the supplied theme in preferences and restart activity to apply it.
+     */
+    private void setTheme(ThemeManager.Theme theme) {
+        if (getThemeId() != theme.mThemeId) {
+            new Preferences(this).setTheme(theme);
+
+            Intent intent = getIntent();
+            finish();
+            overridePendingTransition(0, 0);
+            startActivity(intent);
+            overridePendingTransition(0, 0);
+        }
+    }
+
     public void setPreferredListLayout(ArtworkListLayout listLayout) {
-        ArtworkListLayout prevListLayout = JiveItemView.listLayout(this, window.windowStyle);
+        ArtworkListLayout prevListLayout = getListLayout();
         saveListLayout(listLayout);
         applyWindowStyle(window.windowStyle, prevListLayout);
+    }
+
+    ArtworkListLayout getListLayout() {
+        return JiveItemView.listLayout(this, window.windowStyle);
     }
 
     protected void saveListLayout(ArtworkListLayout listLayout) {
@@ -505,35 +537,115 @@ public class JiveItemListActivity extends BaseListActivity<JiveItemView, JiveIte
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.pluginlistmenu, menu);
-        menuItemList = menu.findItem(R.id.menu_item_list);
-        menuItemGrid = menu.findItem(R.id.menu_item_grid);
+        viewMenu = menu.findItem(R.id.menu_item_view).getSubMenu();
+        MenuCompat.setGroupDividerEnabled(viewMenu, true);
+        menuItemLight = viewMenu.findItem(R.id.menu_item_light);
+        menuItemDark = viewMenu.findItem(R.id.menu_item_dark);
+        menuItemList = viewMenu.findItem(R.id.menu_item_list);
+        menuItemGrid = viewMenu.findItem(R.id.menu_item_grid);
+        menuItemOneLine = viewMenu.findItem(R.id.menu_item_one_line);
+        menuItemTwoLines = viewMenu.findItem(R.id.menu_item_two_lines);
+        menuItemAllInfo = viewMenu.findItem(R.id.menu_item_all_lines);
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        updateViewMenuItems(getPreferredListLayout(), window.windowStyle);
+        fixOverflowMenuIconColor(menu);
+        updateViewMenuItems(getListLayout(), window.windowStyle);
         return super.onPrepareOptionsMenu(menu);
+    }
+
+    /**
+     * Work around an issue with Theme.MaterialComponents.Light.DarkActionBar.
+     * <p>
+     * Icon on the action bar is tinted correct to the theme of action bar. The overflow menu(s)
+     * however are popped up in the theme of the main app, but tinted according to the action bar,
+     * thus becoming invisible.
+     */
+    private void fixOverflowMenuIconColor(Menu menu) {
+        if (getThemeId() == ThemeManager.Theme.LIGHT_DARKACTIONBAR.mThemeId) {
+            fixOverflowMenuIconColor(menu, false);
+        }
+    }
+
+    private void fixOverflowMenuIconColor(Menu menu, boolean isSubMenu) {
+        for (int i = 0; i < menu.size(); i++) {
+            MenuItem item = menu.getItem(i);
+            if (isSubMenu && item.getIcon() != null) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    item.setIconTintList(getTint());
+                } else {
+                    Drawable icon = item.getIcon().mutate();
+                    int color = R.attr.actionMenuTextColor;
+                    icon.setColorFilter(color, PorterDuff.Mode.SRC_IN);
+                    icon.setAlpha(item.isEnabled() ? 255 : 128);
+                    item.setIcon(icon);
+                }
+            }
+            if (item.hasSubMenu()) {
+                fixOverflowMenuIconColor(item.getSubMenu(), true);
+            }
+        }
+    }
+
+    private ColorStateList getTint() {
+        return AppCompatResources.getColorStateList(this, getAttributeValue(R.attr.colorControlNormal));
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_item_list:
-                setPreferredListLayout(ArtworkListLayout.list);
-                return true;
-            case R.id.menu_item_grid:
-                setPreferredListLayout(ArtworkListLayout.grid);
-                return true;
+        int itemId = item.getItemId();
+        if (itemId == R.id.menu_item_light) {
+            setTheme(ThemeManager.Theme.LIGHT_DARKACTIONBAR);
+            return true;
+        } else if (itemId == R.id.menu_item_dark) {
+            setTheme(ThemeManager.Theme.DARK);
+            return true;
+        } else if (itemId == R.id.menu_item_list) {
+            setPreferredListLayout(ArtworkListLayout.list);
+            return true;
+        } else if (itemId == R.id.menu_item_grid) {
+            setPreferredListLayout(ArtworkListLayout.grid);
+            return true;
+        } else if (itemId == R.id.menu_item_one_line) {
+            setMaxLines(1);
+            return true;
+        } else if (itemId == R.id.menu_item_two_lines) {
+            setMaxLines(2);
+            return true;
+        } else if (itemId == R.id.menu_item_all_lines) {
+            setMaxLines(0);
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
+    private void setMaxLines(int maxLines) {
+        new Preferences(this).setMaxLines(getListLayout(), maxLines);
+        updateViewMenuItems(getListLayout(), window.windowStyle);
+        getListView().setAdapter(getListView().getAdapter());
+    }
+
     private void updateViewMenuItems(ArtworkListLayout listLayout, Window.WindowStyle windowStyle) {
-        boolean canChangeListLayout = JiveItemView.canChangeListLayout(windowStyle);
         if (menuItemList != null) {
-            menuItemList.setVisible(canChangeListLayout && listLayout != ArtworkListLayout.list);
-            menuItemGrid.setVisible(canChangeListLayout && listLayout != ArtworkListLayout.grid);
+            (getThemeId() ==  R.style.AppTheme ? menuItemDark : menuItemLight).setChecked(true);
+
+            boolean canChangeListLayout = JiveItemView.canChangeListLayout(windowStyle);
+            viewMenu.setGroupVisible(R.id.menu_group_artwork, canChangeListLayout);
+            (listLayout == ArtworkListLayout.list ? menuItemList : menuItemGrid).setChecked(true);
+
+            switch (new Preferences(this).getMaxLines(listLayout)) {
+                case 1:
+                    menuItemOneLine.setChecked(true);
+                    break;
+                case 2:
+                    menuItemTwoLines.setChecked(true);
+                    break;
+                default:
+                    menuItemAllInfo.setChecked(true);
+                    break;
+            }
         }
     }
 

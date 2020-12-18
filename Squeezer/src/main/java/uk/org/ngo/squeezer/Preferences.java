@@ -100,6 +100,9 @@ public final class Preferences {
     // Preferred home menu layout.
     private static final String KEY_HOME_MENU_LAYOUT = "squeezer.home.menu.layout";
 
+    // Preferred maximum info per item for a given list layout
+    public static final String KEY_MAX_LINES_FORMAT = "squeezer.%s.maxLines";
+
     // Preferred song list layout.
     private static final String KEY_SONG_LIST_LAYOUT = "squeezer.song.list.layout";
 
@@ -417,6 +420,17 @@ public final class Preferences {
     private void setListLayout(String preference, ArtworkListLayout artworkListLayout) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(preference, artworkListLayout.name());
+        editor.apply();
+    }
+
+    /** Get max lines for the supplied list layout. */
+    public int getMaxLines(ArtworkListLayout listLayout) {
+        return sharedPreferences.getInt(String.format(KEY_MAX_LINES_FORMAT, listLayout.name()), 2);
+    }
+
+    public void setMaxLines(ArtworkListLayout listLayout, int maxLines) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt(String.format(KEY_MAX_LINES_FORMAT, listLayout.name()), maxLines);
         editor.apply();
     }
 

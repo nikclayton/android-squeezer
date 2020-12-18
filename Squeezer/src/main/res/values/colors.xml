@@ -112,8 +112,6 @@
     <color name="blueGreyLight">#455A64</color> <!-- + -->
     <color name="blueGreyLightVariant">#263238</color>
 
-    <color name="actionBarBackgroundDark">#272727</color>
-
     <color name="main_button_normal">#606060</color>
     <color name="main_button_selected">#909090</color>
     <color name="notification_button_pressed">#444444</color>

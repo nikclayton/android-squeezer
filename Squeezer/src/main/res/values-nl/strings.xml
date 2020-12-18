@@ -22,6 +22,7 @@
     <string name="menu_item_players">Spelers</string>
     <string name="menu_item_settings_label">Instellingen</string>
     <string name="menu_item_about_label">Over</string>
+    <string name="menu_item_view">View</string>
     <string name="activity_settings_name">Instellingen</string>
     <string name="settings_serveraddr_hint">Naam of IP adres van server</string>
     <string name="settings_server_prompt">Kies een server</string>

@@ -19,16 +19,67 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/menu_item_list"
-        android:title="@string/SWITCH_TO_EXTENDED_LIST"
-        android:icon="@drawable/ic_action_view_as_list"
-        app:showAsAction="ifRoom"
-        />
-
-    <item
-        android:id="@+id/menu_item_grid"
-        android:title="@string/SWITCH_TO_GALLERY"
+        android:id="@+id/menu_item_view"
+        android:title="@string/menu_item_view"
         android:icon="@drawable/ic_action_view_as_grid"
-        app:showAsAction="ifRoom"
-        />
+        android:orderInCategory="1"
+        app:showAsAction="ifRoom">
+        <menu>
+            <group
+                android:id="@+id/menu_group_theme"
+                android:checkableBehavior="single">
+                <item
+                    android:id="@+id/menu_item_light"
+                    android:title="@string/settings_theme_light_dark"
+                    android:icon="@drawable/ic_theme_light"
+                    app:showAsAction="never"
+                    />
+
+                <item
+                    android:id="@+id/menu_item_dark"
+                    android:title="@string/settings_theme_dark"
+                    android:icon="@drawable/ic_theme_dark"
+                    app:showAsAction="never"
+                    />
+            </group>
+            <group
+                android:id="@+id/menu_group_artwork"
+                android:checkableBehavior="single">
+                <item
+                    android:id="@+id/menu_item_list"
+                    android:title="@string/SWITCH_TO_EXTENDED_LIST"
+                    android:icon="@drawable/ic_action_view_as_list"
+                    app:showAsAction="never"
+                    />
+
+                <item
+                    android:id="@+id/menu_item_grid"
+                    android:title="@string/SWITCH_TO_GALLERY"
+                    android:icon="@drawable/ic_action_view_as_grid"
+                    app:showAsAction="never"
+                    />
+            </group>
+            <group
+                android:id="@+id/menu_group_lines"
+                android:checkableBehavior="single">
+                <item
+                    android:id="@+id/menu_item_one_line"
+                    android:title="Display at most 1 line per item"
+                    app:showAsAction="never"
+                    />
+
+                <item
+                    android:id="@+id/menu_item_two_lines"
+                    android:title="Display at most 2 lines per item"
+                    app:showAsAction="never"
+                    />
+
+                <item
+                    android:id="@+id/menu_item_all_lines"
+                    android:title="Display full info"
+                    app:showAsAction="never"
+                    />
+            </group>
+        </menu>
+    </item>
 </menu>

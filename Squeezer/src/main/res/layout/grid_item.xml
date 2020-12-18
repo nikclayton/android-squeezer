@@ -68,9 +68,7 @@ for the implementation.
         android:layout_height="wrap_content"
         android:layout_below="@id/icon"
         android:layout_toStartOf="@id/context_menu"
-        android:ellipsize="end"
         android:paddingTop="4dp"
-        android:maxLines="2"
         android:textAppearance="@style/SqueezerTextAppearance.GridItem.Primary"
         tools:text="Album name"/>
 
@@ -80,8 +78,6 @@ for the implementation.
         android:layout_height="wrap_content"
         android:layout_below="@id/text1"
         android:layout_toStartOf="@id/context_menu"
-        android:ellipsize="end"
-        android:maxLines="2"
         android:textAppearance="@style/SqueezerTextAppearance.GridItem.Secondary"
         tools:text="Artist info"/>
 

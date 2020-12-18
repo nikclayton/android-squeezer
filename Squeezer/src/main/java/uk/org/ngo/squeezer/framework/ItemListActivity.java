@@ -309,7 +309,7 @@ public abstract class ItemListActivity extends BaseActivity {
             int pos = (firstVisibleItemPosition / mPageSize) * mPageSize;
             int end = firstVisibleItemPosition + listView.getChildCount();
 
-            while (pos <= end) {
+            while (pos < end) {
                 maybeOrderPage(pos);
                 pos += mPageSize;
             }

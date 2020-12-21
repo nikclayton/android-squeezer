@@ -16,7 +16,6 @@
 
 package uk.org.ngo.squeezer;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -41,7 +40,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.appcompat.app.ActionBar;
-import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -243,24 +241,10 @@ public class NowPlayingFragment extends Fragment {
 
     private boolean mFullHeightLayout;
 
-    /**
-     * Called before onAttach. Pull out the layout spec to figure out which layout to use later.
-     */
     @Override
-    public void onInflate(@NonNull Context context, @NonNull AttributeSet attrs, Bundle savedInstanceState) {
-        super.onInflate(context, attrs, savedInstanceState);
-
-        int layout_height = attrs.getAttributeUnsignedIntValue(
-                "http://schemas.android.com/apk/res/android",
-                "layout_height", 0);
-
-        mFullHeightLayout = (layout_height == ViewGroup.LayoutParams.MATCH_PARENT);
-    }
-
-    @Override
-    public void onAttach(@NonNull Activity activity) {
-        super.onAttach(activity);
-        mActivity = (BaseActivity) activity;
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        mActivity = (BaseActivity) context;
         pluginViewDelegate = new JiveItemViewLogic(mActivity);
     }
 
@@ -269,16 +253,15 @@ public class NowPlayingFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
-        mActivity.bindService(new Intent(mActivity, SqueezeService.class), serviceConnection,
-                Context.BIND_AUTO_CREATE);
+        mActivity.bindService(new Intent(mActivity, SqueezeService.class), serviceConnection, Context.BIND_AUTO_CREATE);
         Log.d(TAG, "did bindService; serviceStub = " + mService);
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v;
 
+        mFullHeightLayout = (container.getLayoutParams().height == ViewGroup.LayoutParams.MATCH_PARENT);
         if (mFullHeightLayout) {
             v = inflater.inflate(R.layout.now_playing_fragment_full, container, false);
 
@@ -939,7 +922,7 @@ public class NowPlayingFragment extends Fragment {
             AlarmsActivity.show(mActivity);
             return true;
         } else if (itemId == R.id.menu_item_about) {
-            new AboutDialog().show(getFragmentManager(), "AboutDialog");
+            new AboutDialog().show(getParentFragmentManager(), "AboutDialog");
             return true;
         }
 
@@ -969,7 +952,7 @@ public class NowPlayingFragment extends Fragment {
             WifiManager wifiManager = (WifiManager) mActivity
                     .getApplicationContext().getSystemService(Context.WIFI_SERVICE);
             if (!wifiManager.isWifiEnabled()) {
-                FragmentManager fragmentManager = getFragmentManager();
+                FragmentManager fragmentManager = getParentFragmentManager();
                 if (fragmentManager == null) {
                     Log.i(TAG, "fragment manager is null so we can't show EnableWifiDialog");
                     return;

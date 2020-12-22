@@ -228,6 +228,12 @@
         <item name="android:paddingEnd">36dp</item>
     </style>
 
+    <!-- Media controller buttons on bottom bar -->
+    <style name="BottomBar.MediaButton" parent="ImageButton">
+        <item name="android:layout_width">@dimen/album_art_icon_width</item>
+        <item name="android:layout_height">@dimen/album_art_icon_height</item>
+    </style>
+
     <style name="VolumePanel" parent="@android:style/Theme.Panel">
         <item name="android:windowAnimationStyle">@style/VolumeDialogAnimation</item>
     </style>

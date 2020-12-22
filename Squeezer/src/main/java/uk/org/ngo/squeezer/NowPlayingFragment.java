@@ -24,6 +24,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.res.ColorStateList;
+import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
@@ -272,7 +273,6 @@ public class NowPlayingFragment extends Fragment {
             currentTime = v.findViewById(R.id.currenttime);
             totalTime = v.findViewById(R.id.totaltime);
             slider = v.findViewById(R.id.seekbar);
-            volumeButton = v.findViewById(R.id.volume);
             playlistButton = v.findViewById(R.id.playlist);
 
             final ViewParamItemView<JiveItem> viewHolder = new ViewParamItemView<>(mActivity, v);
@@ -295,38 +295,28 @@ public class NowPlayingFragment extends Fragment {
         trackText = v.findViewById(R.id.trackname);
         playPauseButton = v.findViewById(R.id.pause);
 
-        // May or may not be present in the layout, depending on orientation,
-        // screen width, and so on.
         nextButton = v.findViewById(R.id.next);
         prevButton = v.findViewById(R.id.prev);
+        volumeButton = v.findViewById(R.id.volume);
+
+        int screenWidthDp = getResources().getConfiguration().screenWidthDp;
+        if (screenWidthDp < 456) {
+            nextButton.setVisibility(View.GONE);
+            prevButton.setVisibility(View.GONE);
+        }
+
+        if (screenWidthDp < 408 || (456 < screenWidthDp && screenWidthDp < 504)) {
+            volumeButton.setVisibility(View.GONE);
+        }
 
         // Marquee effect on TextViews only works if they're focused.
         trackText.requestFocus();
 
-        playPauseButton.setOnClickListener(view -> {
-            if (mService == null) {
-                return;
-            }
-            mService.togglePausePlay();
-        });
+        playPauseButton.setOnClickListener(view -> mService.togglePausePlay());
 
-        if (nextButton != null) {
-            nextButton.setOnClickListener(view -> {
-                if (mService == null) {
-                    return;
-                }
-                mService.nextTrack();
-            });
-        }
-
-        if (prevButton != null) {
-            prevButton.setOnClickListener(view -> {
-                if (mService == null) {
-                    return;
-                }
-                mService.previousTrack();
-            });
-        }
+        volumeButton.setOnClickListener(view -> mActivity.showVolumePanel());
+        nextButton.setOnClickListener(view -> mService.nextTrack());
+        prevButton.setOnClickListener(view -> mService.previousTrack());
 
         if (mFullHeightLayout) {
             artistText.setOnClickListener(v1 -> {
@@ -349,21 +339,9 @@ public class NowPlayingFragment extends Fragment {
                 }
             });
 
-            shuffleButton.setOnClickListener(view -> {
-                if (mService == null) {
-                    return;
-                }
-                mService.toggleShuffle();
-            });
+            shuffleButton.setOnClickListener(view -> mService.toggleShuffle());
 
-            repeatButton.setOnClickListener(view -> {
-                if (mService == null) {
-                    return;
-                }
-                mService.toggleRepeat();
-            });
-
-            volumeButton.setOnClickListener(view -> mActivity.showVolumePanel());
+            repeatButton.setOnClickListener(view -> mService.toggleRepeat());
 
             playlistButton.setOnClickListener(view -> CurrentPlaylistActivity.show(mActivity));
 
@@ -665,25 +643,15 @@ public class NowPlayingFragment extends Fragment {
 
             // don't remove rew and fwd for remote tracks, because a single track playlist
             // is not an indication that fwd and rwd are invalid actions
-            if ((playerState.getCurrentPlaylistTracksNum() == 1) && !playerState.isRemote()) {
-                disableButton(nextButton);
-                disableButton(prevButton);
-                if (btnContextMenu != null) {
-                    btnContextMenu.setVisibility(View.GONE);
-                }
-            } else {
-                enableButton(nextButton);
-                enableButton(prevButton);
-                if (btnContextMenu != null) {
-                    btnContextMenu.setVisibility(View.VISIBLE);
-                }
-            }
+            boolean canSkip = !((playerState.getCurrentPlaylistTracksNum() == 1) && !playerState.isRemote());
+            nextButton.setEnabled(canSkip);
+            prevButton.setEnabled(canSkip);
 
             if (mFullHeightLayout) {
+                btnContextMenu.setVisibility(View.VISIBLE);
                 artistText.setText(song.getArtist());
                 albumText.setText(song.getAlbum());
                 totalTime.setText(Util.formatElapsedTime(playerState.getCurrentSongDuration()));
-
 
                 mService.pluginItems(song.moreAction, new IServiceItemListCallback<JiveItem>() {
                     @Override
@@ -729,41 +697,6 @@ public class NowPlayingFragment extends Fragment {
             }
         }
         return null;
-    }
-
-    /**
-     * Enable a button, which may be null.
-     *
-     * @param button the button to enable.
-     */
-    private static void enableButton(@Nullable Button button) {
-        setButtonState(button, true);
-    }
-
-    /**
-     * Disable a button, which may be null.
-     *
-     * @param button the button to enable.
-     */
-    private static void disableButton(@Nullable Button button) {
-        setButtonState(button, false);
-    }
-
-    /**
-     * Sets the state of a button to either enabled or disabled. Enabled buttons
-     * are active and have a 1.0 alpha, disabled buttons are inactive and have a
-     * 0.25 alpha. {@code button} may be null, in which case nothing happens.
-     *
-     * @param button the button to affect
-     * @param state the desired state, {@code true} to enable {@code false} to disable.
-     */
-    private static void setButtonState(@Nullable Button button, boolean state) {
-        if (button == null) {
-            return;
-        }
-
-        button.setEnabled(state);
-        button.setAlpha(state ? 1.0f : 0.25f);
     }
 
     private boolean setSecondsElapsed(int seconds) {
@@ -1037,13 +970,13 @@ public class NowPlayingFragment extends Fragment {
         // Ensure that option menu item state is adjusted as appropriate.
         getActivity().supportInvalidateOptionsMenu();
 
-        disableButton(nextButton);
-        disableButton(prevButton);
+        nextButton.setEnabled(false);
+        prevButton.setEnabled(false);
+        volumeButton.setEnabled(false);
 
         if (mFullHeightLayout) {
             shuffleButton.setEnabled(false);
             repeatButton.setEnabled(false);
-            volumeButton.setEnabled(false);
             playlistButton.setEnabled(false);
 
             albumArt.setImageResource(R.drawable.icon_album_noart_fullscreen);
@@ -1077,12 +1010,12 @@ public class NowPlayingFragment extends Fragment {
 
         dismissConnectingDialog();
 
-        enableButton(nextButton);
-        enableButton(prevButton);
+        nextButton.setEnabled(true);
+        prevButton.setEnabled(true);
+        volumeButton.setEnabled(true);
         if (mFullHeightLayout) {
             shuffleButton.setEnabled(true);
             repeatButton.setEnabled(true);
-            volumeButton.setEnabled(true);
             playlistButton.setEnabled(true);
         } else {
             mProgressBar.setEnabled(true);

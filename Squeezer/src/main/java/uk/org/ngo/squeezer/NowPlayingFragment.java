@@ -299,16 +299,6 @@ public class NowPlayingFragment extends Fragment {
         prevButton = v.findViewById(R.id.prev);
         volumeButton = v.findViewById(R.id.volume);
 
-        int screenWidthDp = getResources().getConfiguration().screenWidthDp;
-        if (screenWidthDp < 456) {
-            nextButton.setVisibility(View.GONE);
-            prevButton.setVisibility(View.GONE);
-        }
-
-        if (screenWidthDp < 408 || (456 < screenWidthDp && screenWidthDp < 504)) {
-            volumeButton.setVisibility(View.GONE);
-        }
-
         // Marquee effect on TextViews only works if they're focused.
         trackText.requestFocus();
 
@@ -377,6 +367,16 @@ public class NowPlayingFragment extends Fragment {
                 }
             });
         } else {
+            int screenWidthDp = getResources().getConfiguration().screenWidthDp;
+            if (screenWidthDp < 456) {
+                nextButton.setVisibility(View.GONE);
+                prevButton.setVisibility(View.GONE);
+            }
+
+            if (screenWidthDp < 408 || (456 < screenWidthDp && screenWidthDp < 504)) {
+                volumeButton.setVisibility(View.GONE);
+            }
+
             final GestureDetectorCompat detector = new GestureDetectorCompat(mActivity, new OnSwipeListener() {
                 // Clicking on the layout goes to NowPlayingActivity.
                 @Override

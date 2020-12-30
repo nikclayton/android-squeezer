@@ -33,7 +33,7 @@ public class PlayerViewLogic {
      * Inflate common player actions onto the supplied menu
      */
     public static void inflatePlayerActions(Context context, MenuInflater inflater, Menu menu) {
-        inflater.inflate(R.menu.playermenu, menu);
+        inflater.inflate(R.menu.player_menu, menu);
 
         String xMinutes = context.getString(R.string.X_MINUTES);
         menu.findItem(R.id.in_15_minutes).setTitle(String.format(xMinutes, "15"));

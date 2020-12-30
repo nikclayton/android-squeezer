@@ -19,15 +19,12 @@ package uk.org.ngo.squeezer.model;
 import android.os.Parcel;
 import android.os.SystemClock;
 import androidx.annotation.NonNull;
-import androidx.annotation.StringDef;
 
 import com.google.common.base.Charsets;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.util.Comparator;
 import java.util.Map;
 
@@ -61,20 +58,27 @@ public class Player extends Item implements Comparable<Player> {
         return this.mName.compareToIgnoreCase((otherPlayer).mName);
     }
 
-    public static class Pref {
-        /** The types of player preferences. */
-        @StringDef({ALARM_DEFAULT_VOLUME, ALARM_FADE_SECONDS, ALARM_SNOOZE_SECONDS, ALARM_TIMEOUT_SECONDS,
-                ALARMS_ENABLED, PLAY_TRACK_ALBUM, DEFEAT_DESTRUCTIVE_TTP})
-        @Retention(RetentionPolicy.SOURCE)
-        public @interface Name {}
-        public static final String ALARM_DEFAULT_VOLUME = "alarmDefaultVolume";
-        public static final String ALARM_FADE_SECONDS = "alarmfadeseconds";
-        public static final String ALARM_SNOOZE_SECONDS = "alarmSnoozeSeconds";
-        public static final String ALARM_TIMEOUT_SECONDS = "alarmTimeoutSeconds";
-        public static final String ALARMS_ENABLED = "alarmsEnabled";
-        public static final String PLAY_TRACK_ALBUM = "playtrackalbum";
-        public static final String DEFEAT_DESTRUCTIVE_TTP = "defeatDestructiveTouchToPlay";
-        public static final String MEDIA_DIRS = "mediadirs";
+    /** The types of player preferences. */
+    public enum Pref {
+        ALARM_DEFAULT_VOLUME("alarmDefaultVolume"),
+        ALARM_FADE_SECONDS("alarmfadeseconds"),
+        ALARM_SNOOZE_SECONDS("alarmSnoozeSeconds"),
+        ALARM_TIMEOUT_SECONDS("alarmTimeoutSeconds"),
+        ALARMS_ENABLED("alarmsEnabled"),
+        PLAY_TRACK_ALBUM("playtrackalbum"),
+        DEFEAT_DESTRUCTIVE_TTP("defeatDestructiveTouchToPlay"),
+        SYNC_VOLUME("syncVolume"),
+        SYNC_POWER("syncPower");
+
+        private final String prefName;
+
+        Pref(String prefName) {
+            this.prefName = prefName;
+        }
+
+        public String prefName() {
+            return prefName;
+        }
     }
 
     public Player(Map<String, Object> record) {
@@ -86,11 +90,10 @@ public class Player extends Item implements Comparable<Player> {
         mConnected = getInt(record, "connected") == 1;
         mHashCode = calcHashCode();
 
-        if (record.containsKey(Pref.PLAY_TRACK_ALBUM)) {
-            mPlayerState.prefs.put(Pref.PLAY_TRACK_ALBUM, Util.getString(record, Pref.PLAY_TRACK_ALBUM));
-        }
-        if (record.containsKey(Pref.DEFEAT_DESTRUCTIVE_TTP)) {
-            mPlayerState.prefs.put(Pref.DEFEAT_DESTRUCTIVE_TTP, Util.getString(record, Pref.DEFEAT_DESTRUCTIVE_TTP));
+        for (Player.Pref pref : Player.Pref.values()) {
+            if (record.containsKey(pref.prefName)) {
+                mPlayerState.prefs.put(pref, Util.getString(record, pref.prefName));
+            }
         }
     }
 
@@ -172,26 +175,9 @@ public class Player extends Item implements Comparable<Player> {
     }
 
     /**
-     * Returns a 64 bit identifier for the player.  The ID tracked by the server is a unique
-     * string that identifies the player.  It may be -- but is not required to be -- the
-     * player's MAC address.  Rather than assume it is the MAC address, calculate a 64 bit
-     * hash of the ID and use that.
-     *
-     * @return The hash of the player's ID.
-     */
-    public long getIdAsLong() {
-        return mHashCode.asLong();
-    }
-
-    /**
      * Comparator to compare two players by ID.
      */
-    public static final Comparator<Player> compareById = new Comparator<Player>() {
-        @Override
-        public int compare(Player lhs, Player rhs) {
-            return lhs.getId().compareTo(rhs.getId());
-        }
-    };
+    public static final Comparator<Player> compareById = (lhs, rhs) -> lhs.getId().compareTo(rhs.getId());
 
     @Override
     public boolean equals(Object o) {

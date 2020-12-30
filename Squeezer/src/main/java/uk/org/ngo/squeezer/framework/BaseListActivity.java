@@ -94,7 +94,7 @@ public abstract class BaseListActivity<VH extends ItemViewHolder<T>, T extends I
         listView.setAdapter(getItemAdapter());
         // TODO call setHasFixedSize (not for grid)
 
-        Integer position = (Integer) getRetainedValue(TAG_POSITION);
+        Integer position = getRetainedValue(TAG_POSITION);
         if (position != null) {
             listView.scrollToPosition(position);
         }
@@ -122,8 +122,7 @@ public abstract class BaseListActivity<VH extends ItemViewHolder<T>, T extends I
      */
     public ItemAdapter<VH, T> getItemAdapter() {
         if (itemAdapter == null) {
-            //noinspection unchecked
-            itemAdapter = (ItemAdapter<VH, T>) getRetainedValue(TAG_ADAPTER);
+            itemAdapter = getRetainedValue(TAG_ADAPTER);
             if (itemAdapter == null) {
                 itemAdapter = createItemListAdapter();
                 putRetainedValue(TAG_ADAPTER, itemAdapter);

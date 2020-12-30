@@ -295,14 +295,6 @@ public class SqueezeService extends Service {
     }
 
     /**
-     * The player state change might warrant a new subscription type (e.g., if the
-     * player didn't have a sleep duration set, and now does).
-     */
-    public void onEvent(PlayerStateChanged event) {
-        updatePlayerSubscription(event.player, calculateSubscriptionTypeFor(event.player));
-    }
-
-    /**
      * Updates the playing status of the current player.
      * <p>
      * Updates the Wi-Fi lock and ongoing status notification as necessary.
@@ -962,22 +954,14 @@ public class SqueezeService extends Service {
             return activePlayer.getPlayerState();
         }
 
-        /**
-         * Issues a query for given player preference.
-         */
         @Override
-        public void playerPref(@Player.Pref.Name String playerPref) {
-            playerPref(playerPref, "?");
+        public void playerPref(Player.Pref playerPref, String value) {
+            mDelegate.activePlayerCommand().cmd("playerpref", playerPref.prefName(), value).exec();
         }
 
         @Override
-        public void playerPref(@Player.Pref.Name String playerPref, String value) {
-            mDelegate.activePlayerCommand().cmd("playerpref", playerPref, value).exec();
-        }
-
-        @Override
-        public void playerPref(Player player, @Player.Pref.Name String playerPref, String value) {
-            mDelegate.command(player).cmd("playerpref", playerPref, value).exec();
+        public void playerPref(Player player, Player.Pref playerPref, String value) {
+            mDelegate.command(player).cmd("playerpref", playerPref.prefName(), value).exec();
         }
 
         @Override

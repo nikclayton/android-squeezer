@@ -69,9 +69,8 @@ public interface ISqueezeService {
     void togglePower(Player player);
     void playerRename(Player player, String newName);
     void sleep(Player player, int duration);
-    void playerPref(@Player.Pref.Name String playerPref);
-    void playerPref(@Player.Pref.Name String playerPref, String value);
-    void playerPref(Player player, @Player.Pref.Name String playerPref, String value);
+    void playerPref(Player.Pref playerPref, String value);
+    void playerPref(Player player, Player.Pref playerPref, String value);
 
     /**
      * Synchronises the slave player to the player with masterId.

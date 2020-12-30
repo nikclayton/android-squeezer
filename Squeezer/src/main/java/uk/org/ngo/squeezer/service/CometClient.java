@@ -74,7 +74,6 @@ import uk.org.ngo.squeezer.service.event.AlertEvent;
 import uk.org.ngo.squeezer.service.event.DisplayEvent;
 import uk.org.ngo.squeezer.service.event.HandshakeComplete;
 import uk.org.ngo.squeezer.model.MenuStatusMessage;
-import uk.org.ngo.squeezer.service.event.PlayerPrefReceived;
 import uk.org.ngo.squeezer.service.event.PlayerVolume;
 import uk.org.ngo.squeezer.service.event.RegisterSqueezeNetwork;
 import uk.org.ngo.squeezer.util.Reflection;
@@ -167,11 +166,6 @@ class CometClient extends BaseClient {
         mItemRequestMap = builder.build();
 
         mRequestMap = ImmutableMap.<String, ResponseHandler>builder()
-                .put("playerpref", (player, request, message) -> {
-                    //noinspection WrongConstant
-                    String p2 = (String) message.getDataAsMap().get("_p2");
-                    mEventBus.post(new PlayerPrefReceived(player, request.cmd.get(1), p2 != null ? p2 : request.cmd.get(2)));
-                })
                 .put("mixer", (player, request, message) -> {
                     if (request.cmd.get(1).equals("volume")) {
                         String volume = (String) message.getDataAsMap().get("_volume");
@@ -180,7 +174,23 @@ class CometClient extends BaseClient {
                             player.getPlayerState().setCurrentVolume(newVolume);
                             mEventBus.post(new PlayerVolume(newVolume, player));
                         } else {
+                            // LMS delays player status for volume changes, so order it immediately to respond faster to user input
                             command(player, new String[]{"mixer", "volume", "?"}, Collections.emptyMap());
+
+                            // Since LMS doesn't send player status when volume is updated via a synced player we order them explicitly
+                            if ("1".equals(player.getPlayerState().prefs.get(Player.Pref.SYNC_VOLUME))) {
+                                List<String> slaves = player.getPlayerState().getSyncSlaves();
+                                Player master = getConnectionState().getPlayer(player.getPlayerState().getSyncMaster());
+                                if (master != null && master != player) {
+                                    command(master, new String[]{"mixer", "volume", "?"}, Collections.emptyMap());
+                                }
+                                for (String slave : slaves) {
+                                    Player syncSlave = getConnectionState().getPlayer(slave);
+                                    if (syncSlave != null && syncSlave != player) {
+                                        command(syncSlave, new String[]{"mixer", "volume", "?"}, Collections.emptyMap());
+                                    }
+                                }
+                            }
                         }
                     }
                 })
@@ -373,16 +383,16 @@ class CometClient extends BaseClient {
         // so we check the server version which is also set from server status
         boolean firstTimePlayersReceived = (getConnectionState().getServerVersion() == null);
 
-        getConnectionState().setMediaDirs(Util.getStringArray(data, Player.Pref.MEDIA_DIRS));
+        getConnectionState().setMediaDirs(Util.getStringArray(data, ConnectionState.MEDIA_DIRS));
         getConnectionState().setServerVersion((String) data.get("version"));
         Object[] item_data = (Object[]) data.get("players_loop");
         final HashMap<String, Player> players = new HashMap<>();
         if (item_data != null) {
             for (Object item_d : item_data) {
                 Map<String, Object> record = (Map<String, Object>) item_d;
-                if (!record.containsKey(Player.Pref.DEFEAT_DESTRUCTIVE_TTP) &&
-                        data.containsKey(Player.Pref.DEFEAT_DESTRUCTIVE_TTP)) {
-                    record.put(Player.Pref.DEFEAT_DESTRUCTIVE_TTP, data.get(Player.Pref.DEFEAT_DESTRUCTIVE_TTP));
+                if (!record.containsKey(Player.Pref.DEFEAT_DESTRUCTIVE_TTP.prefName()) &&
+                        data.containsKey(Player.Pref.DEFEAT_DESTRUCTIVE_TTP.prefName())) {
+                    record.put(Player.Pref.DEFEAT_DESTRUCTIVE_TTP.prefName(), data.get(Player.Pref.DEFEAT_DESTRUCTIVE_TTP.prefName()));
                 }
                 Player player = new Player(record);
                 players.put(player.getId(), player);
@@ -702,8 +712,7 @@ class CometClient extends BaseClient {
 
     @Override
     public void subscribePlayerStatus(final Player player, final PlayerState.PlayerSubscriptionType subscriptionType) {
-        Request request = statusRequest(player)
-                .param("subscribe", subscriptionType.getStatus());
+        Request request = statusRequest(player).param("subscribe", subscriptionType.getStatus());
         publishMessage(request, CHANNEL_SLIM_SUBSCRIBE, subscribeResponseChannel(player, CHANNEL_PLAYER_STATUS_FORMAT), new PublishListener() {
             @Override
             public void onMessage(ClientSessionChannel channel, Message message) {
@@ -802,8 +811,8 @@ class CometClient extends BaseClient {
     private Request serverStatusRequest() {
         return request("serverstatus")
                 .defaultPage()
-                .param("prefs", Player.Pref.MEDIA_DIRS + ", " + Player.Pref.DEFEAT_DESTRUCTIVE_TTP)
-                .param("playerprefs", Player.Pref.PLAY_TRACK_ALBUM + "," + Player.Pref.DEFEAT_DESTRUCTIVE_TTP);
+                .prefs("prefs", ConnectionState.MEDIA_DIRS, Player.Pref.DEFEAT_DESTRUCTIVE_TTP.prefName())
+                .prefs("playerprefs", Arrays.stream(Player.Pref.values()).map(Player.Pref::prefName).toArray(String[]::new));
     }
 
     @NonNull
@@ -850,6 +859,11 @@ class CometClient extends BaseClient {
 
         public Request params(Map<String, Object> params) {
             super.params(params);
+            return this;
+        }
+
+        public Request prefs(String param, String ... prefs) {
+            param(param, Joiner.on(",").join(prefs));
             return this;
         }
 

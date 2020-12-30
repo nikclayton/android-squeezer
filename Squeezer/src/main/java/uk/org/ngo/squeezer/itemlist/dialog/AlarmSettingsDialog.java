@@ -57,7 +57,7 @@ public class AlarmSettingsDialog extends DialogFragment {
          * @return The value of the PlayerPref identified by <code>playerPref</code>
          */
         @NonNull
-        String getPlayerPref(@NonNull @Player.Pref.Name String playerPref, @NonNull String def);
+        String getPlayerPref(@NonNull Player.Pref playerPref, @NonNull String def);
 
         /**
          * Called when the user selects the dialog's positive button.

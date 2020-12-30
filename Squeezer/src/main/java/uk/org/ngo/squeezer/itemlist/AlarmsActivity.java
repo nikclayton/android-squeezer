@@ -47,7 +47,7 @@ import uk.org.ngo.squeezer.model.AlarmPlaylist;
 import uk.org.ngo.squeezer.model.Player;
 import uk.org.ngo.squeezer.service.ISqueezeService;
 import uk.org.ngo.squeezer.service.event.ActivePlayerChanged;
-import uk.org.ngo.squeezer.service.event.PlayerPrefReceived;
+import uk.org.ngo.squeezer.service.event.HandshakeComplete;
 import uk.org.ngo.squeezer.util.CompoundButtonWrapper;
 import uk.org.ngo.squeezer.widget.UndoBarController;
 
@@ -63,12 +63,6 @@ public class AlarmsActivity extends BaseListActivity<AlarmView, Alarm> implement
 
     /** Settings button. */
     private Button mSettingsButton;
-
-    /** Have player preference values been requested from the server? */
-    private boolean mPrefsOrdered = false;
-
-    /** Maps from a @Player.Pref.Name to its value. */
-    private final Map<String, String> mPlayerPrefs = new HashMap<>();
 
     private final List<AlarmPlaylist> alarmPlaylists = new ArrayList<>();
 
@@ -99,32 +93,6 @@ public class AlarmsActivity extends BaseListActivity<AlarmView, Alarm> implement
                 getService().playerPref(Player.Pref.ALARMS_ENABLED, isChecked ? "1" : "0");
             }
         });
-    }
-
-    @Override
-    protected void onServiceConnected(@NonNull ISqueezeService service) {
-        super.onServiceConnected(service);
-        maybeOrderPrefs(service);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        ISqueezeService service = getService();
-        if (service != null) {
-            maybeOrderPrefs(service);
-        }
-    }
-
-    private void maybeOrderPrefs(ISqueezeService service) {
-        if (!mPrefsOrdered) {
-            mPrefsOrdered = true;
-
-            service.playerPref(Player.Pref.ALARM_FADE_SECONDS);
-            service.playerPref(Player.Pref.ALARM_DEFAULT_VOLUME);
-            service.playerPref(Player.Pref.ALARM_SNOOZE_SECONDS);
-            service.playerPref(Player.Pref.ALARM_TIMEOUT_SECONDS);
-        }
     }
 
     @Override
@@ -183,9 +151,7 @@ public class AlarmsActivity extends BaseListActivity<AlarmView, Alarm> implement
         if (start == 0) {
             mActivePlayer = service.getActivePlayer();
             service.alarmPlaylists(alarmPlaylistsCallback);
-
-            mAlarmsEnabledButton.setEnabled(false);
-            service.playerPref(Player.Pref.ALARMS_ENABLED);
+            bindPreferences();
         }
     }
 
@@ -229,30 +195,11 @@ public class AlarmsActivity extends BaseListActivity<AlarmView, Alarm> implement
         }
     }
 
-    public void onEventMainThread(PlayerPrefReceived event) {
-        if (!event.player.equals(getService().getActivePlayer())) {
-            return;
-        }
-
-        mPlayerPrefs.put(event.pref, event.value);
-
-        if (Player.Pref.ALARMS_ENABLED.equals(event.pref)) {
-            boolean checked = Integer.parseInt(event.value) > 0;
-            mAlarmsEnabledButton.setEnabled(true);
-            mAlarmsEnabledButton.setChecked(checked);
-            mAllAlarmsHintView.setText(checked ? R.string.all_alarms_on_hint : R.string.all_alarms_off_hint);
-        }
-
-        // The settings dialog can only be shown after all 4 prefs have been received, so
-        // that it can show their values.
-        if (mSettingsButton.getVisibility() == View.INVISIBLE) {
-            if (mPlayerPrefs.containsKey(Player.Pref.ALARM_DEFAULT_VOLUME) &&
-                    mPlayerPrefs.containsKey(Player.Pref.ALARM_SNOOZE_SECONDS) &&
-                    mPlayerPrefs.containsKey(Player.Pref.ALARM_TIMEOUT_SECONDS) &&
-                    mPlayerPrefs.containsKey(Player.Pref.ALARM_FADE_SECONDS)) {
-                mSettingsButton.setVisibility(View.VISIBLE);
-            }
-        }
+    private void bindPreferences() {
+        Map<Player.Pref, String> prefs = mActivePlayer.getPlayerState().prefs;
+        boolean alarmsEnabled = "1".equals(prefs.get(Player.Pref.ALARMS_ENABLED));
+        mAlarmsEnabledButton.setChecked(alarmsEnabled);
+        mAllAlarmsHintView.setText(alarmsEnabled ? R.string.all_alarms_on_hint : R.string.all_alarms_off_hint);
     }
 
     @MainThread
@@ -269,12 +216,9 @@ public class AlarmsActivity extends BaseListActivity<AlarmView, Alarm> implement
 
     @Override
     @NonNull
-    public String getPlayerPref(@NonNull @Player.Pref.Name String playerPref, @NonNull String def) {
-        String ret = mPlayerPrefs.get(playerPref);
-        if (ret == null) {
-            ret = def;
-        }
-        return ret;
+    public String getPlayerPref(@NonNull Player.Pref playerPref, @NonNull String def) {
+        String ret = mActivePlayer.getPlayerState().prefs.get(playerPref);
+        return (ret == null) ? def : ret;
     }
 
     public List<AlarmPlaylist> getAlarmPlaylists() {

@@ -17,8 +17,11 @@
 package uk.org.ngo.squeezer.itemlist;
 
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -37,19 +40,32 @@ import java.util.List;
 
 import uk.org.ngo.squeezer.R;
 import uk.org.ngo.squeezer.framework.ItemAdapter;
+import uk.org.ngo.squeezer.itemlist.dialog.SyncPowerDialog;
+import uk.org.ngo.squeezer.itemlist.dialog.SyncVolumeDialog;
 import uk.org.ngo.squeezer.model.CurrentPlaylistItem;
 import uk.org.ngo.squeezer.model.Player;
 
 public class PlayerListAdapter extends RecyclerView.Adapter<PlayerListAdapter.PlayerGroupViewHolder> {
     private final PlayerListActivity mActivity;
 
-    private final List<SyncGroup> mChildAdapters = new ArrayList<>();
+    private final List<SyncGroup> childAdapters = new ArrayList<>();
+
+    public void notifyItemChanged(Player player) {
+        for (SyncGroup childAdapter : childAdapters) {
+            for (int i = 0; i < childAdapter.getItemCount(); i++) {
+                if (player == childAdapter.getItem(i)) {
+                    childAdapter.notifyItemChanged(i);
+                    return;
+                }
+            }
+        }
+    }
 
     /**
      * A list adapter for a synchronization group, containing players.
      * This class is comparable and it has a name for the synchronization group.
      */
-    private class SyncGroup extends ItemAdapter<PlayerView, Player> implements Comparable<SyncGroup> {
+    class SyncGroup extends ItemAdapter<PlayerView, Player> implements Comparable<SyncGroup> {
 
         public String syncGroupName; // the name of the synchronization group as displayed in the players screen
 
@@ -109,7 +125,7 @@ public class PlayerListAdapter extends RecyclerView.Adapter<PlayerListAdapter.Pl
 
     public void clear() {
         mPlayersChanged = true;
-        mChildAdapters.clear();
+        childAdapters.clear();
         mPlayerCount = 0;
         notifyDataSetChanged();
     }
@@ -141,15 +157,15 @@ public class PlayerListAdapter extends RecyclerView.Adapter<PlayerListAdapter.Pl
             // add the slaves (the players) to the synchronization group
             syncGroup.update(slaves.size(), 0, new ArrayList<>(slaves));
             // add synchronization group to the child adapters
-            mChildAdapters.add(syncGroup);
+            childAdapters.add(syncGroup);
         }
-        Collections.sort(mChildAdapters); // sort sync group list alphabetically by sync group name
+        Collections.sort(childAdapters); // sort sync group list alphabetically by sync group name
         notifyDataSetChanged();
     }
 
     @Override
     public int getItemCount() {
-        return mChildAdapters.size();
+        return childAdapters.size();
     }
 
     @NonNull
@@ -160,7 +176,8 @@ public class PlayerListAdapter extends RecyclerView.Adapter<PlayerListAdapter.Pl
 
     @Override
     public void onBindViewHolder(@NonNull PlayerGroupViewHolder holder, int position) {
-        SyncGroup syncGroup = mChildAdapters.get(position);
+        SyncGroup syncGroup = childAdapters.get(position);
+        holder.item = syncGroup;
         holder.text1.setText(mActivity.getString(R.string.player_group_header, syncGroup.syncGroupName));
 
         CurrentPlaylistItem groupSong = syncGroup.getItem(0).getPlayerState().getCurrentSong();
@@ -169,20 +186,45 @@ public class PlayerListAdapter extends RecyclerView.Adapter<PlayerListAdapter.Pl
                     groupSong.getAlbum()));
         }
 
+        holder.contextMenuButton.setVisibility(syncGroup.getItemCount() > 1 ? View.VISIBLE : View.GONE);
+        holder.contextMenuButton.setOnClickListener(v -> showContextMenu(holder));
+
         holder.players.setAdapter(syncGroup);
         holder.players.addItemDecoration(new DividerItemDecoration(holder.players.getContext(), LinearLayoutManager.VERTICAL));
         holder.players.setLayoutManager(new LinearLayoutManager(holder.players.getContext()));
     }
 
+    public void showContextMenu(final PlayerGroupViewHolder holder) {
+        PopupMenu popup = new PopupMenu(mActivity, holder.contextMenuButton);
+        popup.inflate(R.menu.player_group_menu);
+        popup.setOnMenuItemClickListener(menuItem -> doItemContext(menuItem, holder.item));
+        popup.show();
+    }
+
+    private boolean doItemContext(MenuItem menuItem, SyncGroup selectedItem) {
+        mActivity.setCurrentSyncGroup(selectedItem);
+        if (menuItem.getItemId() == R.id.sync_volume) {
+            SyncVolumeDialog.show(mActivity);
+            return true;
+        } else if (menuItem.getItemId() == R.id.sync_power) {
+            SyncPowerDialog.show(mActivity);
+            return true;
+        }
+        return false;
+    }
+
     public static class PlayerGroupViewHolder extends RecyclerView.ViewHolder {
+        SyncGroup item;
         TextView text1;
         TextView text2;
+        Button contextMenuButton;
         RecyclerView players;
 
         public PlayerGroupViewHolder(@NonNull View itemView) {
             super(itemView);
             text1 = itemView.findViewById(R.id.text1);
             text2 = itemView.findViewById(R.id.text2);
+            contextMenuButton = itemView.findViewById(R.id.context_menu_button);
             players = itemView.findViewById(R.id.players_container);
         }
     }

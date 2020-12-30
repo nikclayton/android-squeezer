@@ -58,12 +58,12 @@ public class PlayerView extends PlayerBaseView {
         volumeBar.addOnSliderTouchListener(new Slider.OnSliderTouchListener() {
             @Override
             public void onStartTrackingTouch(@NonNull Slider slider) {
-                activity.setTrackingTouch(true);
+                activity.setTrackingTouch(player);
             }
 
             @Override
             public void onStopTrackingTouch(@NonNull Slider slider) {
-                activity.setTrackingTouch(false);
+                activity.setTrackingTouch(null);
             }
         });
         volumeBar.addOnChangeListener((slider, value, fromUser) -> {
@@ -87,7 +87,7 @@ public class PlayerView extends PlayerBaseView {
     @Override
     public void showContextMenu(final Player item) {
         PopupMenu popup = new PopupMenu(getActivity(), contextMenuButtonHolder);
-        popup.inflate(R.menu.playercontextmenu);
+        popup.inflate(R.menu.player_context_menu);
 
         Menu menu = popup.getMenu();
         PlayerViewLogic.inflatePlayerActions(activity, popup.getMenuInflater(), menu);
@@ -129,21 +129,20 @@ public class PlayerView extends PlayerBaseView {
             return  true;
         }
 
-        switch (menuItem.getItemId()) {
-            case R.id.rename:
-                new PlayerRenameDialog().show(activity.getSupportFragmentManager(),
-                        PlayerRenameDialog.class.getName());
-                return true;
-            case R.id.player_sync:
-                new PlayerSyncDialog().show(activity.getSupportFragmentManager(),
-                        PlayerSyncDialog.class.getName());
-                return true;
-            case R.id.play_track_album:
-                PlayTrackAlbumDialog.show(activity);
-                return true;
-            case R.id.defeat_destructive_ttp:
-                DefeatDestructiveTouchToPlayDialog.show(activity);
-                return true;
+        if (menuItem.getItemId() == R.id.rename) {
+            new PlayerRenameDialog().show(activity.getSupportFragmentManager(),
+                    PlayerRenameDialog.class.getName());
+            return true;
+        } else if (menuItem.getItemId() == R.id.player_sync) {
+            new PlayerSyncDialog().show(activity.getSupportFragmentManager(),
+                    PlayerSyncDialog.class.getName());
+            return true;
+        } else if (menuItem.getItemId() == R.id.play_track_album) {
+            PlayTrackAlbumDialog.show(activity);
+            return true;
+        } else if (menuItem.getItemId() == R.id.defeat_destructive_ttp) {
+            DefeatDestructiveTouchToPlayDialog.show(activity);
+            return true;
         }
 
         return false;

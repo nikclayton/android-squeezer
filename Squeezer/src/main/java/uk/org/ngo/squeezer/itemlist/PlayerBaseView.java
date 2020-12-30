@@ -31,6 +31,7 @@ public abstract class PlayerBaseView extends ViewParamItemView<Player> {
         modelIcons.put("sb3", R.drawable.ic_sb3);
         modelIcons.put("slimp3", R.drawable.ic_slimp3);
         modelIcons.put("softsqueeze", R.drawable.ic_softsqueeze);
+        modelIcons.put("squeezelite", R.drawable.ic_softsqueeze);
         modelIcons.put("squeezeplay", R.drawable.ic_squeezeplay);
         modelIcons.put("transporter", R.drawable.ic_transporter);
         modelIcons.put("squeezeplayer", R.drawable.ic_squeezeplayer);

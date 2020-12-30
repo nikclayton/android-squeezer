@@ -35,6 +35,8 @@ import uk.org.ngo.squeezer.framework.ItemListActivity;
 import uk.org.ngo.squeezer.itemlist.dialog.DefeatDestructiveTouchToPlayDialog;
 import uk.org.ngo.squeezer.itemlist.dialog.PlayTrackAlbumDialog;
 import uk.org.ngo.squeezer.itemlist.dialog.PlayerSyncDialog;
+import uk.org.ngo.squeezer.itemlist.dialog.SyncPowerDialog;
+import uk.org.ngo.squeezer.itemlist.dialog.SyncVolumeDialog;
 import uk.org.ngo.squeezer.model.Item;
 import uk.org.ngo.squeezer.model.Player;
 import uk.org.ngo.squeezer.model.PlayerState;
@@ -47,14 +49,17 @@ import uk.org.ngo.squeezer.service.event.PlayerVolume;
 public class PlayerListActivity extends ItemListActivity implements
         PlayerSyncDialog.PlayerSyncDialogHost,
         PlayTrackAlbumDialog.PlayTrackAlbumDialogHost,
-        DefeatDestructiveTouchToPlayDialog.DefeatDestructiveTouchToPlayDialogHost {
+        DefeatDestructiveTouchToPlayDialog.DefeatDestructiveTouchToPlayDialogHost,
+        SyncVolumeDialog.SyncVolumeDialogHost,
+        SyncPowerDialog.SyncPowerDialogHost {
     private static final String CURRENT_PLAYER = "currentPlayer";
+    private static final String CURRENT_SYNC_GROUP = "currentSyncGroup";
     private static final String TAG = PlayerListActivity.class.getName();
     /**
      * Map from player IDs to Players synced to that player ID.
      */
     private final Multimap<String, Player> mPlayerSyncGroups = HashMultimap.create();
-    protected boolean mTrackingTouch;
+    protected Player mTrackingTouch = null;
     /**
      * An update arrived while tracking touches. UI should be re-synced.
      */
@@ -62,6 +67,7 @@ public class PlayerListActivity extends ItemListActivity implements
     PlayerListAdapter adapter;
 
     private Player currentPlayer;
+    private PlayerListAdapter.SyncGroup currentSyncGroup;
 
     public static void show(Context context) {
         final Intent intent = new Intent(context, PlayerListActivity.class).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
@@ -71,6 +77,7 @@ public class PlayerListActivity extends ItemListActivity implements
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putParcelable(CURRENT_PLAYER, currentPlayer);
+        putRetainedValue(CURRENT_SYNC_GROUP, currentSyncGroup);
         super.onSaveInstanceState(outState);
     }
 
@@ -82,8 +89,8 @@ public class PlayerListActivity extends ItemListActivity implements
 
 
     public void onEventMainThread(PlayerVolume event) {
-        if (!mTrackingTouch) {
-            adapter.notifyDataSetChanged();
+        if (mTrackingTouch != event.player) {
+            adapter.notifyItemChanged(event.player);
         }
     }
 
@@ -99,6 +106,7 @@ public class PlayerListActivity extends ItemListActivity implements
         if (savedInstanceState != null) {
             currentPlayer = savedInstanceState.getParcelable(PlayerListActivity.CURRENT_PLAYER);
         }
+       currentSyncGroup = getRetainedValue(CURRENT_SYNC_GROUP);
     }
 
     @Override
@@ -110,6 +118,10 @@ public class PlayerListActivity extends ItemListActivity implements
         this.currentPlayer = currentPlayer;
     }
 
+    public void setCurrentSyncGroup(PlayerListAdapter.SyncGroup currentSyncGroup) {
+        this.currentSyncGroup = currentSyncGroup;
+    }
+
     public void playerRename(String newName) {
         ISqueezeService service = getService();
         if (service == null) {
@@ -118,7 +130,7 @@ public class PlayerListActivity extends ItemListActivity implements
 
         service.playerRename(currentPlayer, newName);
         this.currentPlayer.setName(newName);
-        adapter.notifyDataSetChanged();
+        adapter.notifyItemChanged(currentPlayer);
     }
 
     /**
@@ -163,6 +175,30 @@ public class PlayerListActivity extends ItemListActivity implements
     }
 
     @Override
+    public String getSyncVolume() {
+        return currentSyncGroup.getItem(0).getPlayerState().prefs.get(Player.Pref.SYNC_VOLUME);
+    }
+
+    @Override
+    public void setSyncVolume(@NonNull String option) {
+        for (int i = 0; i < currentSyncGroup.getItemCount(); i++) {
+            getService().playerPref(currentSyncGroup.getItem(i), Player.Pref.SYNC_VOLUME, option);
+        }
+    }
+
+    @Override
+    public String getSyncPower() {
+        return currentSyncGroup.getItem(0).getPlayerState().prefs.get(Player.Pref.SYNC_POWER);
+    }
+
+    @Override
+    public void setSyncPower(@NonNull String option) {
+        for (int i = 0; i < currentSyncGroup.getItemCount(); i++) {
+            getService().playerPref(currentSyncGroup.getItem(i), Player.Pref.SYNC_POWER, option);
+        }
+    }
+
+    @Override
     protected <T extends Item> void updateAdapter(int count, int start, List<T> items, Class<T> dataType) {
     }
 
@@ -187,16 +223,16 @@ public class PlayerListActivity extends ItemListActivity implements
     }
 
     public void onEventMainThread(PlayerStateChanged event) {
-        if (!mTrackingTouch) {
+        if (mTrackingTouch == null) {
             updateAndExpandPlayerList();
         } else {
             mUpdateWhileTracking = true;
         }
     }
 
-    public void setTrackingTouch(boolean trackingTouch) {
+    public void setTrackingTouch(Player trackingTouch) {
         mTrackingTouch = trackingTouch;
-        if (!mTrackingTouch) {
+        if (mTrackingTouch == null) {
             if (mUpdateWhileTracking) {
                 mUpdateWhileTracking = false;
                 updateAndExpandPlayerList();

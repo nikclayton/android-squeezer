@@ -2,6 +2,7 @@
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -13,10 +14,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
         <TextView
             android:id="@+id/text1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_toStartOf="@id/context_menu_button"
             android:textAppearance="@style/SqueezerTextAppearance.ListItem.Primary.Highlight"
             tools:text="text1"/>
 
@@ -24,8 +30,19 @@
             android:id="@+id/text2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@id/text1"
+            android:layout_toStartOf="@id/context_menu_button"
             android:textAppearance="@style/SqueezerTextAppearance.ListItem.Secondary"
             tools:text="text2"/>
+
+        <Button style="@style/SqueezerContextMenuButton"
+            android:id="@+id/context_menu_button"
+            android:layout_height="48dp"
+            android:layout_width="48dp"
+            android:layout_alignParentEnd="true"
+            app:icon="@drawable/ic_menu_overflow"
+            />
+        </RelativeLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/players_container"

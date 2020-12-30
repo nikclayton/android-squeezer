@@ -152,16 +152,15 @@ public abstract class ItemListActivity extends BaseActivity {
         mRetainFragment = RetainFragment.getInstance(TAG, getSupportFragmentManager());
         setContentView(getContentView());
 
-        //noinspection unchecked
-        mReceivedPages = (Set<Integer>) getRetainedValue(TAG_RECEIVED_PAGES);
+        mReceivedPages = getRetainedValue(TAG_RECEIVED_PAGES);
         if (mReceivedPages == null) {
             mReceivedPages = new HashSet<>();
             putRetainedValue(TAG_RECEIVED_PAGES, mReceivedPages);
         }
     }
 
-    protected Object getRetainedValue(String key) {
-        return mRetainFragment.get(key);
+    protected <T> T getRetainedValue(String key) {
+        return (T) mRetainFragment.get(key);
     }
 
     protected Object putRetainedValue(String key, Object value) {

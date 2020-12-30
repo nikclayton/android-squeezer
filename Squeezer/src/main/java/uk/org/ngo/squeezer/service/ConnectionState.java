@@ -49,6 +49,8 @@ public class ConnectionState {
 
     private final EventBus mEventBus;
 
+    public final static String MEDIA_DIRS = "mediadirs";
+
     // Connection state machine
     @IntDef({DISCONNECTED, CONNECTION_STARTED, CONNECTION_FAILED, CONNECTION_COMPLETED, RECONNECT})
     @Retention(RetentionPolicy.SOURCE)

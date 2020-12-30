@@ -153,7 +153,7 @@ public class PlayerState implements Parcelable {
 
     /** Map of current values of our the playerprefs we track. See the specific SlimClient */
     @NonNull
-    public Map<String, String> prefs = new HashMap<>();
+    public Map<Player.Pref, String> prefs = new HashMap<>();
 
     public boolean isPlaying() {
         return PLAY_STATE_PLAY.equals(playStatus);
@@ -311,7 +311,7 @@ public class PlayerState implements Parcelable {
     }
 
     public int getCurrentVolume() {
-        return currentVolume;
+        return (currentVolume == -1 ? 0: currentVolume);
     }
 
     public boolean setCurrentVolume(int value) {

@@ -24,7 +24,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.res.ColorStateList;
-import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
@@ -768,7 +767,7 @@ public class NowPlayingFragment extends Fragment {
         // an argument here doesn't work -- but if you do it crashes without
         // a stracktrace on API 7.
         MenuInflater i = mActivity.getMenuInflater();
-        i.inflate(R.menu.now_playing_fragment, menu);
+        i.inflate(R.menu.now_playing_fragment_menu, menu);
         PlayerViewLogic.inflatePlayerActions(mActivity, i, menu);
 
         menuItemSearch = menu.findItem(R.id.menu_item_search);

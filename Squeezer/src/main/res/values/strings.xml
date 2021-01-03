@@ -100,6 +100,7 @@
     <string name="browse_items_text">%2$d %1$s</string>
 
     <string name="player_group_header">Group: %s</string>
+    <string name="player_group_volume">Group volume</string>
     <string name="menu_item_player_sync">Synchronize…</string>
     <string name="menu_item_player_unsync">No synchronization</string>
 

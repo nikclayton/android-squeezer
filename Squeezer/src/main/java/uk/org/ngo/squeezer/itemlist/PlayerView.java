@@ -55,6 +55,7 @@ public class PlayerView extends PlayerBaseView {
 
         PlayerState playerState = player.getPlayerState();
 
+        volumeBar.clearOnSliderTouchListeners();
         volumeBar.addOnSliderTouchListener(new Slider.OnSliderTouchListener() {
             @Override
             public void onStartTrackingTouch(@NonNull Slider slider) {
@@ -64,8 +65,10 @@ public class PlayerView extends PlayerBaseView {
             @Override
             public void onStopTrackingTouch(@NonNull Slider slider) {
                 activity.setTrackingTouch(null);
+                activity.adapter.notifyGroupChanged(player);
             }
         });
+        volumeBar.clearOnChangeListeners();
         volumeBar.addOnChangeListener((slider, value, fromUser) -> {
             if (fromUser) {
                 ISqueezeService service = activity.getService();

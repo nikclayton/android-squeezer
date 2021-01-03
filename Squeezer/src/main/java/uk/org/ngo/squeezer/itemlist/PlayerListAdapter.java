@@ -28,6 +28,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.slider.Slider;
 import com.google.common.base.Joiner;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -43,6 +44,7 @@ import uk.org.ngo.squeezer.itemlist.dialog.SyncPowerDialog;
 import uk.org.ngo.squeezer.itemlist.dialog.SyncVolumeDialog;
 import uk.org.ngo.squeezer.model.CurrentPlaylistItem;
 import uk.org.ngo.squeezer.model.Player;
+import uk.org.ngo.squeezer.service.ISqueezeService;
 import uk.org.ngo.squeezer.widget.DividerItemDecoration;
 
 public class PlayerListAdapter extends RecyclerView.Adapter<PlayerListAdapter.PlayerGroupViewHolder> {
@@ -55,6 +57,18 @@ public class PlayerListAdapter extends RecyclerView.Adapter<PlayerListAdapter.Pl
             for (int i = 0; i < childAdapter.getItemCount(); i++) {
                 if (player == childAdapter.getItem(i)) {
                     childAdapter.notifyItemChanged(i);
+                    return;
+                }
+            }
+        }
+    }
+
+    public void notifyGroupChanged(Player player) {
+        for (int groupPos = 0; groupPos < getItemCount(); groupPos++) {
+            SyncGroup syncGroup = childAdapters.get(groupPos);
+            for (int playerPos = 0; playerPos < syncGroup.getItemCount(); playerPos++) {
+                if (player == syncGroup.getItem(playerPos)) {
+                    notifyItemChanged(groupPos);
                     return;
                 }
             }
@@ -189,9 +203,30 @@ public class PlayerListAdapter extends RecyclerView.Adapter<PlayerListAdapter.Pl
         holder.contextMenuButton.setVisibility(syncGroup.getItemCount() > 1 ? View.VISIBLE : View.GONE);
         holder.contextMenuButton.setOnClickListener(v -> showContextMenu(holder));
 
+        holder.groupVolume.setVisibility(syncGroup.getItemCount() > 1 && !("1".equals(syncGroup.getItem(0).getPlayerState().prefs.get(Player.Pref.SYNC_VOLUME))) ? View.VISIBLE : View.GONE);
+        holder.volumeOffsets = new int[syncGroup.getItemCount()];
+        holder.calcGroupOffsets();
+        holder.volumeBar.clearOnChangeListeners();
+        holder.volumeBar.addOnChangeListener((slider, value, fromUser) -> {
+            if (fromUser) {
+                ISqueezeService service = mActivity.getService();
+                if (service == null) {
+                    return;
+                }
+                int groupVolume = (int)value;
+                for (int i = 0; i < syncGroup.getItemCount(); i++) {
+                    service.adjustVolumeTo(syncGroup.getItem(i), trimVolume(groupVolume + holder.volumeOffsets[i]));
+                }
+            }
+        });
+
         holder.players.setAdapter(syncGroup);
         holder.players.addItemDecoration(new DividerItemDecoration(holder.players.getContext(), LinearLayoutManager.VERTICAL));
         holder.players.setLayoutManager(new LinearLayoutManager(holder.players.getContext()));
+    }
+
+    private int trimVolume(int volume) {
+        return volume < 0 ? 0 : Math.min(volume, 100);
     }
 
     public void showContextMenu(final PlayerGroupViewHolder holder) {
@@ -215,17 +250,40 @@ public class PlayerListAdapter extends RecyclerView.Adapter<PlayerListAdapter.Pl
 
     public static class PlayerGroupViewHolder extends RecyclerView.ViewHolder {
         SyncGroup item;
-        TextView text1;
-        TextView text2;
-        Button contextMenuButton;
-        RecyclerView players;
+        final TextView text1;
+        final TextView text2;
+        final View groupVolume;
+        final Slider volumeBar;
+        final Button contextMenuButton;
+        final RecyclerView players;
+
+        int[] volumeOffsets;
 
         public PlayerGroupViewHolder(@NonNull View itemView) {
             super(itemView);
             text1 = itemView.findViewById(R.id.text1);
             text2 = itemView.findViewById(R.id.text2);
+            groupVolume = itemView.findViewById(R.id.group_volume);
+            volumeBar = itemView.findViewById(R.id.group_volume_slider);
             contextMenuButton = itemView.findViewById(R.id.context_menu_button);
             players = itemView.findViewById(R.id.players_container);
+        }
+
+        private void calcGroupOffsets() {
+            int lowestVolume = item.getItem(0).getPlayerState().getCurrentVolume();
+            for (int i = 0; i < item.getItemCount(); i++) {
+                int currentVolume = item.getItem(i).getPlayerState().getCurrentVolume();
+                if (currentVolume < lowestVolume) lowestVolume = currentVolume;
+            }
+            int groupVolumeOffset = 0;
+            for (int i = 0; i < item.getItemCount(); i++) {
+                int currentVolume = item.getItem(i).getPlayerState().getCurrentVolume();
+                volumeOffsets[i] = currentVolume - lowestVolume;
+                if (volumeOffsets[i] > groupVolumeOffset) groupVolumeOffset = volumeOffsets[i];
+            }
+
+            volumeBar.setValueFrom(-groupVolumeOffset);
+            volumeBar.setValue(item.getItem(0).getPlayerState().getCurrentVolume() - volumeOffsets[0]);
         }
     }
 }

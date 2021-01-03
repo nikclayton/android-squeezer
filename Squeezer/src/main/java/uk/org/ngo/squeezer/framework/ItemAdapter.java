@@ -216,22 +216,6 @@ public abstract class ItemAdapter<VH extends ItemViewHolder<T>, T extends Item> 
     }
 
     /**
-     * @return The position of the given item in this adapter or 0 if not found
-     */
-    public int findItem(T item) {
-        for (int pos = 0; pos < getItemCount(); pos++) {
-            if (getItem(pos) == null) {
-                if (item == null) {
-                    return pos;
-                }
-            } else if (getItem(pos).equals(item)) {
-                return pos;
-            }
-        }
-        return 0;
-    }
-
-    /**
      * Move the item at the specified position to the new position and notify the change.
      */
     public void moveItem(int fromPosition, int toPosition) {

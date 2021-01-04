@@ -16,13 +16,15 @@
 
 package uk.org.ngo.squeezer.itemlist.dialog;
 
-import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.common.base.Joiner;
@@ -54,19 +56,22 @@ public class PlayerSyncDialog extends DialogFragment {
     private PlayerSyncDialogHost mHost;
 
     /** The sync group the user selected. */
-    private int mSelectedGroup = 0;
+    private int mSelectedGroup = -1;
+
+    /** Button to accept selection, disabled until a group is selected */
+    private Button positiveButton;
 
     // Override the Fragment.onAttach() method to instantiate the PlayerSyncDialogHost.
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
         // Verify that the host activity implements the callback interface
         try {
             // Instantiate the PlayerSyncDialogHost.
-            mHost = (PlayerSyncDialogHost) activity;
+            mHost = (PlayerSyncDialogHost) context;
         } catch (ClassCastException e) {
             // The activity doesn't implement the interface, throw exception
-            throw new ClassCastException(activity.toString()
+            throw new ClassCastException(context.toString()
                     + " must implement PlayerSyncDialogHost");
         }
     }
@@ -77,19 +82,19 @@ public class PlayerSyncDialog extends DialogFragment {
         Multimap<String, Player> playerSyncGroups = mHost.getPlayerSyncGroups();
         final Player currentPlayer = mHost.getCurrentPlayer();
 
-        /** The names of each sync group. */
-        List<String> playerSyncGroupNames = new ArrayList<String>();
+        /* The names of each sync group. */
+        List<String> playerSyncGroupNames = new ArrayList<>();
 
-        /**
+        /*
          * The master ID of the player for each sync group. Indices in this correspond
          * 1:1 with {@link playerSyncGroupNames}.
          */
-        final List<String> playerSyncGroupMasterIds = new ArrayList<String>();
+        final List<String> playerSyncGroupMasterIds = new ArrayList<>();
 
         // Build the list of sync groups to show the user.
 
         // Collect and sort the master IDs.
-        List<String> masterIds = new ArrayList<String>(playerSyncGroups.keySet());
+        List<String> masterIds = new ArrayList<>(playerSyncGroups.keySet());
         Collections.sort(masterIds);
 
         // Generate descriptive text for each sync group.
@@ -104,8 +109,8 @@ public class PlayerSyncDialog extends DialogFragment {
                 continue;
 
             // Collect the player names and master ID for this sync group.
-            List<String> playerNames = new ArrayList<String>();
-            List<Player> slaves = new ArrayList<Player>(playerSyncGroups.get(masterId));
+            List<String> playerNames = new ArrayList<>();
+            List<Player> slaves = new ArrayList<>(playerSyncGroups.get(masterId));
             Collections.sort(slaves, Player.compareById);
 
             for (Player slave : slaves) {
@@ -118,36 +123,32 @@ public class PlayerSyncDialog extends DialogFragment {
         // Add an additional entry for the "No synchronisation" option.
         playerSyncGroupNames.add(getString(R.string.menu_item_player_unsync));
 
-        ArrayAdapter<String> playerSyncGroupAdapter = new ArrayAdapter<String>(getActivity(),
+        ArrayAdapter<String> playerSyncGroupAdapter = new ArrayAdapter<>(getActivity(),
                 android.R.layout.simple_list_item_single_choice, playerSyncGroupNames);
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getActivity());
         builder.setTitle(getString(R.string.sync_title, currentPlayer.getName()))
                 .setSingleChoiceItems(playerSyncGroupAdapter, mSelectedGroup,
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                mSelectedGroup = which;
-                            }
+                        (dialog, which) -> {
+                            positiveButton.setEnabled(true);
+                            mSelectedGroup = which;
                         })
-                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // The "No synchronisation" option is always last.
-                        if (mSelectedGroup == playerSyncGroupMasterIds.size()) {
-                            mHost.unsyncPlayer(currentPlayer);
-                        } else {
-                            mHost.syncPlayerToPlayer(currentPlayer,
-                                    playerSyncGroupMasterIds.get(mSelectedGroup));
-                        }
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                    // The "No synchronisation" option is always last.
+                    if (mSelectedGroup == playerSyncGroupMasterIds.size()) {
+                        mHost.unsyncPlayer(currentPlayer);
+                    } else {
+                        mHost.syncPlayerToPlayer(currentPlayer,
+                                playerSyncGroupMasterIds.get(mSelectedGroup));
                     }
                 })
-                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        // User cancelled the dialog, nothing to do.
-                    }
-                });
-        return builder.create();
+                .setNegativeButton(android.R.string.cancel, null);
+        AlertDialog dialog = builder.create();
+        dialog.setOnShowListener(dialogInterface -> {
+            positiveButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
+            positiveButton.setEnabled(false);
+        });
+        return dialog;
     }
+
 }

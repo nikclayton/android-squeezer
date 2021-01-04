@@ -166,6 +166,13 @@ class CometClient extends BaseClient {
         mItemRequestMap = builder.build();
 
         mRequestMap = ImmutableMap.<String, ResponseHandler>builder()
+                .put("sync", (player, request, message) -> {
+                    // LMS does not send new player status for the affected players, even if status
+                    // changes are subscribed, so we order them  here
+                    for (Player value : getConnectionState().getPlayers().values()) {
+                        requestPlayerStatus(value);
+                    }
+                })
                 .put("mixer", (player, request, message) -> {
                     if (request.cmd.get(1).equals("volume")) {
                         String volume = (String) message.getDataAsMap().get("_volume");

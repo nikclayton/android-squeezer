@@ -258,6 +258,10 @@ public class AlarmView extends ItemViewHolder<Alarm> {
                 int time = (hourOfDay * 60 + minute) * 60;
                 alarm.setTod(time);
                 activity.getService().alarmSetTime(alarm.getId(), time);
+                if (!alarm.isEnabled()) {
+                    alarm.setEnabled(true);
+                    activity.getService().alarmEnable(alarm.getId(), true);
+                }
                 activity.getItemAdapter().notifyDataSetChanged();
             }
         }

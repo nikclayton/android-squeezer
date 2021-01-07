@@ -77,6 +77,9 @@ public class SettingsFragment  extends PreferenceFragmentCompat implements
         SwitchPreferenceCompat autoConnectPref = findPreference(Preferences.KEY_AUTO_CONNECT);
         autoConnectPref.setChecked(sharedPreferences.getBoolean(Preferences.KEY_AUTO_CONNECT, true));
 
+        SwitchPreferenceCompat pausePref = findPreference(Preferences.KEY_PAUSE_ON_INCOMING_CALL);
+        pausePref.setChecked(sharedPreferences.getBoolean(Preferences.KEY_PAUSE_ON_INCOMING_CALL, true));
+
         fillScrobblePreferences(sharedPreferences);
 
         fillDownloadPreferences(preferences);

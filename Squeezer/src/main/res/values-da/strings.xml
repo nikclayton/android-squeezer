@@ -58,6 +58,8 @@
     <string name="settings_autoconnect_summary">Tilbyd at aktivere Wi-Fi, og prøv at forbinde ved
         aktiv Wi-Fi forbindelse
     </string>
+    <string name="settings_pause_on_incoming_call_title">Sæt afspilleren på pause ved opkald</string>
+    <string name="settings_pause_on_incoming_call_summary">Musikken vil stoppe når du modtager eller foretager et opkald</string>
 
     <string name="settings_category_ui">Squeezer grænseflade</string>
 

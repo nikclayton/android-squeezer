@@ -44,6 +44,8 @@ import androidx.core.app.NotificationManagerCompat;
 
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
+import android.telephony.PhoneStateListener;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.RemoteViews;
 
@@ -631,7 +633,13 @@ public class SqueezeService extends Service {
         if (ConnectionState.isConnected(event.connectionState) ||
                 ConnectionState.isConnectInProgress(event.connectionState)) {
             startForeground();
+
+            TelephonyManager telephonyManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+            telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
         } else {
+            TelephonyManager telephonyManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+            telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE);
+
             mHandshakeComplete = false;
             stopForeground();
         }
@@ -670,6 +678,17 @@ public class SqueezeService extends Service {
             startForeground(PLAYBACKSERVICE_STATUS, notification);
         }
     }
+
+    PhoneStateListener phoneStateListener = new PhoneStateListener() {
+        @Override
+        public void onCallStateChanged(int state, String phoneNumber) {
+            if ((state == TelephonyManager.CALL_STATE_RINGING || state == TelephonyManager.CALL_STATE_OFFHOOK)
+                    && new Preferences(SqueezeService.this).isPauseOnIncomingCall()
+            ) {
+                squeezeService.pause();
+            }
+        }
+    };
 
     private void stopForeground() {
         Log.i(TAG, "stopForeground");

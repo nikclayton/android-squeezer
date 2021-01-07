@@ -56,6 +56,8 @@
     <string name="settings_autoconnect_summary">Offer to enable Wi-Fi, and on Wi-Fi availability,
         try to connect
     </string>
+    <string name="settings_pause_on_incoming_call_title">Pause music on call</string>
+    <string name="settings_pause_on_incoming_call_summary">The music will pause when you receive or make a call</string>
 
     <string name="settings_scrobble_title">Scrobble to Last.fm</string>
     <string name="settings_scrobble_on">Song information is sent to Last.fm</string>

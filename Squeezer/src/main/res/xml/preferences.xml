@@ -28,6 +28,11 @@
         android:title="@string/settings_autoconnect_title"
         android:summary="@string/settings_autoconnect_summary"/>
 
+    <SwitchPreferenceCompat
+        android:key="squeezer.pause_on_incoming_call"
+        android:title="@string/settings_pause_on_incoming_call_title"
+        android:summary="@string/settings_pause_on_incoming_call_summary"/>
+
     <PreferenceCategory
         android:title="@string/pref_cat_third_party">
 

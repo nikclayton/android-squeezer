@@ -66,6 +66,9 @@ public final class Preferences {
     // Do we automatically try and connect on WiFi availability?
     public static final String KEY_AUTO_CONNECT = "squeezer.autoconnect";
 
+    // Pause music on incoming call?
+    public static final String KEY_PAUSE_ON_INCOMING_CALL = "squeezer.pause_on_incoming_call";
+
     // Are we disconnected via the options menu?
     private static final String KEY_MANUAL_DISCONNECT = "squeezer.manual.disconnect";
 
@@ -375,6 +378,10 @@ public final class Preferences {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean(Preferences.KEY_MANUAL_DISCONNECT, manualDisconnect);
         editor.apply();
+    }
+
+    public boolean isPauseOnIncomingCall() {
+        return sharedPreferences.getBoolean(KEY_PAUSE_ON_INCOMING_CALL, true);
     }
 
     public boolean controlSqueezePlayer(ServerAddress serverAddress) {

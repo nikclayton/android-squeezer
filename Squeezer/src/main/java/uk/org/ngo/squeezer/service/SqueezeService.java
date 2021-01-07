@@ -306,8 +306,6 @@ public class SqueezeService extends Service {
             updateWifiLock(event.player.getPlayerState().isPlaying());
             updateOngoingNotification();
         }
-
-        updatePlayerSubscription(event.player, calculateSubscriptionTypeFor(event.player));
     }
 
     /**
@@ -394,7 +392,7 @@ public class SqueezeService extends Service {
         Player activePlayer = mDelegate.getActivePlayer();
 
         if (mEventBus.hasSubscriberForEvent(PlayerStateChanged.class) ||
-                (mEventBus.hasSubscriberForEvent(SongTimeChanged.class) && player.equals(activePlayer))) {
+                (mEventBus.hasSubscriberForEvent(PlayStatusChanged.class) && player.equals(activePlayer))) {
             return PlayerState.PlayerSubscriptionType.NOTIFY_ON_CHANGE;
         } else {
             return PlayerState.PlayerSubscriptionType.NOTIFY_NONE;

@@ -96,6 +96,9 @@ class CurrentPlaylistItemView extends JiveItemView {
         });
 
         itemView.setOnTouchListener((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_CANCEL) {
+                itemView.setPressed(false);
+            }
             if (event.getAction() == MotionEvent.ACTION_UP) {
                 itemView.setPressed(false);
                 itemView.performClick();

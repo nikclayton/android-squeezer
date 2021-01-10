@@ -22,4 +22,7 @@
 
     <!-- Volume panel -->
     <attr name="volume_panel_back_circle_color" format="reference"/>
+
+    <!-- Current playlist -->
+    <attr name="currentTrackBackground" format="reference"/>
 </resources>

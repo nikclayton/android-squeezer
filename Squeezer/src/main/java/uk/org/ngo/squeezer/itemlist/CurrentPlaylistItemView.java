@@ -47,12 +47,13 @@ class CurrentPlaylistItemView extends JiveItemView {
     @Override
     public void bindView(JiveItem item) {
         super.bindView(item);
-        itemView.setBackgroundResource(getActivity().getAttributeValue(R.attr.selectableItemBackground));
 
         if (getAdapterPosition() == activity.getSelectedIndex()) {
+            itemView.setBackgroundResource(getActivity().getAttributeValue(R.attr.currentTrackBackground));
             text1.setTextAppearance(getActivity(), R.style.SqueezerTextAppearance_ListItem_Primary_Highlight);
             text2.setTextAppearance(getActivity(), R.style.SqueezerTextAppearance_ListItem_Secondary_Highlight);
         } else {
+            itemView.setBackgroundResource(getActivity().getAttributeValue(R.attr.selectableItemBackground));
             text1.setTextAppearance(getActivity(), R.style.SqueezerTextAppearance_ListItem_Primary);
             text2.setTextAppearance(getActivity(), R.style.SqueezerTextAppearance_ListItem_Secondary);
         }

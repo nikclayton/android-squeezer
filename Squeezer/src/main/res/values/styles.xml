@@ -29,6 +29,7 @@
         <item name="sliderStyle">@style/Widget.App.Slider</item>
 
         <item name="volume_panel_back_circle_color">@color/volume_panel_back_circle_color</item>
+        <item name="currentTrackBackground">@drawable/current_track_background_dark</item>
     </style>
 
     <style name="AppTheme.Light.DarkActionBar" parent="Theme.MaterialComponents.Light.DarkActionBar">
@@ -42,6 +43,7 @@
         <item name="sliderStyle">@style/Widget.App.Slider</item>
 
         <item name="volume_panel_back_circle_color">@color/volume_panel_back_circle_color_light</item>
+        <item name="currentTrackBackground">@drawable/current_track_background_light</item>
     </style>
 
     <style name="OverflowMenu" parent="Widget.AppCompat.Light.PopupMenu.Overflow">

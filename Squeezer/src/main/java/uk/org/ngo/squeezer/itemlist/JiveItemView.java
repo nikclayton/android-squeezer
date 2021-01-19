@@ -37,7 +37,7 @@ import uk.org.ngo.squeezer.itemlist.dialog.ArtworkListLayout;
 import uk.org.ngo.squeezer.util.ImageFetcher;
 
 public class JiveItemView extends ViewParamItemView<JiveItem> {
-    private final JiveItemViewLogic logicDelegate;
+    private JiveItemViewLogic logicDelegate;
     private Window.WindowStyle windowStyle;
 
     /** Width of the icon, if VIEW_PARAM_ICON is used. */
@@ -52,10 +52,13 @@ public class JiveItemView extends ViewParamItemView<JiveItem> {
         this.logicDelegate = new JiveItemViewLogic(activity);
         setLoadingViewParams(viewParamIcon() | VIEW_PARAM_TWO_LINE );
 
-        int maxLines = getMaxLines();
-        if (maxLines > 0) {
-            setMaxLines(text1, maxLines);
-            setMaxLines(text2, maxLines);
+        // Certain LMS actions (e.g. slider) doesn't have text in their views
+        if (text1 != null) {
+            int maxLines = getMaxLines();
+            if (maxLines > 0) {
+                setMaxLines(text1, maxLines);
+                setMaxLines(text2, maxLines);
+            }
         }
     }
 
